@@ -16,9 +16,10 @@ ANSI_UTILS_DIR=$(DIR)/ansi-codes
 ETC_DIR=$(DIR)/etc
 ##############################################################
 TIDIED_FILES = \
+			   ansi-test/*.c ansi-test/*.h \
 			   ansi-codes/*.c ansi-codes/*.h \
-			   ansi-rgb-codes/*.c ansi-rgb-codes/*.h \
-			   ansi-utils/*.c ansi-utils/*.h
+			   ansi-utils/*.c ansi-utils/*.h 
+#			   ansi-rgb-codes/*.c ansi-rgb-codes/*.h \
 ##############################################################
 all: do-build
 uncrustify:
@@ -40,6 +41,9 @@ clean:
 do-meson:
 	@meson build || { meson build --reconfigure || { meson build --wipe; } && meson build; }
 	@ninja -C build
+
+do-test:
+	@./build/ansi-test/ansi-test --test
 
 dev: tidy nodemon
 do-build: do-meson

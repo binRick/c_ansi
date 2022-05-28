@@ -3,10 +3,12 @@
 #include <string.h>
 #ifndef ANSI_CODES_H
 #define ANSI_CODES_H
-#define AC_SAVE_PALETTE       "\x1b]30001\\"
-#define AC_RESTORE_PALETTE    "\x1b]30101\\"
+
+
 #define AC_RESETALL           "\x1b[0m"
+
 #define acs(s)          AC_RESETALL s AC_RESETALL
+#define acsl(s)          AC_RESETALL s AC_RESETALL "\n"
 #define ansistr(s)      s AC_RESETALL
 #define ansistrln(s)    s AC_RESETALL "\n"
 
@@ -29,6 +31,7 @@
 #define AC_BRIGHT_BLACK_CYAN         "\x1b[30;1m\x1b[46m"
 #define AC_BRIGHT_BLACK_WHITE        "\x1b[30;1m\x1b[47m"
 
+#define AC_RED_CODE "31"
 #define AC_RED                       "\x1b[31m"
 #define AC_RED_BLACK                 "\x1b[31m\x1b[40m"
 #define AC_RED_RED                   "\x1b[31m\x1b[41m"
@@ -165,6 +168,29 @@
 #define AC_BRIGHT_WHITE_CYAN         "\x1b[37;1m\x1b[46m"
 #define AC_BRIGHT_WHITE_WHITE        "\x1b[37;1m\x1b[47m"
 
+#define AC_BRIGHT_DISABLE_BLINK        "\x1b[?12l"
+#define AC_BRIGHT_ENABLE_BLINK        "\x1b[?12h"
+
+#define AC_SELECTION_BACKGROUND_RED         "\x1b]17;31\\"
+
+#define AC_CURSOR_BAR           "\x1b[5 q"
+#define AC_CURSOR_BLOCK         "\x1b[1 q"
+#define AC_CURSOR_UNDER         "\x1b[3 q"
+
+#define AC_SHOW_CURSOR         "\x1b[?25h"
+#define AC_HIDE_CURSOR         "\x1b[?25l"
+
+#define AC_CURSOR_COLOR(NAME) "\x1b]12;" NAME "\x1b\\"
+#define AC_CURSOR_RED AC_CURSOR_COLOR("red")
+#define AC_CURSOR_BLACK AC_CURSOR_COLOR("black")
+
+#define AC_CURSOR_COLOR_RED    "'\x1b]12;31\\"
+#define AC_CURSOR_COLOR_GREEN    "'\x1b]12;32\\"
+
+#define AC_SAVE_PALETTE       "\x1b]30001\\"
+#define AC_RESTORE_PALETTE    "\x1b]30101\\"
+#define AC_LOAD_PALETTE   AC_RESTORE_PALETTE
+
 #define AC_FG8(i)           "\x1b[38;5;"#i "m"
 #define AC_BG8(i)           "\x1b[48;5;"#i "m"
 
@@ -189,6 +215,7 @@
 #define AC_RIGHT(n)     "\x1b["#n "C"
 #define AC_LEFT(n)      "\x1b["#n "D"
 #define AC_POS(x, y)    "\x1b["#x ";"#y "H"
+
 #define AC_HOME    "\x1b[H"
 #define AC_CLS     "\x1b[2J" AC_HOME
 
