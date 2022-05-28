@@ -39,6 +39,7 @@ clean:
 
 do-meson:
 	@meson build || { meson build --reconfigure || { meson build --wipe; } && meson build; }
+	@ninja -C build
 
 dev: tidy nodemon
 do-build: do-meson

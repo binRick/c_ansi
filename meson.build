@@ -15,15 +15,15 @@ cc = meson.get_compiler('c')
 #//////////////////////////////////////////////////////////////////////
 m_dep = cc.find_library('m', required : true)
 subdir('ansi-codes')
-subdir('ansi-utils')
-subdir('ansi-rgb-utils')
+#subdir('ansi-utils')
+#subdir('ansi-rgb-utils')
 c_ansi_deps = [
   ansi_codes_dep,  
-  ansi_utils_dep,  
+  #  ansi_utils_dep,  
   #  ansi_rgb_dep,  
 ]
 #//////////////////////////////////////////////////////////////////////
-c_ansi_lib = static_library('c-ansi', 
+c_ansi_lib = library('c-ansi', 
   install: false, 
   dependencies: c_ansi_deps,
   include_directories: [],
@@ -35,3 +35,4 @@ c_ansi_dep = declare_dependency(
   link_with: c_ansi_lib,
 )
 
+subdir('ansi-test')
