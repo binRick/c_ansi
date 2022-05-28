@@ -5,7 +5,7 @@ ansi_rgb_utils_deps = [
   ansi_codes_dep,
 ]
 
-ansi_rgb_utils_lib = static_library('ansi-rgb-utils', 
+ansi_rgb_utils_lib = library('ansi-rgb-utils', 
   install: false, 
   dependencies: ansi_rgb_utils_deps,
   include_directories: [],
