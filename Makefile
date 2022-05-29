@@ -14,6 +14,7 @@ DIR=$(shell $(PWD))
 ANSI_CODES_DIR=$(DIR)/ansi-codes
 ANSI_UTILS_DIR=$(DIR)/ansi-codes
 ETC_DIR=$(DIR)/etc
+DN = >/dev/null 2>&1
 ##############################################################
 TIDIED_FILES = \
 			   ansi-test/*.c ansi-test/*.h \
@@ -21,7 +22,7 @@ TIDIED_FILES = \
 			   ansi-utils/*.c ansi-utils/*.h 
 #			   ansi-rgb-codes/*.c ansi-rgb-codes/*.h \
 ##############################################################
-all: do-build
+all: do-build do-test
 uncrustify:
 	@$(UNCRUSTIFY) -c $(ETC_DIR)/uncrustify.cfg --replace $(TIDIED_FILES) 
 
@@ -37,16 +38,49 @@ fix-dbg:
 tidy: uncrustify uncrustify-clean fix-dbg         
 clean: 
 	@rm -rf build
-
 do-meson:
-	@meson build || { meson build --reconfigure || { meson build --wipe; } && meson build; }
+	@meson build $(DN) \
+		|| meson build --reconfigure $(DN) \
+		|| meson build --wipe
+	@meson build
 	@ninja -C build
 
-do-test:
-	@./build/ansi-test/ansi-test --test
+test: do-test
 
-dev: tidy nodemon
+do-ninja-test:
+	@ninja -C build test
+
+do-test: do-ninja-test
+
+dev: nodemon
 do-build: do-meson
 nodemon:
-	@$(PASSH) -L .nodemon.log $(NODEMON) -w '*/meson.build' --delay 1 -i '*/subprojects' -I  -w 'include/*.h' -w meson.build -w src -w Makefile -w loader/meson.build -w loader/src -w loader/include -i '*/embeds/*' -e tpl,build,sh,c,h,Makefile -x env -- bash -c 'make dev-all||true'
+	@$(PASSH) -L .nodemon.log $(NODEMON) -w '*/meson.build' --delay 1 -i '*/subprojects' -I  -w 'include/*.h' -w meson.build -w src -w Makefile -w loader/meson.build -w loader/src -w loader/include -i '*/embeds/*' -e tpl,build,sh,c,h,Makefile -x env -- bash -c 'make||true'
 
+test-fxns:
+	@grep -h '^[[:space:]].*ANSI_FXN(' ansi-test/*|cut -d, -f1|cut -d'(' -f2
+
+test-cases:
+	@grep -h '^ANSI_ARG(' ansi-test/*|cut -d, -f1|cut -d'(' -f2
+
+test-case-commands:
+	@make test-cases|xargs -I % echo ./build/ansi-test/ansi-test \-\-%
+
+test-fxn-commands:
+	@make test-fxns|xargs -I % echo ./build/ansi-test/ansi-test \-\-%
+
+do-test-commands:
+	@echo "------------------------------"
+	@echo "Test Commands"
+	@echo "------------------------------"
+	@make test-case-commands|bash
+	@echo "------------------------------"; echo
+
+do-test-fxns:
+	@echo "------------------------------"
+	@echo "Test Functions"
+	@echo "------------------------------"
+	@eval "`make test-fxn-commands`"
+	@echo "------------------------------";echo
+
+do-tests: do-test-fxns do-test-commands
