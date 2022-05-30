@@ -5,7 +5,7 @@ term_utils_include_dirs = [
 ]
 
 term_utils_deps = [
-     term_termpaint_dep,
+     ansi_utils_dep,
 ]
 
 term_utils_lib = static_library('term-utils',

@@ -15,6 +15,5 @@
 #include <string.h>
 #include <string.h>
 #include <sys/time.h>
-int term_utils_main(int argc, char *argv[]);
 
 #endif

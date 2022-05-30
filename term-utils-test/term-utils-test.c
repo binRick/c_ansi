@@ -7,5 +7,5 @@ int main(int argc, char **argv) {
     printf("Test OK\n"); return(0);
   }
   printf("ok\n");
-  return(term_utils_main(argc, argv));
+  return(0);
 }
