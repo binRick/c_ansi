@@ -17,7 +17,7 @@ cc = meson.get_compiler('c')
 #//////////////////////////////////////////////////////////////////////
 m_dep = cc.find_library('m', required : true)
 parson_shared_dep = dependency('parson',fallback:['parson', 'parson_shared_dep'], required: true)
-subdir('meson/deps/termpaint')
+#subdir('meson/deps/termpaint')
 subdir('meson/deps/asprintf')
 subdir('meson/deps/ms')
 subdir('meson/deps/bytes')
@@ -45,6 +45,9 @@ subdir('ansi-rgb-utils-test')
 #//////////////////////////////////////////////////////////////////////
 subdir('ansi')
 subdir('ansi-test')
+#//////////////////////////////////////////////////////////////////////
+subdir('term-termpaint')
+subdir('term-termpaint-test')
 #//////////////////////////////////////////////////////////////////////
 subdir('term-utils')
 subdir('term-utils-test')

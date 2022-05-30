@@ -18,11 +18,11 @@ term_test_deps = [
      cargs_dep,
      c_timer_dep,
      c_fsio_dep,
-     termpaint_dep,
      ansi_codes_dep,
      ansi_utils_dep,
      ansi_rgb_utils_dep,
      term_utils_dep,
+     term_termpaint_dep,
 ]
 
 if get_option('enable-binaries')

@@ -2,11 +2,10 @@ term_utils_srcs = [
   'term-utils.c',
 ]
 term_utils_include_dirs = [
-  '../submodules/termpaint',
 ]
 
 term_utils_deps = [
-     termpaint_dep,
+     term_termpaint_dep,
 ]
 
 term_utils_lib = static_library('term-utils',
