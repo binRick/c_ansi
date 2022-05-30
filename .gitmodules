@@ -1,3 +1,60 @@
 [submodule "submodules/c_colors"]
 	path = submodules/c_colors
 	url = https://github.com/binRick/c_colors
+[submodule "submodules/assertf"]
+	path = submodules/assertf
+	url = https://github.com/leiless/assertf.h
+[submodule "submodules/bytes"]
+	path = submodules/bytes
+	url = https://github.com/clibs/bytes
+[submodule "submodules/c_string_buffer"]
+	path = submodules/c_string_buffer
+	url = https://github.com/sagiegurari/c_string_buffer
+[submodule "submodules/c_stringfn"]
+	path = submodules/c_stringfn
+	url = https://github.com/sagiegurari/c_stringfn
+[submodule "submodules/c_timer"]
+	path = submodules/c_timer
+	url = https://github.com/binRick/c_timer
+[submodule "submodules/cargs"]
+	path = submodules/cargs
+	url = https://github.com/likle/cargs
+[submodule "submodules/dbg"]
+	path = submodules/dbg
+	url = https://github.com/leiless/dbg.h
+[submodule "submodules/debug_print_h"]
+	path = submodules/debug_print_h
+	url = https://github.com/rtaycher/debug_print_h
+[submodule "submodules/djbhash"]
+	path = submodules/djbhash
+	url = https://github.com/gdi/djbhash
+[submodule "submodules/fs.c"]
+	path = submodules/fs.c
+	url = https://github.com/jwerle/fs.c
+[submodule "submodules/generic-print"]
+	path = submodules/generic-print
+	url = https://github.com/exebook/generic-print.git
+[submodule "submodules/ms"]
+	path = submodules/ms
+	url = https://github.com/clibs/ms
+[submodule "submodules/rgba"]
+	path = submodules/rgba
+	url = https://github.com/clibs/rgba
+[submodule "submodules/timestamp"]
+	path = submodules/timestamp
+	url = https://github.com/clibs/timestamp
+[submodule "submodules/parson"]
+	path = submodules/parson
+	url = https://github.com/kgabis/parson
+[submodule "submodules/termpaint"]
+	path = submodules/termpaint
+	url = https://github.com/termpaint/termpaint
+[submodule "submodules/asprintf"]
+	path = submodules/asprintf
+	url = https://github.com/littlstar/asprintf.c
+[submodule "submodules/c_embed"]
+	path = submodules/c_embed
+	url = https://github.com/binRick/c_embed
+[submodule "submodules/c_fsio"]
+	path = submodules/c_fsio
+	url = https://github.com/sagiegurari/c_fsio

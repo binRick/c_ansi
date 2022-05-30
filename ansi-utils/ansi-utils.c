@@ -3,9 +3,6 @@
 #define ANSI_UTILS_C
 #include "ansi-utils.h"
 //#include "parse-colors.h"
-#include "termpaint.h"
-#include "termpaintx.h"
-#include "termpaintx_ttyrescue.h"
 
 TerminalCapabilities_t TerminalCapabilities = {
   .RestorePalette            = false,
@@ -33,6 +30,11 @@ char *au_draw_box(int BOX_SIZE){
 int au_term_size(int *w, int *h) {
   struct winsize ws;
   int            ret = ioctl(1, TIOCGWINSZ, &ws);
+
+  fprintf(stderr,
+          "number of rows: %i, number of columns: %i, screen width: %i, screen height: %i\n",
+          ws.ws_row, ws.ws_col, ws.ws_xpixel, ws.ws_ypixel
+          );
 
   if (ret < 0) {
     return(ret);

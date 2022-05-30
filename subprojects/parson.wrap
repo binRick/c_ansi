@@ -1,0 +1,4 @@
+[wrap-git]
+directory=parson
+url=https://github.com/kgabis/parson
+revision=head

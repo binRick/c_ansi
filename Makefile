@@ -17,10 +17,14 @@ ETC_DIR=$(DIR)/etc
 DN = >/dev/null 2>&1
 ##############################################################
 TIDIED_FILES = \
-			   ansi-test/*.c ansi-test/*.h \
 			   ansi-codes/*.c ansi-codes/*.h \
-			   ansi-utils/*.c ansi-utils/*.h 
-#			   ansi-rgb-codes/*.c ansi-rgb-codes/*.h \
+			   ansi-codes-test/*.c ansi-codes-test/*.h \
+			   ansi-rgb-utils/*.c ansi-rgb-utils/*.h \
+			   ansi-rgb-utils-test/*.c ansi-rgb-utils-test/*.h \
+			   ansi-utils/*.c ansi-utils/*.h  \
+			   ansi-utils-test/*.c ansi-utils-test/*.h \
+			   term-utils/*.c term-utils/*.h  \
+			   term-utils-test/*.c term-utils-test/*.h 
 ##############################################################
 all: do-build do-test
 uncrustify:
