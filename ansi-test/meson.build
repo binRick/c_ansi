@@ -2,7 +2,7 @@ ansi_test_srcs = [
   'ansi-test.c',
 ]
 ansi_test_deps = [
-     ansi_codes_dep, 
+     c_ansi_dep, 
 ]
 
 ansi_test_exec = executable('ansi-test',

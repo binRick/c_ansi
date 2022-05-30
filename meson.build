@@ -1,5 +1,4 @@
-project('c-ansi', ['c'],default_options: ['warning_level=0','c_std=gnu99'])
-PROJECT_NAME = 'c-ansi'
+project('c_ansi', ['c'],default_options: ['warning_level=0','c_std=gnu99'])
 config = configuration_data()
 version = run_command('git', 'describe', '--tags').stdout().strip()
 config.set('version', version)
@@ -17,7 +16,7 @@ cc = meson.get_compiler('c')
 #//////////////////////////////////////////////////////////////////////
 m_dep = cc.find_library('m', required : true)
 parson_shared_dep = dependency('parson',fallback:['parson', 'parson_shared_dep'], required: true)
-#subdir('meson/deps/termpaint')
+#//////////////////////////////////////////////////////////////////////
 subdir('meson/deps/asprintf')
 subdir('meson/deps/ms')
 subdir('meson/deps/bytes')
@@ -43,8 +42,6 @@ subdir('ansi-utils-test')
 subdir('ansi-rgb-utils')
 subdir('ansi-rgb-utils-test')
 #//////////////////////////////////////////////////////////////////////
-subdir('ansi')
-subdir('ansi-test')
 #//////////////////////////////////////////////////////////////////////
 subdir('term-utils')
 subdir('term-utils-test')
@@ -52,20 +49,6 @@ subdir('term-utils-test')
 subdir('term-termpaint')
 subdir('term-termpaint-test')
 #//////////////////////////////////////////////////////////////////////
-c_ansi_deps = [
-  ansi_codes_dep,  
-  ansi_utils_dep,  
-  term_termpaint_dep,  
-]
-c_ansi_include_dirs = [
-]
-c_ansi_lib = library(PROJECT_NAME,
-  install: false,
-  dependencies: c_ansi_deps,
-  include_directories: c_ansi_include_dirs,
-)
-c_ansi_dep = declare_dependency(
-  include_directories: c_ansi_include_dirs,
-  link_with: c_ansi_lib,
-)
+subdir('ansi')
+subdir('ansi-test')
 #//////////////////////////////////////////////////////////////////////

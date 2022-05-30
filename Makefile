@@ -21,12 +21,11 @@ TIDIED_FILES = \
 			   ansi-codes-test/*.c ansi-codes-test/*.h \
 			   ansi-rgb-utils/*.c ansi-rgb-utils/*.h \
 			   ansi-rgb-utils-test/*.c ansi-rgb-utils-test/*.h \
-			   ansi-utils/*.c ansi-utils/*.h  \
-			   ansi-utils-test/*.c ansi-utils-test/*.h \
 			   term-termpaint/*.c term-termpaint/*.h  \
 			   term-termpaint-test/*.c term-termpaint-test/*.h  \
 			   term-utils/*.c term-utils/*.h  \
-			   term-utils-test/*.c term-utils-test/*.h 
+			   term-utils-test/*.c term-utils-test/*.h \
+			   ansi-test/*.c ansi-test/*.h \
 ##############################################################
 all: do-build do-test
 uncrustify:
