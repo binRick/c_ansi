@@ -10,17 +10,15 @@
 #include <string.h>
 #include <sys/ioctl.h>
 #include <termios.h>
-
-
+///////////////////////////////////////////////////////////////////////////////////yy
 typedef struct {
   bool RestorePalette, IsTTY, AltScreenInitiallyEnabled, Wasicanon;
 } TerminalCapabilities_t;
-
 typedef enum {
   OFF,
   ON,
   QUERY,
 } BoolQuery;
-
-
+///////////////////////////////////////////////////////////////////////////////////yy
+char *strdup_escaped(const char *tmp);
 #endif
