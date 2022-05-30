@@ -2,6 +2,10 @@
 #ifndef ANSI_UTILS_C
 #define ANSI_UTILS_C
 #include "ansi-utils.h"
+//#include "parse-colors.h"
+#include "termpaint.h"
+#include "termpaintx.h"
+#include "termpaintx_ttyrescue.h"
 
 TerminalCapabilities_t TerminalCapabilities = {
   .RestorePalette            = false,

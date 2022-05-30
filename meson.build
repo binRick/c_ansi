@@ -14,8 +14,9 @@ add_project_arguments('-Wno-pointer-sign', language : 'c')
 cc = meson.get_compiler('c')
 #//////////////////////////////////////////////////////////////////////
 m_dep = cc.find_library('m', required : true)
+termpaint_dep = dependency('termpaint', required: true)
 subdir('ansi-codes')
-#subdir('ansi-utils')
+subdir('ansi-utils')
 #subdir('ansi-rgb-utils')
 c_ansi_deps = [
   ansi_codes_dep,  

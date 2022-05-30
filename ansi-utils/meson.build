@@ -3,6 +3,7 @@ ansi_utils_srcs = [
 ]
 ansi_utils_deps = [
   ansi_codes_dep,
+  termpaint_dep,
 ]
 
 
