@@ -2,6 +2,9 @@ ansi_codes_test_srcs = [
   'ansi-codes-test.c',
 ]
 ansi_codes_test_deps = [
+  incbin_dep,
+  http_get_dep,
+  curl_dep,
 ]
 
 if get_option('enable-binaries')

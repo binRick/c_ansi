@@ -15,6 +15,7 @@ add_project_arguments('-Wno-pointer-sign', language : 'c')
 cc = meson.get_compiler('c')
 #//////////////////////////////////////////////////////////////////////
 m_dep = cc.find_library('m', required : true)
+curl_dep = cc.find_library('curl', required : true)
 parson_shared_dep = dependency('parson',fallback:['parson', 'parson_shared_dep'], required: true)
 #//////////////////////////////////////////////////////////////////////
 subdir('meson/deps/asprintf')
@@ -32,6 +33,9 @@ subdir('meson/deps/cstringfn')
 subdir('meson/deps/fs')
 subdir('meson/deps/rgba')
 subdir('meson/deps/timestamp')
+subdir('meson/deps/incbin')
+subdir('meson/deps/cstructs_json')
+subdir('meson/deps/http-get')
 #//////////////////////////////////////////////////////////////////////
 subdir('ansi-codes')
 subdir('ansi-codes-test')

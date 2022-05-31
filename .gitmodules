@@ -58,3 +58,12 @@
 [submodule "submodules/c_fsio"]
 	path = submodules/c_fsio
 	url = https://github.com/sagiegurari/c_fsio
+[submodule "submodules/incbin"]
+	path = submodules/incbin
+	url = https://github.com/graphitemaster/incbin
+[submodule "submodules/cstructs-json"]
+	path = submodules/cstructs-json
+	url = https://github.com/tylerneylon/cstructs-json
+[submodule "submodules/http-get.c"]
+	path = submodules/http-get.c
+	url = https://github.com/clibs/http-get.c
