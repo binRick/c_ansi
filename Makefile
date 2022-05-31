@@ -54,6 +54,8 @@ test: do-test
 
 do-ninja-test:
 	@ninja -C build test
+	@./build/ansi-test/ansi-test  -v | ./submodules/greatest/contrib/greenest
+
 
 do-test: do-ninja-test
 
