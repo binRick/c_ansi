@@ -67,3 +67,9 @@
 [submodule "submodules/http-get.c"]
 	path = submodules/http-get.c
 	url = https://github.com/clibs/http-get.c
+[submodule "submodules/throw.h"]
+	path = submodules/throw.h
+	url = https://github.com/jwerle/throw.h
+[submodule "submodules/greatest"]
+	path = submodules/greatest
+	url = https://github.com/silentbicycle/greatest

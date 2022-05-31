@@ -10,4 +10,4 @@ ansi_test_exec = executable('ansi-test',
    dependencies: ansi_test_deps,
    include_directories: [],
 )
-test('ansi-test Test', ansi_test_exec, args: ['--test'])
+test('ansi-test Test', ansi_test_exec, args: [])

@@ -10,8 +10,10 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+
 static int file_exists(const char *path) {
   struct stat b;
+
   return(stat(path, &b));
 }
 
@@ -32,7 +34,8 @@ int main(int argc, char **argv) {
   http_get_free(res);
 
   char *f = "./google.html";
-  int ok = http_get_file("http://google.com", f);
+  int  ok = http_get_file("http://google.com", f);
+
   printf("\nok=%d\n", ok);
   printf("file exists:%d\n\n", file_exists(f));
 
