@@ -1,9 +1,9 @@
 #pragma once
 #ifndef TERM_UTILS_TEST_H
 #define TRUE_UTILS_TEST_H
-#include "../submodules/cargs/include/cargs.h"
-#include "../term-termpaint/term-termpaint.h"
-#include <assert.h>
+#include "submodules/cargs/include/cargs.h"
+#include "term-termpaint/term-termpaint.h"
+//#include <assert.h>
 #include <ctype.h>
 #include <stdarg.h>
 #include <stdbool.h>

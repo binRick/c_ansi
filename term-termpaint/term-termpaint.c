@@ -723,6 +723,8 @@ int term_termpaint_main(int argc, char **argv) {
   if (!init()) {
     return(1);
   }
+//  struct StringFNStrings names = get_palette_names();
+  fprintf(stderr, "%d palette names\n", 0);
 
   termpaint_attr *attr_ui     = termpaint_attr_new(TERMPAINT_DEFAULT_COLOR, TERMPAINT_DEFAULT_COLOR);
   termpaint_attr *attr_sample = termpaint_attr_new(TERMPAINT_DEFAULT_COLOR, TERMPAINT_DEFAULT_COLOR);
