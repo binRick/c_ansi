@@ -73,3 +73,6 @@
 [submodule "submodules/greatest"]
 	path = submodules/greatest
 	url = https://github.com/silentbicycle/greatest
+[submodule "submodules/c_palettes"]
+	path = submodules/c_palettes
+	url = https://github.com/binRick/c_palettes

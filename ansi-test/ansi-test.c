@@ -53,7 +53,6 @@ SUITE(the_suite) {
   RUN_TEST1(basic_ansi_test, &arg);
 }
 
-/* Add definitions that need to be in the test runner's main file. */
 GREATEST_MAIN_DEFS();
 
 

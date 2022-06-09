@@ -11,12 +11,14 @@ void cycle_cursor_visiblity();
 void cycle_cursor_blink();
 void update_cursor_profile();
 
-char *debug     = NULL;
-bool debug_used = false;
-bool quit;
+char          *debug     = NULL;
+bool          debug_used = false;
+bool          quit;
+volatile char _PALETTE_NAME[200] = "DEFAULT_PALETTE";
+char          *PALETTE_NAME      = _PALETTE_NAME;
 
-int  cursor_x = 0;
-int  cursor_y = 1;
+int           cursor_x = 0;
+int           cursor_y = 1;
 
 typedef struct CURSOR_PROFILE {
   int  x;
@@ -32,6 +34,16 @@ typedef struct event_ {
   struct event_ *next;
 } event;
 event *event_current;
+
+
+void draw_center_options(termpaint_attr *attr_ui){
+  termpaint_surface_write_with_attr(surface, 29, 11, "up/down: change palette", attr_ui);
+  termpaint_surface_write_with_attr(surface, 29, 12, "c: toggle cursor style", attr_ui);
+  termpaint_surface_write_with_attr(surface, 29, 13, "v: toggle cursor visibility", attr_ui);
+  termpaint_surface_write_with_attr(surface, 29, 14, "left/right: change select", attr_ui);
+  termpaint_surface_write_with_attr(surface, 29, 15, "up/esc: undo choice", attr_ui);
+  termpaint_surface_write_with_attr(surface, 29, 16, "enter: follow menu path", attr_ui);
+}
 
 
 static int min(int a, int b) {
@@ -298,13 +310,12 @@ void repaint_samples(termpaint_attr *attr_ui, termpaint_attr *attr_sample){
 
 void repaint_all(termpaint_attr *attr_ui, termpaint_attr *attr_sample){
   termpaint_surface_clear_with_attr(surface, attr_ui);
-
-  termpaint_surface_write_with_attr(surface, 1, 0, "Attribute Demo", attr_ui);
-
+  termpaint_surface_write_with_attr(surface, 1, 0, "Terminal Style Demo", attr_ui);
   repaint_samples(attr_ui, attr_sample);
 
   termpaint_surface_write_with_attr(surface, 25, 2, "Select Color", attr_ui);
-
+  termpaint_surface_write_with_attr(surface, 65, 2, "Current Palette", attr_ui);
+  termpaint_surface_write_with_attr(surface, 65, 3, PALETTE_NAME, attr_ui);
   termpaint_surface_write_with_attr(surface, 2, 20, "q: Quit", attr_ui);
 }
 
@@ -466,7 +477,6 @@ void rgb_color_menu(termpaint_attr *attr_ui, termpaint_attr *attr_to_change, int
 
   int *selected = &red;
 
-  termpaint_surface_write_with_attr(surface, 29, 10, "left/right: select component", attr_ui);
   termpaint_surface_write_with_attr(surface, 29, 11, "up/down: adjust value", attr_ui);
   termpaint_surface_write_with_attr(surface, 29, 12, "page up/page down: adjust value (16 increments)", attr_ui);
   termpaint_surface_write_with_attr(surface, 29, 13, "esc: abort", attr_ui);
@@ -571,10 +581,7 @@ void menu(termpaint_attr *attr_ui, termpaint_attr *attr_sample) {
   while (!quit) {
     if (reset) {
       repaint_all(attr_ui, attr_sample);
-
-      termpaint_surface_write_with_attr(surface, 29, 14, "left/right: change select", attr_ui);
-      termpaint_surface_write_with_attr(surface, 29, 15, "up/esc: undo choice", attr_ui);
-      termpaint_surface_write_with_attr(surface, 29, 16, "enter: follow menu path", attr_ui);
+      draw_center_options(attr_ui);
 
       reset = false;
     }
@@ -598,6 +605,13 @@ void menu(termpaint_attr *attr_ui, termpaint_attr *attr_sample) {
       cycle_cursor_visiblity();
     } else if (evt->type == TERMPAINT_EV_CHAR && strcmp(evt->string, "c") == 0) {
       cycle_cursor_style();
+    }
+
+    if (evt->type == TERMPAINT_EV_KEY && strcmp(evt->string, "ArrowDown") == 0) {
+      fprintf(stderr, "down......\n");
+    }
+    if (evt->type == TERMPAINT_EV_KEY && strcmp(evt->string, "ArrowUp") == 0) {
+      fprintf(stderr, "up......\n");
     }
 
     if (evt->type == TERMPAINT_EV_KEY && strcmp(evt->string, "ArrowLeft") == 0 && !sample) {

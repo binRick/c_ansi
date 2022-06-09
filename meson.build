@@ -2,6 +2,7 @@ project('c_ansi', ['c'],default_options: ['warning_level=0','c_std=gnu99'])
 config = configuration_data()
 version = run_command('git', 'describe', '--tags').stdout().strip()
 config.set('version', version)
+add_project_arguments('-DTBL1_INCLUDED', language : 'c')
 add_project_arguments('-D_GNU_SOURCE', language : 'c')
 add_project_arguments('-DDBG_H_DEF_ONCE', language : 'c')
 add_project_arguments('-DDBG_H_NO_WARNING', language : 'c')
@@ -13,11 +14,20 @@ add_project_arguments('-Wno-incompatible-pointer-types', language : 'c')
 add_project_arguments('-Wno-pointer-sign', language : 'c')
 #//////////////////////////////////////////////////////////////////////
 cc = meson.get_compiler('c')
+inc_dirs = include_directories(
+  'submodules',
+  'submodules/c_palettes',
+  'meson/deps/c_embed',
+  './',
+  '../',
+)
+inc = inc_dirs
 #//////////////////////////////////////////////////////////////////////
 m_dep = cc.find_library('m', required : true)
 curl_dep = cc.find_library('curl', required : true)
 parson_shared_dep = dependency('parson',fallback:['parson', 'parson_shared_dep'], required: true)
 #//////////////////////////////////////////////////////////////////////
+subdir('meson/deps/c_timer')
 subdir('meson/deps/asprintf')
 subdir('meson/deps/ms')
 subdir('meson/deps/bytes')
@@ -27,7 +37,6 @@ subdir('meson/deps/debug_print_h')
 subdir('meson/deps/djbhash')
 subdir('meson/deps/c_string_buffer')
 subdir('meson/deps/c_fsio')
-subdir('meson/deps/c_timer')
 subdir('meson/deps/cargs')
 subdir('meson/deps/cstringfn')
 subdir('meson/deps/fs')
@@ -55,4 +64,7 @@ subdir('term-termpaint-test')
 #//////////////////////////////////////////////////////////////////////
 subdir('ansi')
 subdir('ansi-test')
+#//////////////////////////////////////////////////////////////////////
+subdir('submodules/c_palettes/meson/deps/embedded_palettes')
+subdir('submodules/c_palettes/palette-utils')
 #//////////////////////////////////////////////////////////////////////

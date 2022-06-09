@@ -41,8 +41,10 @@ fix-dbg:
 	@$(SED) 's|, % zu);|, %zu);|g' -i $(TIDIED_FILES)
 
 tidy: uncrustify uncrustify-clean fix-dbg         
+
 clean: 
 	@rm -rf build
+
 do-meson:
 	@meson build $(DN) \
 		|| meson build --reconfigure $(DN) \
@@ -62,7 +64,11 @@ do-test: do-ninja-test
 dev: nodemon
 do-build: do-meson
 nodemon:
-	@$(PASSH) -L .nodemon.log $(NODEMON) -w '*/meson.build' --delay 1 -i '*/subprojects' -I  -w 'include/*.h' -w meson.build -w src -w Makefile -w loader/meson.build -w loader/src -w loader/include -i '*/embeds/*' -e tpl,build,sh,c,h,Makefile -x env -- bash -c 'make||true'
+	@$(PASSH) -L .nodemon.log $(NODEMON) \
+		-V \
+		-i build \
+		-w submodules \
+		-w "*/*.c" -w '*/meson.build' --delay 1 -i '*/subprojects' -I  -w 'include/*.h' -w meson.build -w src -w Makefile -w loader/meson.build -w loader/src -w loader/include -i '*/embeds/*' -e tpl,build,sh,c,h,Makefile -x env -- bash -c 'make||true'
 
 test-fxns:
 	@grep -h '^[[:space:]].*ANSI_FXN(' ansi-test/*|cut -d, -f1|cut -d'(' -f2
