@@ -76,3 +76,9 @@
 [submodule "submodules/c_palettes"]
 	path = submodules/c_palettes
 	url = https://github.com/binRick/c_palettes
+[submodule "submodules/path-basename.c"]
+	path = submodules/path-basename.c
+	url = https://github.com/michaelrhodes/path-basename.c
+[submodule "submodules/str-replace.c"]
+	path = submodules/str-replace.c
+	url = https://github.com/stephenmathieson/str-replace.c

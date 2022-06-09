@@ -1,3 +1,4 @@
+#include "embeds/tbl1.c"
 #include "term-termpaint.h"
 #include "termpaint-includes.c"
 
@@ -10,15 +11,24 @@ void cycle_cursor_style();
 void cycle_cursor_visiblity();
 void cycle_cursor_blink();
 void update_cursor_profile();
+void debug_cur_palette();
+char *get_cur_palette_name();
+char *get_cur_palette_data();
+char *get_cur_palette_filename();
+struct Palette get_cur_palette();
 
-char          *debug     = NULL;
-bool          debug_used = false;
-bool          quit;
-volatile char _PALETTE_NAME[200] = "DEFAULT_PALETTE";
-char          *PALETTE_NAME      = _PALETTE_NAME;
+char           *debug     = NULL;
+bool           debug_used = false;
+bool           quit;
+volatile char  _PALETTE_NAME[200] = "DEFAULT_PALETTE";
+char           *PALETTE_NAME      = _PALETTE_NAME;
+volatile int   cur_palette_index  = 0;
 
-int           cursor_x = 0;
-int           cursor_y = 1;
+int            cursor_x = 0;
+int            cursor_y = 1;
+
+termpaint_attr *attr_ui;
+termpaint_attr *attr_sample;
 
 typedef struct CURSOR_PROFILE {
   int  x;
@@ -74,6 +84,16 @@ volatile char MSG[1024];
                                                                    TERMPAINT_COLOR_GREEN, TERMPAINT_COLOR_BLACK); \
                                termpaint_terminal_flush(terminal, false);                                         \
                              } while (0); }
+
+
+static char *tp__basename(const char *path){
+  const char *slash = strrchr(path, '/');
+
+  if (slash) {
+    path = slash + 1;
+  }
+  return((char *)path);
+}
 
 
 void debug_log(termpaint_integration *integration, const char *data, int length) {
@@ -314,8 +334,19 @@ void repaint_all(termpaint_attr *attr_ui, termpaint_attr *attr_sample){
   repaint_samples(attr_ui, attr_sample);
 
   termpaint_surface_write_with_attr(surface, 25, 2, "Select Color", attr_ui);
-  termpaint_surface_write_with_attr(surface, 65, 2, "Current Palette", attr_ui);
-  termpaint_surface_write_with_attr(surface, 65, 3, PALETTE_NAME, attr_ui);
+
+  char *cp_msg = malloc(1024);
+
+  sprintf(cp_msg,
+          "Current Palette: #%d/%lu %s | Type: %d: %s |",
+          (cur_palette_index + 1),
+          embedded_palettes_table_qty,
+          get_cur_palette_name(),
+          get_palette_data_type(get_cur_palette_data()),
+          get_palette_data_type_name(get_cur_palette_data())
+          );
+  termpaint_surface_write_with_attr(surface, 65, 2, cp_msg, attr_ui);
+  free(cp_msg);
   termpaint_surface_write_with_attr(surface, 2, 20, "q: Quit", attr_ui);
 }
 
@@ -609,9 +640,21 @@ void menu(termpaint_attr *attr_ui, termpaint_attr *attr_sample) {
 
     if (evt->type == TERMPAINT_EV_KEY && strcmp(evt->string, "ArrowDown") == 0) {
       fprintf(stderr, "down......\n");
+      cur_palette_index--;
+      if (cur_palette_index < 1) {
+        cur_palette_index = embedded_palettes_table_qty - 1;
+      }
+      debug_cur_palette();
+      repaint_all(attr_ui, attr_sample);
     }
     if (evt->type == TERMPAINT_EV_KEY && strcmp(evt->string, "ArrowUp") == 0) {
       fprintf(stderr, "up......\n");
+      cur_palette_index++;
+      if (cur_palette_index >= embedded_palettes_table_qty) {
+        cur_palette_index = 0;
+      }
+      debug_cur_palette();
+      repaint_all(attr_ui, attr_sample);
     }
 
     if (evt->type == TERMPAINT_EV_KEY && strcmp(evt->string, "ArrowLeft") == 0 && !sample) {
@@ -718,16 +761,106 @@ void menu(termpaint_attr *attr_ui, termpaint_attr *attr_sample) {
 } /* menu */
 
 
+struct Palette get_cur_palette(){
+  return(get_palette(get_cur_palette_data()));
+}
+
+
+char *get_cur_palette_filename(){
+  return(embedded_palettes_table[cur_palette_index].filename);
+}
+
+
+char *get_cur_palette_data(){
+  return(embedded_palettes_table[cur_palette_index].data);
+}
+
+
+char *get_cur_palette_name(){
+  return(tp__basename(get_cur_palette_filename()));
+}
+
+
+void debug_cur_palette(){
+  fprintf(stderr,
+          "==============\n%s\n==============\n",
+          get_cur_palette_data()
+          );
+  fprintf(stderr,
+          "Palette #%d: %s (%s) -> %lu bytes\n",
+          cur_palette_index,
+          get_cur_palette_name(),
+          get_cur_palette_filename(),
+          strlen(get_cur_palette_data())
+          );
+  fprintf(stderr,
+          AC_RESETALL AC_BLUE AC_REVERSED     "[Palette]" AC_RESETALL "\n"
+          AC_RESETALL AC_YELLOW AC_REVERSED   "\t|Type:\t\t%s|" AC_RESETALL "\n"
+          AC_RESETALL AC_YELLOW AC_REVERSED   "\t|FG:\t\t%s|" AC_RESETALL "\n"
+          AC_RESETALL AC_YELLOW AC_REVERSED   "\t|BG:\t\t%s|" AC_RESETALL "\n"
+          AC_RESETALL AC_YELLOW AC_REVERSED   "\t|Cursor:\t%s|" AC_RESETALL "\n"
+          ////////////////////////////////////////////////////////////////////////
+          AC_RESETALL "  " AC_ITALIC AC_GREEN AC_REVERSED   "|Foreground|" AC_RESETALL "\n"
+          ////////////////////////////////////////////////////////////////////////
+          AC_RESETALL AC_BLACK_WHITE AC_REVERSED   "\t|Black:%10s|" AC_RESETALL "\n"
+          AC_RESETALL AC_RED AC_REVERSED     "\t|Red:%10s|" AC_RESETALL "\n"
+          AC_RESETALL AC_YELLOW AC_REVERSED  "\t|Yellow:%10s|" AC_RESETALL "\n"
+          AC_RESETALL AC_BLUE AC_REVERSED    "\t|Blue:%10s|" AC_RESETALL "\n"
+          AC_RESETALL AC_BLUE AC_REVERSED    "\t|Magenta:%10s|" AC_RESETALL "\n"
+          AC_RESETALL AC_BLUE AC_REVERSED    "\t|Cyan:%10s|" AC_RESETALL "\n"
+          AC_RESETALL AC_BLUE AC_REVERSED    "\t|White:%10s|" AC_RESETALL "\n"
+          ////////////////////////////////////////////////////////////////////////
+          AC_RESETALL "  " AC_ITALIC AC_GREEN AC_REVERSED   "|Background|" AC_RESETALL "\n"
+          ////////////////////////////////////////////////////////////////////////
+          AC_RESETALL AC_BLACK_WHITE AC_REVERSED   "\t|Black:%10s|" AC_RESETALL "\n"
+          AC_RESETALL AC_RED AC_REVERSED     "\t|Red:%10s|" AC_RESETALL "\n"
+          AC_RESETALL AC_YELLOW AC_REVERSED  "\t|Yellow:%10s|" AC_RESETALL "\n"
+          AC_RESETALL AC_BLUE AC_REVERSED    "\t|Blue:%10s|" AC_RESETALL "\n"
+          AC_RESETALL AC_BLUE AC_REVERSED    "\t|Magenta:%10s|" AC_RESETALL "\n"
+          AC_RESETALL AC_BLUE AC_REVERSED    "\t|Cyan:%10s|" AC_RESETALL "\n"
+          AC_RESETALL AC_BLUE AC_REVERSED    "\t|White:%10s|" AC_RESETALL "\n"
+          ////////////////////////////////////////////////////////////////////////
+          , get_cur_palette().TypeName
+          /////////////////////////////////////
+          , get_cur_palette().fg,
+          get_cur_palette().bg,
+          get_cur_palette().cursor
+          /////////////////////////////////////
+          , get_cur_palette().fgColors->black,
+          get_cur_palette().fgColors->red,
+          get_cur_palette().fgColors->yellow,
+          get_cur_palette().fgColors->blue,
+          get_cur_palette().fgColors->magenta,
+          get_cur_palette().fgColors->cyan,
+          get_cur_palette().fgColors->white
+          /////////////////////////////////////
+          , get_cur_palette().bgColors->black,
+          get_cur_palette().bgColors->red,
+          get_cur_palette().bgColors->yellow,
+          get_cur_palette().bgColors->blue,
+          get_cur_palette().bgColors->magenta,
+          get_cur_palette().bgColors->cyan,
+          get_cur_palette().bgColors->white
+          /////////////////////////////////////
+          );
+  fprintf(stderr,
+          "%lu palette names\n",
+          embedded_palettes_table_qty
+          );
+} /* debug_cur_palette */
+
+
 int term_termpaint_main(int argc, char **argv) {
   (void)argc; (void)argv;
   if (!init()) {
     return(1);
   }
-//  struct StringFNStrings names = get_palette_names();
-  fprintf(stderr, "%d palette names\n", 0);
 
-  termpaint_attr *attr_ui     = termpaint_attr_new(TERMPAINT_DEFAULT_COLOR, TERMPAINT_DEFAULT_COLOR);
-  termpaint_attr *attr_sample = termpaint_attr_new(TERMPAINT_DEFAULT_COLOR, TERMPAINT_DEFAULT_COLOR);
+  debug_cur_palette();
+
+
+  attr_ui     = termpaint_attr_new(TERMPAINT_DEFAULT_COLOR, TERMPAINT_DEFAULT_COLOR);
+  attr_sample = termpaint_attr_new(TERMPAINT_DEFAULT_COLOR, TERMPAINT_DEFAULT_COLOR);
 
   repaint_all(attr_ui, attr_sample);
 

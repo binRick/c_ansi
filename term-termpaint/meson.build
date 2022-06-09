@@ -15,9 +15,10 @@ term_termpaint_deps = [
   cstringfn_dep,  
   #palette_utils_dep,  
   termpaint_dep,
+  palettes_dep,
 ]
 
-term_termpaint_lib = static_library('term-termpaint',
+term_termpaint_lib = library('term-termpaint',
   term_termpaint_srcs,
   install: false,
   dependencies: term_termpaint_deps,

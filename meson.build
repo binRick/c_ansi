@@ -36,6 +36,8 @@ parson_shared_dep = dependency('parson',
 #//////////////////////////////////////////////////////////////////////
 subdir('meson/deps/c_timer')
 #subdir('meson/deps/assertf')
+#subdir('meson/deps/str-replace')
+#subdir('meson/deps/path-basename')
 subdir('meson/deps/asprintf')
 subdir('meson/deps/ms')
 subdir('meson/deps/bytes')
@@ -62,6 +64,7 @@ subdir('ansi-rgb-utils')
 subdir('ansi-rgb-utils-test')
 #//////////////////////////////////////////////////////////////////////
 subdir('submodules/c_palettes/meson/deps/embedded_palettes')
+subdir('submodules/c_palettes/palettes')
 subdir('submodules/c_palettes/palette-utils')
 #//////////////////////////////////////////////////////////////////////
 subdir('ansi-utils')
