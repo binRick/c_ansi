@@ -53,7 +53,8 @@ clean:
 do-meson:
 	@meson build $(DN) \
 		|| meson build --reconfigure $(DN) \
-		|| meson build --wipe
+		|| meson build --wipe \
+		|| rm -rf build
 	@meson build
 	@ninja -C build
 
