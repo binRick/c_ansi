@@ -12,7 +12,7 @@ term_termpaint_include_dirs = [
 ]
 
 term_termpaint_deps = [
-  cstringfn_dep,  
+  c_stringfn_dep,  
   #palette_utils_dep,  
   termpaint_dep,
   palettes_dep,

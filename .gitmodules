@@ -82,3 +82,6 @@
 [submodule "submodules/str-replace.c"]
 	path = submodules/str-replace.c
 	url = https://github.com/stephenmathieson/str-replace.c
+[submodule "submodules/meson_deps"]
+	path = submodules/meson_deps
+	url = https://github.com/binRick/meson_deps

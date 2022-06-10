@@ -16,14 +16,23 @@ add_project_arguments('-Wno-incompatible-pointer-types', language : 'c')
 add_project_arguments('-Wno-pointer-sign', language : 'c')
 #//////////////////////////////////////////////////////////////////////
 cc = meson.get_compiler('c')
+pwd_bin = find_program('pwd', required : true)
+pwd = run_command(pwd_bin, check: true).stdout().strip()
 deps = []
 inc = include_directories(
   'submodules',
+  'submodules/meson_deps',
+  'submodules/meson_deps/submodules',
+  'meson/deps/ms',
+  'submodules/c_fsio/include',
+  'submodules/c_string_buffer/include',
+  'submodules/c_stringfn/include',
   'submodules/c_palettes',
   'submodules/c_palettes/palettes',
   'meson/deps/c_embed',
   './',
   '../',
+  '../../../',
 )
 #//////////////////////////////////////////////////////////////////////
 m_dep = cc.find_library('m', required : true)
@@ -39,16 +48,19 @@ subdir('meson/deps/c_timer')
 #subdir('meson/deps/str-replace')
 #subdir('meson/deps/path-basename')
 subdir('meson/deps/asprintf')
-subdir('meson/deps/ms')
-subdir('meson/deps/bytes')
+subdir('submodules/meson_deps/meson/deps/ms')
+subdir('submodules/meson_deps/meson/deps/bytes')
+subdir('submodules/meson_deps/meson/deps/djbhash')
+subdir('submodules/meson_deps/meson/deps/c_string_buffer')
+subdir('submodules/meson_deps/meson/deps/c_stringfn')
+subdir('submodules/meson_deps/meson/deps/c_fsio')
 subdir('meson/deps/c_embed')
 subdir('meson/deps/generic_print')
 subdir('meson/deps/debug_print_h')
-subdir('meson/deps/djbhash')
-subdir('meson/deps/c_string_buffer')
-subdir('meson/deps/c_fsio')
+#subdir('meson/deps/c_string_buffer')
+#subdir('meson/deps/c_fsio')
 subdir('meson/deps/cargs')
-subdir('meson/deps/cstringfn')
+#subdir('meson/deps/cstringfn')
 subdir('meson/deps/fs')
 subdir('meson/deps/rgba')
 subdir('meson/deps/timestamp')
