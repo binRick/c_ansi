@@ -102,3 +102,5 @@ do-test-fxns:
 	@echo "------------------------------";echo
 
 do-tests: do-test-fxns do-test-commands
+git-pull:
+	@git pull --recurse-submodules
