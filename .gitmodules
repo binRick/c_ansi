@@ -85,3 +85,6 @@
 [submodule "submodules/meson_deps"]
 	path = submodules/meson_deps
 	url = https://github.com/binRick/meson_deps
+[submodule "submodules/asprintf.c"]
+	path = submodules/asprintf.c
+	url = https://github.com/jwerle/asprintf.c

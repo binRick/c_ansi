@@ -22,3 +22,4 @@ c_ansi_dev
 google.html
 .err
 meson/deps/*/meson-local.build
+subprojects/*/

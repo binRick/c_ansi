@@ -29,7 +29,10 @@ inc = include_directories(
   'submodules/c_stringfn/include',
   'submodules/c_palettes',
   'submodules/c_palettes/palettes',
-  'meson/deps/c_embed',
+  'submodules/c_embed',
+  'submodules/debug_print_h',
+  'submodules/generic-print',
+  'submodules/incbin',
   './',
   '../',
   '../../../',
@@ -38,36 +41,38 @@ inc = include_directories(
 m_dep = cc.find_library('m', required : true)
 curl_dep = cc.find_library('curl', required : true)
 #//////////////////////////////////////////////////////////////////////
-parson_shared_dep = dependency('parson',
-  fallback:['parson', 'parson_shared_dep'], 
-  required: true,
-)
 #//////////////////////////////////////////////////////////////////////
-subdir('meson/deps/c_timer')
-#subdir('meson/deps/assertf')
-#subdir('meson/deps/str-replace')
-#subdir('meson/deps/path-basename')
-subdir('meson/deps/asprintf')
+subdir('submodules/meson_deps/meson/deps/asprintf')
 subdir('submodules/meson_deps/meson/deps/ms')
 subdir('submodules/meson_deps/meson/deps/bytes')
 subdir('submodules/meson_deps/meson/deps/djbhash')
 subdir('submodules/meson_deps/meson/deps/c_string_buffer')
 subdir('submodules/meson_deps/meson/deps/c_stringfn')
 subdir('submodules/meson_deps/meson/deps/c_fsio')
-subdir('meson/deps/c_embed')
-subdir('meson/deps/generic_print')
-subdir('meson/deps/debug_print_h')
+subdir('submodules/meson_deps/meson/deps/cargs')
+subdir('submodules/meson_deps/meson/deps/parson')
+subdir('submodules/meson_deps/meson/deps/fs')
+subdir('submodules/meson_deps/meson/deps/rgba')
+subdir('submodules/meson_deps/meson/deps/c_timer')
+subdir('submodules/meson_deps/meson/deps/c_embed')
+subdir('submodules/meson_deps/meson/deps/debug_print_h')
+subdir('submodules/meson_deps/meson/deps/generic_print')
+subdir('submodules/meson_deps/meson/deps/termpaint')
+subdir('submodules/meson_deps/meson/deps/incbin')
+#subdir('meson/deps/c_embed')
+#subdir('meson/deps/generic_print')
+#subdir('meson/deps/debug_print_h')
 #subdir('meson/deps/c_string_buffer')
 #subdir('meson/deps/c_fsio')
-subdir('meson/deps/cargs')
+#subdir('meson/deps/cargs')
 #subdir('meson/deps/cstringfn')
-subdir('meson/deps/fs')
-subdir('meson/deps/rgba')
+#subdir('meson/deps/fs')
+#subdir('meson/deps/rgba')
 subdir('meson/deps/timestamp')
 subdir('meson/deps/incbin')
 subdir('meson/deps/cstructs_json')
 subdir('meson/deps/http-get')
-subdir('meson/deps/termpaint')
+#subdir('meson/deps/termpaint')
 #//////////////////////////////////////////////////////////////////////
 subdir('ansi-codes')
 subdir('ansi-codes-test')

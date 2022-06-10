@@ -156,13 +156,6 @@ void cycle_cursor_visiblity(){
 
 
 void cycle_cursor_style(){
-  /*
-   * sprintf(MSG,
-   *      "cur cursor style:%d|"
-   *      , cursor_profile->style
-   *      );
-   * M(MSG);
-   */
   if (cursor_profile->style == TERMPAINT_CURSOR_STYLE_BAR) {
     cursor_profile->style = TERMPAINT_CURSOR_STYLE_BLOCK;
   }else if (cursor_profile->style == TERMPAINT_CURSOR_STYLE_BLOCK) {
@@ -170,6 +163,7 @@ void cycle_cursor_style(){
   }else{
     cursor_profile->style = TERMPAINT_CURSOR_STYLE_BAR;
   }
+
   update_cursor_profile();
 }
 
@@ -212,8 +206,6 @@ void event_callback(void *userdata, termpaint_event *tp_event) {
             surface_updates_qty
             );
     M(MSG);
-//    termpaint_image_save_to_file(surface,"/tmp/termpaint.ansi");
-    // fprintf(stderr, "%s\n", MSG);
   }
 
   if (my_event) {
@@ -348,7 +340,7 @@ char *get_palette_type_name(int CUR_PALETTE_TYPE_ID){
 
 void repaint_all(termpaint_attr *attr_ui, termpaint_attr *attr_sample){
   termpaint_surface_clear_with_attr(surface, attr_ui);
-  termpaint_surface_write_with_attr(surface, 1, 0, "Terminal Style Demo", attr_ui);
+  termpaint_surface_write_with_attr(surface, 1, 0, "Terminal UI", attr_ui);
   repaint_samples(attr_ui, attr_sample);
 
   termpaint_surface_write_with_attr(surface, 25, 2, "Select Color", attr_ui);
