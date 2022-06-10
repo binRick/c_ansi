@@ -1,6 +1,8 @@
 #include "embeds/tbl1.c"
 #include "term-termpaint.h"
 #include "termpaint-includes.c"
+#define DEBUG_PALETTE_COLORS_TO_STDERR    false
+
 
 termpaint_terminal    *terminal;
 termpaint_surface     *surface;
@@ -16,13 +18,16 @@ char *get_cur_palette_name();
 char *get_cur_palette_data();
 char *get_cur_palette_filename();
 struct Palette get_cur_palette();
+void normalize_palette_type_selection();
 
 char           *debug     = NULL;
 bool           debug_used = false;
 bool           quit;
-volatile char  _PALETTE_NAME[200] = "DEFAULT_PALETTE";
-char           *PALETTE_NAME      = _PALETTE_NAME;
-volatile int   cur_palette_index  = 0;
+volatile char  _PALETTE_NAME[200]     = "DEFAULT_PALETTE";
+char           *PALETTE_NAME          = _PALETTE_NAME;
+volatile int   cur_palette_index      = 0;
+volatile int   prev_cur_palette_index = 0;
+volatile int   CUR_PALETTE_TYPE_ID    = 0;
 
 int            cursor_x = 0;
 int            cursor_y = 1;
@@ -328,6 +333,19 @@ void repaint_samples(termpaint_attr *attr_ui, termpaint_attr *attr_sample){
 }
 
 
+char *get_palette_type_name(int CUR_PALETTE_TYPE_ID){
+  char N[32];
+
+  switch (CUR_PALETTE_TYPE_ID) {
+  case 0: sprintf(&N, "%s", "All"); break;
+  case 1: sprintf(&N, "%s", "Paleta"); break;
+  case 2: sprintf(&N, "%s", "KFC"); break;
+  default: sprintf(&N, "%s", "UNKNOWN"); break;
+  }
+  return(strdup(N));
+}
+
+
 void repaint_all(termpaint_attr *attr_ui, termpaint_attr *attr_sample){
   termpaint_surface_clear_with_attr(surface, attr_ui);
   termpaint_surface_write_with_attr(surface, 1, 0, "Terminal Style Demo", attr_ui);
@@ -335,20 +353,71 @@ void repaint_all(termpaint_attr *attr_ui, termpaint_attr *attr_sample){
 
   termpaint_surface_write_with_attr(surface, 25, 2, "Select Color", attr_ui);
 
+  char *cp_type_msg = malloc(1024);
+
+  sprintf(cp_type_msg,
+          "Palette Type: %s",
+          get_palette_type_name(CUR_PALETTE_TYPE_ID)
+          );
+  termpaint_surface_write_with_attr(surface, 65, 2, cp_type_msg, attr_ui);
+  free(cp_type_msg);
+
   char *cp_msg = malloc(1024);
 
   sprintf(cp_msg,
-          "Current Palette: #%d/%lu %s | Type: %d: %s |",
+          "Current Palette: #%d/%lu %s | Type: %s |",
           (cur_palette_index + 1),
           embedded_palettes_table_qty,
           get_cur_palette_name(),
-          get_palette_data_type(get_cur_palette_data()),
           get_palette_data_type_name(get_cur_palette_data())
           );
-  termpaint_surface_write_with_attr(surface, 65, 2, cp_msg, attr_ui);
+  termpaint_surface_write_with_attr(surface, 65, 3, cp_msg, attr_ui);
   free(cp_msg);
+
+  char           *_msg     = malloc(1024 * 32);
+  termpaint_attr *set_attr = termpaint_attr_new(TERMPAINT_DEFAULT_COLOR, TERMPAINT_DEFAULT_COLOR);
+
+  sprintf(_msg,
+          "Foreground:"
+          "\t<#"
+          "%s"
+          "> -> "
+          "%s",
+          get_cur_palette().fg,
+          get_cur_palette().fg
+          );
+  termpaint_attr_set_bg(set_attr, TERMPAINT_NAMED_COLOR + 1);
+  termpaint_surface_write_with_attr(surface, 65, 5, _msg, attr_ui);
+
+  sprintf(_msg,
+          "Background:"
+          "\t<#"
+          "%s"
+          "> -> "
+          "%s",
+          get_cur_palette().bg,
+          get_cur_palette().bg
+          );
+  termpaint_attr_set_bg(set_attr, TERMPAINT_NAMED_COLOR + 2);
+  termpaint_surface_write_with_attr(surface, 65, 6, _msg, set_attr);
+
+  sprintf(_msg,
+          "Cursor:"
+          "\t\t\t\t\t<#"
+          "%s"
+          "> -> "
+          "%s",
+          get_cur_palette().cursor,
+          get_cur_palette().cursor
+          );
+  termpaint_attr_set_bg(set_attr, TERMPAINT_NAMED_COLOR + 3);
+  termpaint_surface_write_with_attr(surface, 65, 7, _msg, set_attr);
+
+  free(_msg);
+  termpaint_attr_free(set_attr);
+
   termpaint_surface_write_with_attr(surface, 2, 20, "q: Quit", attr_ui);
-}
+} /* repaint_all */
 
 
 void update_current_key_display(termpaint_attr *attr_ui, event *evt) {
@@ -605,6 +674,46 @@ void rgb_color_menu(termpaint_attr *attr_ui, termpaint_attr *attr_to_change, int
 } /* rgb_color_menu */
 
 
+void normalize_palette_type_selection(){
+  if (CUR_PALETTE_TYPE_ID < 0) {
+    CUR_PALETTE_TYPE_ID = 2;
+  }
+  if (CUR_PALETTE_TYPE_ID > 2) {
+    CUR_PALETTE_TYPE_ID = 0;
+  }
+  if (cur_palette_index < 1) {
+    cur_palette_index = embedded_palettes_table_qty - 1;
+  }
+  if (cur_palette_index >= embedded_palettes_table_qty) {
+    cur_palette_index = 0;
+  }
+  int MAX_CHANGES = 100, CHANGES = 0;
+
+  while (CUR_PALETTE_TYPE_ID != 0 && CUR_PALETTE_TYPE_ID < 3 && (get_cur_palette().Type != (CUR_PALETTE_TYPE_ID - 1))) {
+    if (prev_cur_palette_index < cur_palette_index || (prev_cur_palette_index > embedded_palettes_table_qty - 1)) {
+      cur_palette_index++;
+    }else if (prev_cur_palette_index > cur_palette_index || (prev_cur_palette_index < 0)) {
+      cur_palette_index--;
+    }else{
+      cur_palette_index++;
+    }
+    if (cur_palette_index < 0) {
+      cur_palette_index = embedded_palettes_table_qty;
+    }
+
+    if (cur_palette_index >= embedded_palettes_table_qty) {
+      cur_palette_index = 0;
+    }
+    if (CHANGES > MAX_CHANGES) {
+      break;
+    }
+    CHANGES++;
+  }
+  debug_cur_palette();
+  repaint_all(attr_ui, attr_sample);
+}
+
+
 void menu(termpaint_attr *attr_ui, termpaint_attr *attr_sample) {
   bool sample = true;
   bool reset  = true;
@@ -636,36 +745,27 @@ void menu(termpaint_attr *attr_ui, termpaint_attr *attr_sample) {
       cycle_cursor_visiblity();
     } else if (evt->type == TERMPAINT_EV_CHAR && strcmp(evt->string, "c") == 0) {
       cycle_cursor_style();
-    }
-
-    if (evt->type == TERMPAINT_EV_KEY && strcmp(evt->string, "ArrowDown") == 0) {
-      fprintf(stderr, "down......\n");
-      cur_palette_index--;
-      if (cur_palette_index < 1) {
-        cur_palette_index = embedded_palettes_table_qty - 1;
-      }
-      debug_cur_palette();
-      repaint_all(attr_ui, attr_sample);
-    }
-    if (evt->type == TERMPAINT_EV_KEY && strcmp(evt->string, "ArrowUp") == 0) {
-      fprintf(stderr, "up......\n");
+    }else if (evt->type == TERMPAINT_EV_KEY && strcmp(evt->string, "PageUp") == 0) {
+      prev_cur_palette_index = cur_palette_index;
+      CUR_PALETTE_TYPE_ID++;
+      normalize_palette_type_selection();
+    }else if (evt->type == TERMPAINT_EV_KEY && strcmp(evt->string, "PageDown") == 0) {
+      prev_cur_palette_index = cur_palette_index;
+      CUR_PALETTE_TYPE_ID--;
+      normalize_palette_type_selection();
+    }else if (evt->type == TERMPAINT_EV_KEY && strcmp(evt->string, "ArrowUp") == 0) {
+      prev_cur_palette_index = cur_palette_index;
       cur_palette_index++;
-      if (cur_palette_index >= embedded_palettes_table_qty) {
-        cur_palette_index = 0;
-      }
-      debug_cur_palette();
-      repaint_all(attr_ui, attr_sample);
-    }
-
-    if (evt->type == TERMPAINT_EV_KEY && strcmp(evt->string, "ArrowLeft") == 0 && !sample) {
+      normalize_palette_type_selection();
+    }else if (evt->type == TERMPAINT_EV_KEY && strcmp(evt->string, "ArrowDown") == 0) {
+      prev_cur_palette_index = cur_palette_index;
+      cur_palette_index--;
+      normalize_palette_type_selection();
+    }else if (evt->type == TERMPAINT_EV_KEY && strcmp(evt->string, "ArrowLeft") == 0 && !sample) {
       sample = true;
-    }
-
-    if (evt->type == TERMPAINT_EV_KEY && strcmp(evt->string, "ArrowRight") == 0 && sample) {
+    }else if (evt->type == TERMPAINT_EV_KEY && strcmp(evt->string, "ArrowRight") == 0 && sample) {
       sample = false;
-    }
-
-    if (evt->type == TERMPAINT_EV_KEY && strcmp(evt->string, "Enter") == 0) {
+    }else if (evt->type == TERMPAINT_EV_KEY && strcmp(evt->string, "Enter") == 0) {
       int which_color = 0;
 
       termpaint_surface_write_with_attr(surface, 25, 4, "* Foreground", attr_ui);
@@ -782,6 +882,10 @@ char *get_cur_palette_name(){
 
 
 void debug_cur_palette(){
+  if (!DEBUG_PALETTE_COLORS_TO_STDERR) {
+    return;
+  }
+
   fprintf(stderr,
           "==============\n%s\n==============\n",
           get_cur_palette_data()
@@ -795,6 +899,7 @@ void debug_cur_palette(){
           );
   fprintf(stderr,
           AC_RESETALL AC_BLUE AC_REVERSED     "[Palette]" AC_RESETALL "\n"
+          AC_RESETALL AC_YELLOW AC_REVERSED   "\t|Name:\t\t%s|" AC_RESETALL "\n"
           AC_RESETALL AC_YELLOW AC_REVERSED   "\t|Type:\t\t%s|" AC_RESETALL "\n"
           AC_RESETALL AC_YELLOW AC_REVERSED   "\t|FG:\t\t%s|" AC_RESETALL "\n"
           AC_RESETALL AC_YELLOW AC_REVERSED   "\t|BG:\t\t%s|" AC_RESETALL "\n"
@@ -820,7 +925,8 @@ void debug_cur_palette(){
           AC_RESETALL AC_BLUE AC_REVERSED    "\t|Cyan:%10s|" AC_RESETALL "\n"
           AC_RESETALL AC_BLUE AC_REVERSED    "\t|White:%10s|" AC_RESETALL "\n"
           ////////////////////////////////////////////////////////////////////////
-          , get_cur_palette().TypeName
+          , get_cur_palette_name(),
+          get_cur_palette().TypeName
           /////////////////////////////////////
           , get_cur_palette().fg,
           get_cur_palette().bg,
@@ -855,9 +961,7 @@ int term_termpaint_main(int argc, char **argv) {
   if (!init()) {
     return(1);
   }
-
   debug_cur_palette();
-
 
   attr_ui     = termpaint_attr_new(TERMPAINT_DEFAULT_COLOR, TERMPAINT_DEFAULT_COLOR);
   attr_sample = termpaint_attr_new(TERMPAINT_DEFAULT_COLOR, TERMPAINT_DEFAULT_COLOR);
