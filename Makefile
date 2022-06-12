@@ -105,3 +105,5 @@ do-test-fxns:
 do-tests: do-test-fxns do-test-commands
 git-pull:
 	@git pull --recurse-submodules
+git-submodules-pull:
+	@git submodule foreach git pull origin master --jobs=10

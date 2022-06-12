@@ -15,7 +15,7 @@
 	url = https://github.com/sagiegurari/c_stringfn
 [submodule "submodules/c_timer"]
 	path = submodules/c_timer
-	url = https://github.com/binRick/c_timer
+	url = ssh://git@github.com/binRick/c_timer
 [submodule "submodules/cargs"]
 	path = submodules/cargs
 	url = https://github.com/likle/cargs
