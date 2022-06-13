@@ -1,7 +1,7 @@
 #pragma once
 #ifndef TERM_UTILS_TEST_H
 #define TRUE_UTILS_TEST_H
-#include "../submodules/cargs/include/cargs.h"
+#include "../../subprojects/cargs/include/cargs.h"
 #include "../term-utils/term-utils.h"
 #include <assert.h>
 #include <ctype.h>

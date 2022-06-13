@@ -42,9 +42,9 @@ subdir('ansi-codes-test')
 subdir('ansi-rgb-utils')
 subdir('ansi-rgb-utils-test')
 #//////////////////////////////////////////////////////////////////////
-subdir('submodules/c_palettes/meson/deps/embedded_palettes')
-subdir('submodules/c_palettes/palettes')
-subdir('submodules/c_palettes/palette-utils')
+#subdir('submodules/c_palettes/meson/deps/embedded_palettes')
+#subdir('submodules/c_palettes/palettes')
+#subdir('submodules/c_palettes/palette-utils')
 #//////////////////////////////////////////////////////////////////////
 subdir('ansi-utils')
 subdir('ansi-utils-test')
@@ -52,9 +52,9 @@ subdir('ansi-utils-test')
 subdir('term-utils')
 subdir('term-utils-test')
 #//////////////////////////////////////////////////////////////////////
-subdir('term-termpaint')
-subdir('term-termpaint-test')
+#subdir('term-termpaint')
+#subdir('term-termpaint-test')
 #//////////////////////////////////////////////////////////////////////
-subdir('ansi')
-subdir('ansi-test')
+#subdir('ansi')
+#subdir('ansi-test')
 #//////////////////////////////////////////////////////////////////////

@@ -2,7 +2,7 @@
 #ifndef TERM_RGB_UTILS_TEST_H
 #define TERM_RGB_UTILS_TEST_H
 #include "../ansi-rgb-utils/ansi-rgb-utils.h"
-#include "../submodules/cargs/include/cargs.h"
+#include "../subprojects/cargs/include/cargs.h"
 #include <assert.h>
 #include <ctype.h>
 #include <stdarg.h>

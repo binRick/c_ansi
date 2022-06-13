@@ -2,7 +2,7 @@
 #ifndef TERM_UTILS_TEST_H
 #define TRUE_UTILS_TEST_H
 #include "../ansi-utils/ansi-utils.h"
-#include "../submodules/cargs/include/cargs.h"
+#include "../subprojects/cargs/include/cargs.h"
 #include <assert.h>
 #include <ctype.h>
 #include <stdarg.h>

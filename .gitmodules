@@ -75,7 +75,7 @@
 	url = https://github.com/silentbicycle/greatest
 [submodule "submodules/c_palettes"]
 	path = submodules/c_palettes
-	url = https://github.com/binRick/c_palettes
+	url = ssh://git@github.com/binRick/c_palettes
 [submodule "submodules/path-basename.c"]
 	path = submodules/path-basename.c
 	url = https://github.com/michaelrhodes/path-basename.c
@@ -84,7 +84,7 @@
 	url = https://github.com/stephenmathieson/str-replace.c
 [submodule "submodules/meson_deps"]
 	path = submodules/meson_deps
-	url = https://github.com/binRick/meson_deps
+	url = ssh://git@github.com/binRick/meson_deps
 [submodule "submodules/asprintf.c"]
 	path = submodules/asprintf.c
 	url = https://github.com/jwerle/asprintf.c
