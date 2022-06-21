@@ -9,7 +9,7 @@ image_utils_include_dirs = [
 image_utils_test_deps = [
   image_utils_dep,
   list_dep,
-  ansicodes_dep,
+  ansi_codes_dep,
   c_fsio_dep,
   c_stringfn_dep,
   c_string_buffer_dep,
