@@ -41,10 +41,7 @@ fix-dbg:
 	@$(SED) 's|, % d);|, %d);|g' -i $(TIDIED_FILES)
 	@$(SED) 's|, % zu);|, %zu);|g' -i $(TIDIED_FILES)
 
-add-meson-deps:
-	@git add meson/deps/*/meson.build
-
-tidy: add-meson-deps uncrustify uncrustify-clean fix-dbg         
+tidy: uncrustify uncrustify-clean fix-dbg         
 
 
 

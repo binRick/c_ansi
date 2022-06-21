@@ -1,56 +1,27 @@
-project('c_ansi', ['c'],default_options: ['warning_level=0','c_std=gnu99'])
+project('c_ansi',['c'],default_options: ['warning_level=3','c_std=gnu99'])
 cc = meson.get_compiler('c')
-pwd = run_command(find_program('pwd', required : true), check: true).stdout().strip()
-meson_deps_dir = pwd+'/submodules/meson_deps'
+meson_deps_dir = join_paths(meson.current_source_dir(), 'submodules/meson_deps')
+pwd = meson.current_source_dir()
 inc = [
   include_directories(
-    'submodules/c_palettes',
+    './submodules/meson_deps/submodules/c_palettes',
+    './submodules/meson_deps/submodules',
+    './submodules/meson_deps',
+    './submodules',
+    './subprojects',
     './',
   ),
 ]
 #############################################################################
 subdir('submodules/meson_deps/meson/args')
 subdir('submodules/meson_deps/meson/inc')
-#############################################################################
-subdir('submodules/meson_deps/meson/deps/timestamp')
-subdir('submodules/meson_deps/meson/deps/list')
-subdir('submodules/meson_deps/meson/deps/curl')
-subdir('submodules/meson_deps/meson/deps/asprintf')
-subdir('submodules/meson_deps/meson/deps/ansicodes')
-subdir('submodules/meson_deps/meson/deps/greatest')
-subdir('submodules/meson_deps/meson/deps/tinydir')
-subdir('submodules/meson_deps/meson/deps/log.h')
-subdir('submodules/meson_deps/meson/deps/debug-memory')
-subdir('submodules/meson_deps/meson/deps/parson')
-subdir('submodules/meson_deps/meson/deps/djbhash')
-subdir('submodules/meson_deps/meson/deps/c_stringfn')
-subdir('submodules/meson_deps/meson/deps/c_string_buffer')
-subdir('submodules/meson_deps/meson/deps/uuid4')
-subdir('submodules/meson_deps/meson/deps/c_fsio')
-subdir('submodules/meson_deps/meson/deps/bytes')
-subdir('submodules/meson_deps/meson/deps/ms')
-subdir('submodules/meson_deps/meson/deps/slug')
-subdir('submodules/meson_deps/meson/deps/cargs')
-subdir('submodules/meson_deps/meson/deps/fs')
-subdir('submodules/meson_deps/meson/deps/rgba')
-subdir('submodules/meson_deps/meson/deps/c_timer')
-subdir('submodules/meson_deps/meson/deps/c_embed')
-subdir('submodules/meson_deps/meson/deps/debug_print_h')
-subdir('submodules/meson_deps/meson/deps/generic_print')
-subdir('submodules/meson_deps/meson/deps/termpaint')
-subdir('submodules/meson_deps/meson/deps/incbin')
-subdir('submodules/meson_deps/meson/deps/dmt')
-subdir('submodules/meson_deps/meson/deps/http-get')
+subdir('submodules')
 #//////////////////////////////////////////////////////////////////////
 subdir('ansi-codes')
 subdir('ansi-codes-test')
 #//////////////////////////////////////////////////////////////////////
 subdir('ansi-rgb-utils')
 subdir('ansi-rgb-utils-test')
-#//////////////////////////////////////////////////////////////////////
-#subdir('submodules/c_palettes/meson/deps/embedded_palettes')
-#subdir('submodules/c_palettes/palettes')
-#subdir('submodules/c_palettes/palette-utils')
 #//////////////////////////////////////////////////////////////////////
 subdir('ansi-utils')
 subdir('ansi-utils-test')
@@ -60,6 +31,7 @@ subdir('term-utils-test')
 #//////////////////////////////////////////////////////////////////////
 subdir('image-utils')
 subdir('image-utils-test')
+#//////////////////////////////////////////////////////////////////////
 #subdir('term-termpaint')
 #subdir('term-termpaint-test')
 #//////////////////////////////////////////////////////////////////////
