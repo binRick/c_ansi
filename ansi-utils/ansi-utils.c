@@ -1,6 +1,4 @@
 #pragma once
-#ifndef ANSI_UTILS_C
-#define ANSI_UTILS_C
 #include "ansi-utils.h"
 //#include "parse-colors.h"
 
@@ -203,4 +201,3 @@ void restoreicanon(void){
   seticanon(TerminalCapabilities.Wasicanon, true);
 }
 
-#endif

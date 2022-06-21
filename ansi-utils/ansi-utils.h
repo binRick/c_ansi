@@ -1,6 +1,4 @@
 #pragma once
-#ifndef ANSI_UTILS_H
-#define ANSI_UTILS_H
 #include "../ansi-codes/ansi-codes.h"
 #include <stdbool.h>
 #include <stdio.h>
@@ -22,4 +20,3 @@ typedef enum {
 ///////////////////////////////////////////////////////////////////////////////////yy
 char *strdup_escaped(const char *tmp);
 
-#endif

@@ -54,11 +54,11 @@ void ansi_reset(FILE *file) {
 bool is_in_rgb_range(struct RGB rgb) {
   if (
     rgb.red < 0
-     || rgb.red > 1
-     || rgb.green < 0
-     || rgb.green > 1
-     || rgb.blue < 0
-     || rgb.blue > 1
+    || rgb.red > 1
+    || rgb.green < 0
+    || rgb.green > 1
+    || rgb.blue < 0
+    || rgb.blue > 1
     ) {
     return(false);
   }

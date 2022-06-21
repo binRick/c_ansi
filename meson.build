@@ -34,6 +34,7 @@ subdir('submodules/meson_deps/meson/deps/debug_print_h')
 subdir('submodules/meson_deps/meson/deps/generic_print')
 subdir('submodules/meson_deps/meson/deps/termpaint')
 subdir('submodules/meson_deps/meson/deps/incbin')
+subdir('submodules/meson_deps/meson/deps/dmt')
 subdir('submodules/meson_deps/meson/deps/http-get')
 #//////////////////////////////////////////////////////////////////////
 subdir('ansi-codes')

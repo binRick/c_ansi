@@ -2,16 +2,17 @@ ansi_utils_test_srcs = [
   'ansi-utils-test.c',
 ]
 ansi_utils_include_dirs = [
+  '.',
+  '../ansi-utils',
+  '../ansi-utils-test',
 ]
 ansi_utils_test_deps = [
-       ansi_utils_dep,
+  ansi_utils_dep,
 ]
 
 if get_option('enable-binaries')
   ansi_utils_test_exec = executable('ansi-utils-test',
-     [
-      ansi_utils_test_srcs,
-     ],
+     ansi_utils_test_srcs,
      dependencies: ansi_utils_test_deps,
      include_directories: [
        ansi_utils_include_dirs,

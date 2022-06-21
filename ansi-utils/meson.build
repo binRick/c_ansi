@@ -7,6 +7,7 @@ ansi_utils_deps = [
 
 
 ansi_utils_lib = library('ansi-utils', 
+  ansi_utils_srcs,
   install: false, 
   dependencies: ansi_utils_deps,
   include_directories: [],

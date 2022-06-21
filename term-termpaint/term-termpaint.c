@@ -186,8 +186,8 @@ void event_callback(void *userdata, termpaint_event *tp_event) {
     my_event->string   = strdup(tp_event->key.atom);
     my_event->next     = NULL;
   } else if (tp_event->type == TERMPAINT_EV_MOUSE) {
-    if (  (tp_event->mouse.action == TERMPAINT_MOUSE_PRESS && tp_event->mouse.button == 0)
-       || tp_event->mouse.action == TERMPAINT_MOUSE_MOVE) {
+    if ((tp_event->mouse.action == TERMPAINT_MOUSE_PRESS && tp_event->mouse.button == 0)
+        || tp_event->mouse.action == TERMPAINT_MOUSE_MOVE) {
       cursor_x = tp_event->mouse.x;
       cursor_y = tp_event->mouse.y;
       //         char *cell = cell_at(&board, tp_event->mouse.x, tp_event->mouse.y);

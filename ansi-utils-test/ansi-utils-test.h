@@ -1,6 +1,4 @@
 #pragma once
-#ifndef TERM_UTILS_TEST_H
-#define TRUE_UTILS_TEST_H
 #include "../ansi-utils/ansi-utils.h"
 #include "../subprojects/cargs/include/cargs.h"
 #include <assert.h>
@@ -74,4 +72,3 @@ static struct cag_option options[] = {
 };
 
 
-#endif
