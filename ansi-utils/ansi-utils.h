@@ -1,5 +1,5 @@
 #pragma once
-#include "ansi-codes/ansi-codes.h"
+#include "ansi-codes.h"
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdio.h>
