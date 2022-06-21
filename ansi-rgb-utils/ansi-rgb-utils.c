@@ -1,5 +1,5 @@
 #pragma once
-#include "ansi-rgb-utils.h"
+#include "ansi-rgb-utils/ansi-rgb-utils.h"
 
 
 unsigned char luminanceFromRGB(unsigned char r, unsigned char g, unsigned char b) {

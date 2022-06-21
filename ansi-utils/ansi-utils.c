@@ -1,5 +1,5 @@
 #pragma once
-#include "ansi-utils.h"
+#include "ansi-utils/ansi-utils.h"
 
 TerminalCapabilities_t TerminalCapabilities = {
   .RestorePalette            = false,
