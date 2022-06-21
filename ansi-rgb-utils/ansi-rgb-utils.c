@@ -2,6 +2,11 @@
 #include "ansi-rgb-utils.h"
 
 
+unsigned char luminanceFromRGB(unsigned char r, unsigned char g, unsigned char b) {
+  return((unsigned char)(0.2126 * r + 0.7152 * g + 0.0722 * b));
+}
+
+
 void show_color(FILE *file, int color) {
   ansi_256_bg(file, color);
   fprintf(file, "                                                       ");

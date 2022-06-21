@@ -26,6 +26,7 @@ TIDIED_FILES = \
 			   term-utils/*.c term-utils/*.h  \
 			   term-utils-test/*.c term-utils-test/*.h \
 			   ansi-test/*.c ansi-test/*.h \
+			   image-*/*.c image-*/*.h 
 ##############################################################
 all: do-build do-test
 uncrustify:
