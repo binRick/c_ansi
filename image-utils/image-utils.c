@@ -1,4 +1,4 @@
-#include "image-utils.h"
+#include "image-utils/image-utils.h"
 #include <fcntl.h>
 #include <stdint.h>
 #include <stdio.h>

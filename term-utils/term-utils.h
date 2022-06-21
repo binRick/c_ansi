@@ -1,6 +1,4 @@
 #pragma once
-#ifndef TERM_UTILS_H
-#define TERM_UTILS_H
 #include <assert.h>
 #include <ctype.h>
 #include <stdarg.h>
@@ -16,4 +14,3 @@
 #include <string.h>
 #include <sys/time.h>
 
-#endif
