@@ -23,3 +23,7 @@ google.html
 .err
 meson/deps/*/meson-local.build
 subprojects/*/
+.make-log-*
+.make-log-*
+.make-*log*
+ansi-codes/.attic

@@ -2,6 +2,7 @@ image_utils_srcs = [
   'image-utils.c',
 ]
 image_utils_include_dirs = [
+  inc,
 ]
 
 image_utils_deps = [
@@ -12,9 +13,7 @@ image_utils_lib = static_library('image-utils',
   image_utils_srcs,
   install: false,
   dependencies: image_utils_deps,
-  include_directories: [
-    image_utils_include_dirs,
-  ],
+  include_directories: image_utils_include_dirs,
 )
 
 image_utils_dep = declare_dependency(

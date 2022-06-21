@@ -1,8 +1,6 @@
 #pragma once
-#ifndef TERM_RGB_UTILS_TEST_H
-#define TERM_RGB_UTILS_TEST_H
-#include "../ansi-rgb-utils/ansi-rgb-utils.h"
-#include "../subprojects/cargs/include/cargs.h"
+#include "ansi-rgb-utils/ansi-rgb-utils.h"
+#include "cargs/include/cargs.h"
 #include <assert.h>
 #include <ctype.h>
 #include <stdarg.h>
@@ -73,5 +71,3 @@ static struct cag_option options[] = {
     .description    = "Shows the command help" }
 };
 
-
-#endif

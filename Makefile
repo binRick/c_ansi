@@ -25,7 +25,6 @@ TIDIED_FILES = \
 			   term-termpaint-test/*.c term-termpaint-test/*.h  \
 			   term-utils/*.c term-utils/*.h  \
 			   term-utils-test/*.c term-utils-test/*.h \
-			   ansi-test/*.c ansi-test/*.h \
 			   image-*/*.c image-*/*.h 
 ##############################################################
 all: do-build do-test
@@ -61,7 +60,6 @@ test: do-test
 do-ninja-test:
 	@ninja -C build test
 
-#@./build/ansi-test/ansi-test  -v | ./submodules/greatest/contrib/greenest
 
 
 do-test: do-ninja-test
@@ -75,33 +73,6 @@ nodemon:
 		-w submodules \
 		-w "*/*.c" -w '*/meson.build' --delay 1 -i '*/subprojects' -I  -w 'include/*.h' -w meson.build -w src -w Makefile -w loader/meson.build -w loader/src -w loader/include -i '*/embeds/*' -e tpl,build,sh,c,h,Makefile -x env -- bash -c 'make||true'
 
-test-fxns:
-	@grep -h '^[[:space:]].*ANSI_FXN(' ansi-test/*|cut -d, -f1|cut -d'(' -f2
-
-test-cases:
-	@grep -h '^ANSI_ARG(' ansi-test/*|cut -d, -f1|cut -d'(' -f2
-
-test-case-commands:
-	@make test-cases|xargs -I % echo ./build/ansi-test/ansi-test \-\-%
-
-test-fxn-commands:
-	@make test-fxns|xargs -I % echo ./build/ansi-test/ansi-test \-\-%
-
-do-test-commands:
-	@echo "------------------------------"
-	@echo "Test Commands"
-	@echo "------------------------------"
-	@make test-case-commands|bash
-	@echo "------------------------------"; echo
-
-do-test-fxns:
-	@echo "------------------------------"
-	@echo "Test Functions"
-	@echo "------------------------------"
-	@eval "`make test-fxn-commands`"
-	@echo "------------------------------";echo
-
-do-tests: do-test-fxns do-test-commands
 git-pull:
 	@git pull --recurse-submodules
 git-submodules-pull:

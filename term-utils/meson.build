@@ -2,19 +2,19 @@ term_utils_srcs = [
   'term-utils.c',
 ]
 term_utils_include_dirs = [
+  inc,
 ]
 
 term_utils_deps = [
-     ansi_utils_dep,
+  ansi_codes_dep,
+  ansi_utils_dep,
 ]
 
 term_utils_lib = static_library('term-utils',
   term_utils_srcs,
   install: false,
   dependencies: term_utils_deps,
-  include_directories: [
-    term_utils_include_dirs,
-  ],
+  include_directories: term_utils_include_dirs,
 )
 
 term_utils_dep = declare_dependency(

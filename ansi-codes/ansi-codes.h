@@ -1,8 +1,6 @@
 #pragma once
 #include <stdio.h>
 #include <string.h>
-#ifndef ANSI_CODES_H
-#define ANSI_CODES_H
 
 #define color_reset() \
   printf("\x1b[0m")
@@ -271,5 +269,3 @@
 #define AC_HOME    "\x1b[H"
 #define AC_CLS     "\x1b[2J" AC_HOME
 
-
-#endif

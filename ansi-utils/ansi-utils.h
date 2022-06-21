@@ -1,5 +1,5 @@
 #pragma once
-#include "../ansi-codes/ansi-codes.h"
+#include "ansi-codes/ansi-codes.h"
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdio.h>
@@ -19,4 +19,11 @@ typedef enum {
 } BoolQuery;
 ///////////////////////////////////////////////////////////////////////////////////yy
 char *strdup_escaped(const char *tmp);
-
+void restoreicanon(void);
+char *au_draw_box(int BOX_SIZE);
+char * AC_cur(int par, char type);
+char * AC_cur_prv(int par, bool state);
+void au_save_palette();
+void au_restore_palette();
+char * AC_cur_pos(int x, int y, char type);
+///////////////////////////////////////////////////////////////////////////////////yy

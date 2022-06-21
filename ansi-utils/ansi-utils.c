@@ -1,12 +1,73 @@
 #pragma once
 #include "ansi-utils.h"
-//#include "parse-colors.h"
 
 TerminalCapabilities_t TerminalCapabilities = {
   .RestorePalette            = false,
   .AltScreenInitiallyEnabled = false,
   .IsTTY                     = false,
 };
+static bool seticanon(bool icanon, bool echo);
+static void await_c1(unsigned char c1);
+static char *read_csi();
+static bool query_dec_mode(int mode);
+static void do_dec_mode(int mode, BoolQuery val, const char *name);
+
+
+char *strdup_escaped(const char *tmp) {
+  char *ret = malloc(strlen(tmp) * 4 + 1);
+  char *dst = ret;
+
+  for ( ; *tmp; tmp++) {
+    if (*tmp >= ' ' && *tmp <= 126 && *tmp != '\\') {
+      *dst = *tmp;
+      ++dst;
+    } else {
+      dst += sprintf(dst, "\\x%02hhx", (unsigned char)*tmp);
+    }
+  }
+  *dst = 0;
+  return(ret);
+}
+
+
+void au_restore_palette(){
+  printf(AC_RESTORE_PALETTE);
+}
+
+
+void au_save_palette(){
+  printf(AC_SAVE_PALETTE);
+}
+
+
+char * AC_cur(int par, char type) {
+  register char *ret = (char *)malloc(strlen(ACCSI) + sizeof(char) * 6);
+
+  sprintf(ret, ACCSI "%d%c", par, type);
+  return(ret);
+}
+
+
+char * AC_cur_pos(int x, int y, char type) {
+  register char *ret = (char *)malloc(strlen(ACCSI) + strlen(ACTKN(x)) + strlen(ACTKN(y)) + sizeof(char) * 2);
+
+  sprintf(ret, ACCSI "%d;%d%c", x, y, type);
+  return(ret);
+}
+
+
+char * AC_cur_prv(int par, bool state) {
+  register char *ret = (char *)malloc(strlen(ACCSIP) + sizeof(char) * 7);
+
+  sprintf(ret, ACCSIP "%d%c", par, (((int)state) ? 'h' : 'l'));
+  return(ret);
+}
+
+
+
+void restoreicanon(void){
+  seticanon(TerminalCapabilities.Wasicanon, true);
+}
 
 
 char *au_draw_box(int BOX_SIZE){
@@ -79,22 +140,6 @@ static char *read_csi(){
 }
 
 
-char *strdup_escaped(const char *tmp) {
-  char *ret = malloc(strlen(tmp) * 4 + 1);
-  char *dst = ret;
-
-  for ( ; *tmp; tmp++) {
-    if (*tmp >= ' ' && *tmp <= 126 && *tmp != '\\') {
-      *dst = *tmp;
-      ++dst;
-    } else {
-      dst += sprintf(dst, "\\x%02hhx", (unsigned char)*tmp);
-    }
-  }
-  *dst = 0;
-  return(ret);
-}
-
 
 static bool query_dec_mode(int mode){
   printf("\x1b[?%d$p", mode);
@@ -133,40 +178,6 @@ static bool query_dec_mode(int mode){
 }
 
 
-void au_restore_palette(){
-  printf(AC_RESTORE_PALETTE);
-}
-
-
-void au_save_palette(){
-  printf(AC_SAVE_PALETTE);
-}
-
-
-char * AC_cur(int par, char type) {
-  register char *ret = (char *)malloc(strlen(ACCSI) + sizeof(char) * 6);
-
-  sprintf(ret, ACCSI "%d%c", par, type);
-  return(ret);
-}
-
-
-char * AC_cur_pos(int x, int y, char type) {
-  register char *ret = (char *)malloc(strlen(ACCSI) + strlen(ACTKN(x)) + strlen(ACTKN(y)) + sizeof(char) * 2);
-
-  sprintf(ret, ACCSI "%d;%d%c", x, y, type);
-  return(ret);
-}
-
-
-char * AC_cur_prv(int par, bool state) {
-  register char *ret = (char *)malloc(strlen(ACCSIP) + sizeof(char) * 7);
-
-  sprintf(ret, ACCSIP "%d%c", par, (((int)state) ? 'h' : 'l'));
-  return(ret);
-}
-
-
 static void do_dec_mode(int mode, BoolQuery val, const char *name){
   if (query_dec_mode(mode)) {
     printf("%s on\n", name);
@@ -194,10 +205,5 @@ static bool seticanon(bool icanon, bool echo){
   }
   tcsetattr(0, TCSANOW, &termios);
   return(ret);
-}
-
-
-void restoreicanon(void){
-  seticanon(TerminalCapabilities.Wasicanon, true);
 }
 

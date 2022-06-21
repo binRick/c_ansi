@@ -168,7 +168,6 @@ float rgb_to_hsv_value(struct RGB rgb) {
 }
 
 
-/* rgb -> hsv saturation */
 float rgb_to_hsv_saturation(struct RGB rgb) {
   if (!is_in_rgb_range(rgb)) {
     return(-1);
