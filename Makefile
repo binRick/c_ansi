@@ -40,32 +40,20 @@ fix-dbg:
 	@$(SED) 's|, % d);|, %d);|g' -i $(TIDIED_FILES)
 	@$(SED) 's|, % zu);|, %zu);|g' -i $(TIDIED_FILES)
 
-tidy: uncrustify uncrustify-clean fix-dbg         
-
-
-
+tidy: uncrustify uncrustify-clean fix-dbg rm-make-logs
 clean: 
 	@rm -rf build
-
 do-meson:
-	@meson build $(DN) \
-		|| meson build --reconfigure $(DN) \
-		|| meson build --wipe \
-		|| rm -rf build
-	@meson build
-	@ninja -C build
-
+	@eval cd . && {  meson build || { meson build --reconfigure || { meson build --wipe; } && meson build; }; }	
+rm-make-logs:
+	@rm .make-log* 2>/dev/null||true
 test: do-test
-
-do-ninja-test:
-	@ninja -C build test
-
-
-
-do-test: do-ninja-test
 
 dev: nodemon
 do-build: do-meson
+	@meson compile -C build
+do-test:
+	@passh meson test -C build -v --print-errorlogs	
 nodemon:
 	@$(PASSH) -L .nodemon.log $(NODEMON) \
 		-V \

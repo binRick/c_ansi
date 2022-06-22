@@ -17,11 +17,9 @@ inc = [
   ),
 ]
 #############################################################################
-subdir('submodules/meson_deps/meson/args')
-subdir('submodules/meson_deps/meson/inc')
+subdir('submodules')
 #//////////////////////////////////////////////////////////////////////
 subdir('ansi-codes')
-subdir('submodules')
 subdir('ansi-utils')
 subdir('ansi-rgb-utils')
 subdir('term-utils')

@@ -1,3 +1,5 @@
+subdir('meson_deps/meson/args')
+subdir('meson_deps/meson/inc')
 subdir('meson_deps/meson/deps/timestamp')
 subdir('meson_deps/meson/deps/list')
 subdir('meson_deps/meson/deps/curl')
