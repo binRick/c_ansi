@@ -689,11 +689,3 @@ const LabColor      ansi_to_lab_map[] = {
 };
 
 
-static inline RGBColor ansi_to_rgb(int ansi_num) {
-  return(ansi_to_rgb_map[ansi_num - ANSI_MAP_OFFSET]);
-}
-
-
-static inline LabColor ansi_to_lab(int ansi_num) {
-  return(ansi_to_lab_map[ansi_num - ANSI_MAP_OFFSET]);
-}

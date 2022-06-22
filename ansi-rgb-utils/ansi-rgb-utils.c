@@ -1,6 +1,13 @@
 #pragma once
 #include "ansi-rgb-utils/ansi-rgb-utils.h"
+static inline RGBColor ansi_to_rgb(int ansi_num) {
+  return(ansi_to_rgb_map[ansi_num - ANSI_MAP_OFFSET]);
+}
 
+
+static inline LabColor ansi_to_lab(int ansi_num) {
+  return(ansi_to_lab_map[ansi_num - ANSI_MAP_OFFSET]);
+}
 
 unsigned char luminanceFromRGB(unsigned char r, unsigned char g, unsigned char b) {
   return((unsigned char)(0.2126 * r + 0.7152 * g + 0.0722 * b));
