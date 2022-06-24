@@ -1,4 +1,6 @@
 #pragma once
+#include "hsluv-c/src/hsluv.h"
+#include "hsluv-c/tests/snapshot.h"
 #include <assert.h>
 #include <ctype.h>
 #include <dirent.h>
@@ -21,16 +23,19 @@
 #include <wchar.h>
 #include <wctype.h>
 //////////////////////////////////////////////////////////
-typedef struct ColorInfo                                    ColorInfo;
-typedef struct Ansi_t                                       Ansi_t;
-typedef struct CSEQ                                         CSEQ;
-typedef struct SEQ                                          SEQ;
-typedef struct RGB_t                                        RGB_t;
-typedef struct { double L;   double a;   double b; }        LabColor;
-typedef struct { double L;   double C;   double h; }        LChColor;
-typedef struct { double r;   double g;    double b; }       RGBColor;
-typedef struct { double rl;    double gl;    double bl; }   SRGBColor;
-typedef struct { double x;    double y;   double z; }       XYZColor;
+//typedef struct RGBColor RGBColor;
+typedef struct SRGBColor                                SRGBColor;
+typedef struct ColorInfo                                ColorInfo;
+typedef struct LabColor                                 LabColor;
+typedef struct Ansi_t                                   Ansi_t;
+typedef struct CSEQ                                     CSEQ;
+typedef struct SEQ                                      SEQ;
+typedef struct RGB_t                                    RGB_t;
+struct LabColor { double L;   double a;   double b; };
+typedef struct { double L;   double C;   double h; }    LChColor;
+struct RGBColor { double r;   double g;    double b; };
+struct SRGBColor { double rl;    double gl;    double bl; };
+typedef struct { double x;    double y;   double z; }   XYZColor;
 //////////////////////////////////////////////////////////
 struct Ansi_t {
   const char *fg;
@@ -78,8 +83,8 @@ struct HSV {
   float value;
 };
 //////////////////////////////////////////////////////////
-static inline RGBColor ansi_to_rgb(int ansi_num);
-static inline LabColor ansi_to_lab(int ansi_num);
+struct RGB_Double ansi_to_rgb(int ansi_num);
+LabColor ansi_to_lab(int ansi_num);
 void print_ansi_color(int red, int green, int blue, int wl, char *word);
 void print_ansi_to_rgb(int ansi_code);
 void ansi_256_fg(FILE *file, int color);
@@ -196,13 +201,13 @@ static const double srgb_to_xyz_matrix[] = {
   0.2126, 0.7152, 0.0722,
   0.0193, 0.1192, 0.9505,
 };
-static const double xyz_to_srgb_matrix[] = {
+static const double   xyz_to_srgb_matrix[] = {
   3.2406255,  -1.537208,  -0.4986286,
   -0.9689307, 1.8757561,  0.0415175,
   0.0557101,  -0.2040211, 1.0569959,
 };
 //////////////////////////////////////////////////////////
-const RGBColor      ansi_to_rgb_map[] = {
+const struct RGBColor ansi_to_rgb_map[] = {
   { 0x0p+0,               0x0p+0,               0x0p+0               },
   { 0x0p+0,               0x0p+0,               0x1.7d7d7d7d7d7d8p-2 },
   { 0x0p+0,               0x0p+0,               0x1.0f0f0f0f0f0f1p-1 },
@@ -445,7 +450,7 @@ const RGBColor      ansi_to_rgb_map[] = {
   { 0x1.ddddddddddddep-1, 0x1.ddddddddddddep-1, 0x1.ddddddddddddep-1 },
 };
 
-const LabColor      ansi_to_lab_map[] = {
+const LabColor        ansi_to_lab_map[] = {
   { 0x0p+0,               0x0p+0,                0x0p+0                },
   { 0x1.dda5cfe092fep+2,  0x1.332b010968089p+5,  -0x1.a2c4a323ffe92p+5 },
   { 0x1.c397c39a77298p+3, 0x1.8af9b447e90cbp+5,  -0x1.0cf90bbbcc5d8p+6 },
@@ -687,5 +692,4 @@ const LabColor      ansi_to_lab_map[] = {
   { 0x1.6a5b0dbe1d206p+6, 0x1.3cc84a548eep-8,    -0x1.3962b46c7fep-7   },
   { 0x1.78642ea7f55e1p+6, 0x1.4735fc607fap-8,    -0x1.43b3c60170cp-7   },
 };
-
 

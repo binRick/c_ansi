@@ -6,6 +6,7 @@ ansi_rgb_utils_incs = [
 ]
 ansi_rgb_utils_deps = [
   ansi_codes_dep,
+  hsluv_c_dep,
 ]
 
 ansi_rgb_utils_lib = library('ansi-rgb-utils', 

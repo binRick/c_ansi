@@ -1,6 +1,9 @@
 #pragma once
 #include "ansi-rgb-utils/ansi-rgb-utils.h"
 #include "cargs/include/cargs.h"
+#include "dbg.h/dbg.h"
+#include "log.h/log.h"
+#include "rgba/src/rgba.h"
 #include <assert.h>
 #include <ctype.h>
 #include <stdarg.h>

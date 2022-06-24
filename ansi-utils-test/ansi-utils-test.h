@@ -1,6 +1,6 @@
 #pragma once
 #include "../ansi-utils/ansi-utils.h"
-#include "../subprojects/cargs/include/cargs.h"
+#include "cargs.h"
 #include <assert.h>
 #include <ctype.h>
 #include <stdarg.h>

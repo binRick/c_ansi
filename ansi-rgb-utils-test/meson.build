@@ -5,7 +5,11 @@ ansi_rgb_utils_test_incs = [
   inc,
 ]
 ansi_rgb_utils_test_deps = [
+  dbg_dep,
+  logh_dep,
+  hsluv_c_dep,
   ansi_codes_dep,
+  rgba_dep,
   ansi_rgb_utils_dep,
   ansi_utils_dep,
 ]
