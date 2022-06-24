@@ -20,6 +20,7 @@ typedef enum {
 ///////////////////////////////////////////////////////////////////////////////////yy
 char *strdup_escaped(const char *tmp);
 void restoreicanon(void);
+bool seticanon(bool icanon, bool echo);
 char *au_draw_box(int BOX_SIZE);
 char * AC_cur(int par, char type);
 char * AC_cur_prv(int par, bool state);

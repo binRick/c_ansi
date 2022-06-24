@@ -192,9 +192,10 @@ static const char *HEX_VALUES = "0123456789ABCDEF";
 #define RESET    ESCAPE "[0m" ESCAPE "[49m"
 #define RESETF()           printf(ESCAPE "[0m" ESCAPE "[49m")
 #define OUTPUT_HIDE()      printf(ESCAPE "^")
-// Cursor attributes
+
 #define CURSOR_HIDE()      printf(ESCAPE "[?25l")
 #define CURSOR_SHOW()      printf(ESCAPE "[?25h")
+// Cursor attributes
 //////////////////////////////////////////////////////////
 static const double srgb_to_xyz_matrix[] = {
   0.4124, 0.3576, 0.1805,

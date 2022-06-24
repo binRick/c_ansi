@@ -1,6 +1,7 @@
 project('c_ansi',['c'],default_options: ['warning_level=0','c_std=gnu99'],
   subproject_dir: 'submodules/meson_deps/subprojects',  
   )
+passh_program = find_program('passh', required : true)
 cc = meson.get_compiler('c')
 meson_deps_dir = join_paths(meson.current_source_dir(), 'submodules/meson_deps')
 pwd = meson.current_source_dir()

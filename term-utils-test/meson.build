@@ -19,6 +19,6 @@ if get_option('enable-binaries')
      ],
   )
   if get_option('enable-binary-tests')
-    test('term-utils-test', term_utils_test_exec, args: ['--test'])
+    test('term-utils-test', passh_program, args: [term_utils_test_exec, '--test'])
   endif
 endif

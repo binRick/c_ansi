@@ -187,7 +187,7 @@ static void do_dec_mode(int mode, BoolQuery val, const char *name){
 }
 
 
-static bool seticanon(bool icanon, bool echo){
+bool seticanon(bool icanon, bool echo){
   struct termios termios;
 
   tcgetattr(0, &termios);
