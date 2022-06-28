@@ -16,6 +16,9 @@ inc = [
     'submodules/meson_deps',
     'submodules',
     'submodules/meson_deps/subprojects/cargs/include',
+    'submodules/meson_deps/submodules/c_embed/embeds',
+    'submodules/meson_deps/submodules/c_embed',
+    'submodules/meson_deps/submodules/c_palettes',
     '.',
   ),
 ]

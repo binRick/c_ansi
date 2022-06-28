@@ -1,10 +1,7 @@
 #pragma once
 #include "ansi-rgb-utils/ansi-rgb-utils.h"
-
-
-struct RGB_Double ansi_to_rgb(int ansi_num) {
-  return(ansi_to_rgb_map[ansi_num - ANSI_MAP_OFFSET]);
-}
+#include <math.h>
+#include <stdint.h>
 
 
 LabColor ansi_to_lab(int ansi_num) {
@@ -192,3 +189,18 @@ float rgb_to_hsv_saturation(struct RGB rgb) {
   }
 }
 
+
+void rgb_to_ints(struct RGBColor rgb, int *r, int *g, int *b) {
+  *r = round(rgb.r * 255.0);
+  *g = round(rgb.g * 255.0);
+  *b = round(rgb.b * 255.0);
+}
+
+
+struct RGBColor rgb_from_ints(int r, int g, int b) {
+  return((struct RGBColor){
+    .r = r / 255.0,
+    .g = g / 255.0,
+    .b = b / 255.0,
+  });
+}

@@ -2,12 +2,16 @@ ansi_codes_srcs = [
   'ansi-codes.c',
 ]
 ansi_codes_dirs = [
+  '.',
+  '../../',
+  '../',
   inc,
 ]
 ansi_codes_deps = [
 ]
 
-ansi_codes_lib = library('ansi-codes', 
+ansi_codes_lib = shared_library('ansi-codes', 
+  ansi_codes_srcs,
   install: false, 
   dependencies: ansi_codes_deps,
   include_directories: ansi_codes_dirs,

@@ -8,6 +8,12 @@ ansi_utils_include_dirs = [
 ]
 ansi_utils_test_deps = [
   ansi_utils_dep,
+  ansi_codes_dep,
+  c_stringfn_dep,
+  c_string_buffer_dep,
+  c_fsio_dep,
+  ansi_rgb_utils_dep,
+  vt100utils_dep,
 ]
 
 if get_option('enable-binaries')

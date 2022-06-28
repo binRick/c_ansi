@@ -1,5 +1,6 @@
 #pragma once
 #include "ansi-codes/ansi-codes.h"
+//#include "vt100utils/vt100utils.h"
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdio.h>
@@ -18,6 +19,7 @@ typedef enum {
   QUERY,
 } BoolQuery;
 ///////////////////////////////////////////////////////////////////////////////////yy
+char *random_rgb();
 char *strdup_escaped(const char *tmp);
 void restoreicanon(void);
 bool seticanon(bool icanon, bool echo);
@@ -28,3 +30,16 @@ void au_save_palette();
 void au_restore_palette();
 char * AC_cur_pos(int x, int y, char type);
 ///////////////////////////////////////////////////////////////////////////////////yy
+#define BIN2DEC(b)    (((b) >= 0 && (b) <= 9) ? (b)+'0' : (b))
+#define DEC2BIN(d)    (((d) >= '0' && (d) <= '9') ? (d)-'0' : (d))
+#define BIN2HEX(b)    (((b)>=0 && (b)<=9)?(b)+'0':\
+                       ((b)>=10 && (b)<=15)?(b)-10+'A':\
+                        (b))
+#define HEX2BIN(h)    (((h)>='0' && (h)<='9')?(h)-'0':\
+                       ((h)>='A' && (h)<='F')?(h)-'A' + 10:\
+                       ((h)>='a' && (h)<='f')?(h)-'a' + 10:\
+                        (h))
+
+#define BRIGHT_COLOR_GOLDEN_RATIO 1.618;
+void bright_color_init( float alpha );
+void bright_color( int i, float color[4] );

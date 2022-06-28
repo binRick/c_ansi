@@ -16,7 +16,9 @@
 #include <sys/time.h>
 #include <unistd.h>
 /////////////////////////////////////////////////////////////////
+#include "embeds/tbl1.c"
 #include "palettes/palettes.h"
+
 #include "submodules/c_string_buffer/include/stringbuffer.h"
 #include "submodules/c_stringfn/include/stringfn.h"
 /////////////////////////////////////////////////////////////////

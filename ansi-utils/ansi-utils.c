@@ -1,12 +1,14 @@
 #pragma once
 #include "ansi-utils/ansi-utils.h"
+#include <math.h>
+#include <stdlib.h>
+#include <string.h>
 
 TerminalCapabilities_t TerminalCapabilities = {
   .RestorePalette            = false,
   .AltScreenInitiallyEnabled = false,
   .IsTTY                     = false,
 };
-static bool seticanon(bool icanon, bool echo);
 static void await_c1(unsigned char c1);
 static char *read_csi();
 static bool query_dec_mode(int mode);
@@ -206,4 +208,156 @@ bool seticanon(bool icanon, bool echo){
   tcsetattr(0, TCSANOW, &termios);
   return(ret);
 }
+
+#include "ansi-utils.h"
+#include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/time.h>
+
+char *random_rgb() {
+  struct timeval tv;
+  gettimeofday(&tv, NULL);  // should not fail
+  unsigned int seed = (unsigned int)tv.tv_sec + (unsigned int)(1000 * tv.tv_usec);
+  srand(seed);
+
+  float hue = rand() % 360;  // range [0, 360)
+  const float saturation = 0.5f;  // range [0, 1]
+  const float value = 0.95f;  // range [0, 1]
+
+	float fC = value * saturation;  // Chroma
+  float fHPrime = fmod(hue / 60.0, 6);
+  float fX = fC * (1 - fabs(fmod(fHPrime, 2) - 1));
+  float fM = value - fC;
+
+  float fR, fG, fB;
+  if (0 <= fHPrime && fHPrime < 1) {
+    fR = fC;
+    fG = fX;
+    fB = 0;
+  } else if (1 <= fHPrime && fHPrime < 2) {
+    fR = fX;
+    fG = fC;
+    fB = 0;
+  } else if (2 <= fHPrime && fHPrime < 3) {
+    fR = 0;
+    fG = fC;
+    fB = fX;
+  } else if (3 <= fHPrime && fHPrime < 4) {
+    fR = 0;
+    fG = fX;
+    fB = fC;
+  } else if (4 <= fHPrime && fHPrime < 5) {
+    fR = fX;
+    fG = 0;
+    fB = fC;
+  } else if (5 <= fHPrime && fHPrime < 6) {
+    fR = fC;
+    fG = 0;
+    fB = fX;
+  } else {
+    fR = 0;
+    fG = 0;
+    fB = 0;
+  }
+
+  fR += fM;
+  fG += fM;
+  fB += fM;
+
+  int r = 255 * fR;
+  int g = 255 * fG;
+  int b = 255 * fB;
+
+  char s[256];
+  sprintf(s,"\x1b[38;2;%d;%d;%dm[%d/%d/%d]",r,g,b,r,g,b);
+  return(strdup(s));
+}
+
+
+
+
+
+
+
+
+
+// lookup table of nice bright colors
+static float colors[8*8*8][4];
+
+static void RGBfromHSV( double hue, double saturation, double value, float rgb[3] )
+{
+  int hi = floor(hue * 6.0);
+  float f = hue*6.0 - hi; 
+  float v = value;
+  float p = value * (1.0 - saturation);
+  float q = value * (1.0 - f * saturation);
+  float t = value * (1.0 - (1 - f) * saturation);
+
+  switch( hi )
+    {
+    case 0:
+      rgb[0] = v;
+      rgb[1] = t;
+      rgb[2] = p;
+      break;
+    case 1:
+      rgb[0] = q;
+      rgb[1] = v;
+      rgb[2] = p;
+      break;
+    case 2:
+      rgb[0] = p;
+      rgb[1] = v;
+      rgb[2] = t;
+      break;
+    case 3:
+      rgb[0] = p;
+      rgb[1] = q;
+      rgb[2] = v;
+      break;
+    case 4:
+      rgb[0] = t;
+      rgb[1] = p;
+      rgb[2] = v;
+      break;
+    default:
+      rgb[0] = v;
+      rgb[1] = p;
+      rgb[2] = q;
+    }
+}
+
+/* Initialize a table of nice bright usable unique colors. Parameter
+   @alpha sets the alpha channel density (transparency) for all
+   colors. */
+void bright_color_init( float alpha )
+{
+  double h = drand48(); // # use random start value
+
+  // a table of nice bright colors
+   int num = 8;
+  for(  int i=0; i<num; i++ )
+    for(  int j=0; j<num; j++ )
+      for(  int k=0; k<num; k++ )
+	{
+	  h += 1.0 / BRIGHT_COLOR_GOLDEN_RATIO;
+
+	  float col[3];
+	  RGBfromHSV( fmod(h,1.0), 0.8, 0.99, col );
+	  
+	   int c = (8*8*i)+(8*j)+k;
+	  colors[c][0] = col[0];
+	  colors[c][1] = col[1];
+	  colors[c][2] = col[2];
+	  colors[c][3] = alpha;
+	}
+}
+
+/* Get a nice bright color from index @i in the color table. */
+void bright_color( int i, float color[4] )
+{
+  memcpy( color, colors[ i % (8*8*8) ], 4 * sizeof(float) );
+}
+
 
