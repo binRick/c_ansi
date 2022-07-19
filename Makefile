@@ -61,8 +61,28 @@ nodemon:
 		-w "ansi-rgb-utils-test/*.c"  \
 		-w "ansi-rgb-utils/*.c"  \
 		-w "*/*.c" -w '*/meson.build' --delay 1 -i '*/subprojects' -I  -w 'include/*.h' -w meson.build -w src -w Makefile -w loader/meson.build -w loader/src -w loader/include -i '*/embeds/*' -e tpl,build,sh,c,h,Makefile -x env -- bash -c 'reset;make||true'
-
+meson-introspect-all:
+	@meson introspect --all -i meson.build
+meson-introspect-targets:
+	@meson introspect --targets -i meson.build
+meson-binaries:
+	@meson introspect --targets  meson.build -i | jq 'map(select(.type == "executable").filename)|flatten|join("\n")' -Mrc|xargs -I % echo ./build/%
+run-binary:
+	@make meson-binaries | fzf --reverse | xargs -I % passh "./%"
 git-pull:
 	@git pull --recurse-submodules
 git-submodules-pull:
 	@git submodule foreach git pull origin master --jobs=10
+
+meson-tests-list:
+	@meson test -C build --list
+meson-tests:
+	@make meson-tests-list|fzf --reverse -m | xargs -I % env cmd="\
+		meson test --num-processes 1 -C build -v --no-stdsplit --print-errorlogs \"%\"" \
+			env bash -c '\
+	eval "$$cmd" && \
+	ansi -n --green --bold "OK" && \
+	echo -n "> " && \
+	ansi -n --yellow --italic "$$cmd" && \
+	echo \
+'	

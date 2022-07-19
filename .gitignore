@@ -27,3 +27,4 @@ subprojects/*/
 .make-log-*
 .make-*log*
 ansi-codes/.attic
+loc.sh
