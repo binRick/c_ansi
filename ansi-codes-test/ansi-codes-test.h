@@ -1,8 +1,7 @@
 #pragma once
 #ifndef TERM_CODEST_TEST_H
 #define TRUE_CODES_TEST_H
-#include "../ansi-codes/ansi-codes.h"
-#include "../submodules/cargs/include/cargs.h"
+/////////////////////////////////////////////////////////
 #include <assert.h>
 #include <ctype.h>
 #include <stdarg.h>
@@ -17,6 +16,10 @@
 #include <string.h>
 #include <string.h>
 #include <sys/time.h>
+/////////////////////////////////////////////////////////
+#include "ansi-codes/ansi-codes.h"
+#include "submodules/cargs/include/cargs.h"
+/////////////////////////////////////////////////////////
 
 int parse_args(int argc, char *argv[]);
 int debug_args();

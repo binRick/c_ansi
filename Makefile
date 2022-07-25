@@ -48,7 +48,7 @@ do-meson:
 rm-make-logs:
 	@rm .make-log* 2>/dev/null||true
 test: do-test
-
+build: do-meson
 dev: nodemon
 do-build: do-meson
 	@meson compile -C build

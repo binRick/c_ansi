@@ -1,6 +1,5 @@
 #pragma once
-#include "hsluv-c/src/hsluv.h"
-#include "hsluv-c/tests/snapshot.h"
+//////////////////////////////////////////////////////////
 #include <assert.h>
 #include <ctype.h>
 #include <dirent.h>
@@ -22,6 +21,9 @@
 #include <unistd.h>
 #include <wchar.h>
 #include <wctype.h>
+//////////////////////////////////////////////////////////
+#include "hsluv-c/src/hsluv.h"
+#include "hsluv-c/tests/snapshot.h"
 //////////////////////////////////////////////////////////
 //typedef struct RGBColor RGBColor;
 typedef struct SRGBColor                                SRGBColor;

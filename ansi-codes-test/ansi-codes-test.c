@@ -1,14 +1,17 @@
-#include "ansi-codes-test.h"
+///////////////////////////////////////////////////////////////////
 #include <assert.h>
 #include <stdlib.h>
 #define INCBIN_SILENCE_BITCODE_WARNING
-#include "../submodules/http-get.c/src/http-get.h"
-#include "../submodules/incbin/incbin.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
+///////////////////////////////////////////////////////////////////
+#include "ansi-codes-test/ansi-codes-test.h"
+#include "submodules/http-get.c/src/http-get.h"
+#include "submodules/incbin/incbin.h"
+///////////////////////////////////////////////////////////////////
 INCBIN(char, __TEST_INCLUDE_0__, "test-include-0.txt");
 
 

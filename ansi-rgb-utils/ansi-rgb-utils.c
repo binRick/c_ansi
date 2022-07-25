@@ -1,7 +1,9 @@
 #pragma once
-#include "ansi-rgb-utils/ansi-rgb-utils.h"
+/////////////////////////////////////////////////////////
 #include <math.h>
 #include <stdint.h>
+/////////////////////////////////////////////////////////
+#include "ansi-rgb-utils/ansi-rgb-utils.h"
 
 
 LabColor ansi_to_lab(int ansi_num) {
