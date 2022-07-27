@@ -25,6 +25,7 @@ inc = [
 #############################################################################
 subdir('submodules')
 #//////////////////////////////////////////////////////////////////////
+subdir('emojis')
 subdir('ansi-codes')
 subdir('ansi-utils')
 subdir('ansi-rgb-utils')
@@ -37,6 +38,7 @@ subdir('ansi-rgb-utils-test')
 subdir('ansi-codes-test')
 subdir('ansi-utils-test')
 subdir('image-utils-test')
+subdir('emojis-test')
 #subdir('term-termpaint')
 #subdir('term-termpaint-test')
 #//////////////////////////////////////////////////////////////////////
