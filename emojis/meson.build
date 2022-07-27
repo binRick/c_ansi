@@ -8,6 +8,7 @@ emojis_incs = [
 ]
 emojis_deps = [
   c_vector_dep,
+  djbhash_dep,
 ]
 
 

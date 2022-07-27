@@ -5,21 +5,22 @@
 #include <string.h>
 /////////////////////////////////////
 #include "c_vector/include/vector.h"
+#include "djbhash/src/djbhash.h"
 /////////////////////////////////////
-static size_t emojis_table_qty = 1594;
 //////////////////////////////////////////
 typedef struct emojis_t emojis_t;
 //////////////////////////////////////////
 struct Vector *get_emojis_names_v();
-struct Vector *get_emojis_v();
-struct emojis_t *get_emoji_t(size_t index);
+struct Vector *get_emojis_t_v();
 size_t get_emojis_qty();
+struct emojis_t *get_emoji_t(size_t index);
+int get_emoji_t_index_by_name(const char *name);
+struct emojis_t *get_emoji_t_by_name(const char *name);
 //////////////////////////////////////////
-
-
 struct emojis_t {
     char name[32];
     char emoji[32];
+    size_t chars;
 } static emojis_table[] = {
     { .name = "+1", .emoji = "👍", },
     { .name = "-1", .emoji = "👎", },

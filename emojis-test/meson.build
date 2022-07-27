@@ -7,6 +7,8 @@ emojis_include_dirs = [
 ]
 emojis_test_emojis = [
   emojis_dep,
+  bench_dep,
+  c_vector_dep,
 ]
 emojis_c_args = [
 ]
