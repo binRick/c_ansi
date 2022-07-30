@@ -2,8 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#define color_reset() \
-  printf("\x1b[0m")
+void color_reset();
 
 #define color_set(r, g, b) \
   printf("\x1b[38;2;%d;%d;%dm", r, g, b)
@@ -50,14 +49,17 @@
 }
 #define ACTKN(token)      (#token)
 
+#define AC_ESC    "\x1b"
+#ifdef AC_RESETALL
+#undef AC_RESETALL
+#endif
+#define AC_RESETALL    AC_ESC "[0m"
 
-#define acs(s)            AC_RESETALL s AC_RESETALL
-#define acsl(s)           AC_RESETALL s AC_RESETALL "\n"
-#define ansistr(s)        s AC_RESETALL
-#define ansistrln(s)      s AC_RESETALL "\n"
 
-#define AC_ESC                         "\x1b"
-#define AC_RESETALL                    AC_ESC "[0m"
+#define acs(s)          AC_RESETALL s AC_RESETALL
+#define acsl(s)         AC_RESETALL s AC_RESETALL "\n"
+#define ansistr(s)      s AC_RESETALL
+#define ansistrln(s)    s AC_RESETALL "\n"
 
 #define AC_BLACK                       "\x1b[30m"
 #define AC_BLACK_BLACK                 "\x1b[30m\x1b[40m"
@@ -259,13 +261,19 @@
 #define AC_FAST_BLINK     "\x1b[6m"
 #define AC_INVERSE        "\x1b[7m"
 #define AC_NOINVERSE      "\x1b[27m"
-#define AC_INVERSED       AC_INVERSE
-#define AC_REVERSE        "\x1b[7m"
-#define AC_REVERSED       AC_REVERSE
-#define AC_SOLID          "\x1b[7m"
-#define AC_STRIKE         "\x1b[9m"
-#define AC_INVISIBLE      "\x1b[8m"
-#define AC_NORMAL         "\x1b[22m"
+#ifdef AC_INVERSED
+#undef AC_INVERSED
+#endif
+#define AC_INVERSED    AC_INVERSE
+#define AC_REVERSE     "\x1b[7m"
+#ifdef AC_REVERSED
+#undef AC_REVERSED
+#endif
+#define AC_REVERSED     AC_REVERSE
+#define AC_SOLID        "\x1b[7m"
+#define AC_STRIKE       "\x1b[9m"
+#define AC_INVISIBLE    "\x1b[8m"
+#define AC_NORMAL       "\x1b[22m"
 #define AC_UP(n)        "\x1b["#n "A"
 #define AC_DOWN(n)      "\x1b["#n "B"
 #define AC_RIGHT(n)     "\x1b["#n "C"

@@ -156,30 +156,33 @@ void print_cube(FILE *file, int g);
 #define COLOR_FG_RGB              L"\033[48;2;%u;%u;%um"
 #define COLOR_RESET_TO_DEFAULT    L"\033[0m"
 /***********************/// HEX COLOR CONSTANTS
-#define HEX_LEN                   6
+#ifdef HEX_LEN
+#undef HEX_LEN
+#endif
+#define HEX_LEN                  6
 static const char *HEX_VALUES = "0123456789ABCDEF";
 /***********************///
-#define LAB_XYZ_SIGMA             (6.0 / 29.0)
-#define LAB_XYZ_SIGMA_SQUARED     (LAB_XYZ_SIGMA * LAB_XYZ_SIGMA)
-#define LAB_XYZ_SIGMA_CUBED       (LAB_XYZ_SIGMA_SQUARED * LAB_XYZ_SIGMA)
-#define XYZ_D65_XN                0.95047
-#define XYZ_D65_YN                1.0
-#define XYZ_D65_ZN                1.08883
-#define VAL_25_POW_7              6103515625
+#define LAB_XYZ_SIGMA            (6.0 / 29.0)
+#define LAB_XYZ_SIGMA_SQUARED    (LAB_XYZ_SIGMA * LAB_XYZ_SIGMA)
+#define LAB_XYZ_SIGMA_CUBED      (LAB_XYZ_SIGMA_SQUARED * LAB_XYZ_SIGMA)
+#define XYZ_D65_XN               0.95047
+#define XYZ_D65_YN               1.0
+#define XYZ_D65_ZN               1.08883
+#define VAL_25_POW_7             6103515625
 /***********************/// ANSI COLOR CONSTANTS
-#define ANSI_MIN                  16
-#define ANSI_MAX                  256
-#define ANSI_MAP_OFFSET           ANSI_MIN
-#define ANSI_MAP_LEN              (ANSI_MAX - ANSI_MAP_OFFSET)
+#define ANSI_MIN                 16
+#define ANSI_MAX                 256
+#define ANSI_MAP_OFFSET          ANSI_MIN
+#define ANSI_MAP_LEN             (ANSI_MAX - ANSI_MAP_OFFSET)
 //////////////////////////////////////////////////////////
-#define ESCAPE                    "\x1b"
-#define BOLD                      ESCAPE "[1m"
-#define DIM                       ESCAPE "[2m"
-#define ITALIC                    ESCAPE "[3m"
-#define UNDER                     ESCAPE "[4m"
-#define BLINK                     ESCAPE "[5m"
-#define INVERSE                   ESCAPE "[7m"
-#define STRIKE                    ESCAPE "[8m"
+#define ESCAPE                   "\x1b"
+#define BOLD                     ESCAPE "[1m"
+#define DIM                      ESCAPE "[2m"
+#define ITALIC                   ESCAPE "[3m"
+#define UNDER                    ESCAPE "[4m"
+#define BLINK                    ESCAPE "[5m"
+#define INVERSE                  ESCAPE "[7m"
+#define STRIKE                   ESCAPE "[8m"
 // Text 256 colors
 #define FG_256(code)       printf(ESCAPE "[38;5;" #code "m")
 #define BG_256(code)       printf(ESCAPE "[48;5;" #code "m")

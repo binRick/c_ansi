@@ -4,14 +4,11 @@ ansi_codes_test_srcs = [
 ansi_codes_test_deps = [
   incbin_dep,
   http_get_dep,
-  curl_dep,
 ]
 
 if get_option('enable-binaries')
   ansi_codes_test_exec = executable('ansi-codes-test',
-     [
-      ansi_codes_test_srcs,
-     ],
+     ansi_codes_test_srcs,
      dependencies: ansi_codes_test_deps,
      include_directories: [],
   )

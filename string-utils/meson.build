@@ -2,6 +2,7 @@ string_utils_srcs = [
   'string-utils.c',
 ]
 string_utils_include_dirs = [
+  '.',
   inc,
 ]
 

@@ -28,6 +28,19 @@ TIDIED_FILES = \
 			   image-*/*.c image-*/*.h 
 ##############################################################
 all: do-build do-test
+do-muon-setup:
+	@muon setup build-muon
+do-muon-clean:
+	@rm -rf build-muon
+do-muon-build:
+	@muon samu -C build-muon
+do-muon-install:
+	@cd build-muon && muon install
+do-muon-test:
+	@cd build-muon && muon test
+build-muon: do-muon-setup do-muon-build do-muon-test
+muon: build-muon do-muon-install
+	
 uncrustify:
 	@$(UNCRUSTIFY) -c $(ETC_DIR)/uncrustify.cfg --replace $(TIDIED_FILES) 
 

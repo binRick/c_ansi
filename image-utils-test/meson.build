@@ -21,7 +21,7 @@ image_utils_test_deps = [
 
 if get_option('enable-binaries')
   image_utils_test_exec = executable('image-utils-test',
-      image_utils_test_srcs,
+     image_utils_test_srcs,
      dependencies: image_utils_test_deps,
      include_directories: image_utils_include_dirs,
   )

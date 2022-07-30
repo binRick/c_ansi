@@ -1,6 +1,5 @@
 emojis_srcs = [
   'emojis.c',
-  'emojis.h',
 ]
 emojis_incs = [
   inc,
@@ -12,7 +11,7 @@ emojis_deps = [
 ]
 
 
-emojis_lib = library('emojis', 
+emojis_lib = static_library('emojis', 
   emojis_srcs,
   install: false, 
   dependencies: emojis_deps,

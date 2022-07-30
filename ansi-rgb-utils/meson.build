@@ -10,7 +10,7 @@ ansi_rgb_utils_deps = [
   rgba_dep,
 ]
 
-ansi_rgb_utils_lib = shared_library('ansi-rgb-utils', 
+ansi_rgb_utils_lib = static_library('ansi-rgb-utils', 
   ansi_rgb_utils_srcs,
   install: false, 
   dependencies: ansi_rgb_utils_deps,

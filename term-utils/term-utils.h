@@ -14,3 +14,4 @@
 #include <string.h>
 #include <sys/time.h>
 
+void tu_dummy(void);

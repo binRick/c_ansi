@@ -13,7 +13,6 @@ ansi_utils_test_deps = [
   c_string_buffer_dep,
   c_fsio_dep,
   ansi_rgb_utils_dep,
-  vt100utils_dep,
 ]
 
 if get_option('enable-binaries')

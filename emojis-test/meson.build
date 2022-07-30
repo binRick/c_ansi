@@ -1,6 +1,5 @@
 emojis_test_srcs = [
   'emojis-test.c',
-  'emojis-test.h',
 ]
 emojis_include_dirs = [
   inc,
@@ -23,7 +22,6 @@ if get_option('enable-binaries')
      link_args: emojis_link_args,
      c_args: emojis_c_args,
      install: true,
-     pie: true,
   )
   if get_option('enable-binary-tests')
     test('emojis-test', 
@@ -31,7 +29,6 @@ if get_option('enable-binaries')
       timeout: 20,
       is_parallel: true,
       workdir: meson.current_source_dir(),
-      verbose: true,
       )
   endif
 endif

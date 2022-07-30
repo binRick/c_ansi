@@ -7,7 +7,6 @@ ansi_utils_incs = [
 ]
 ansi_utils_deps = [
   ansi_codes_dep,
-  vt100utils_dep,
 ]
 
 

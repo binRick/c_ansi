@@ -11,7 +11,7 @@ term_termpaint_deps = [
   termpaint_dep,
 ]
 
-term_termpaint_lib = library('term-termpaint',
+term_termpaint_lib = static_library('term-termpaint',
   term_termpaint_srcs,
   install: false,
   dependencies: term_termpaint_deps,
