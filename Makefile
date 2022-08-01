@@ -27,7 +27,7 @@ TIDIED_FILES = \
 			   term-utils-test/*.c term-utils-test/*.h \
 			   image-*/*.c image-*/*.h 
 ##############################################################
-all: do-build do-test
+all: do-build do-test muon
 do-muon-setup:
 	@muon setup build-muon
 do-muon-clean:
@@ -39,7 +39,7 @@ do-muon-install:
 do-muon-test:
 	@cd build-muon && muon test
 build-muon: do-muon-setup do-muon-build do-muon-test
-muon: build-muon do-muon-install
+muon: build-muon
 	
 uncrustify:
 	@$(UNCRUSTIFY) -c $(ETC_DIR)/uncrustify.cfg --replace $(TIDIED_FILES) 
@@ -54,14 +54,14 @@ fix-dbg:
 	@$(SED) 's|, % zu);|, %zu);|g' -i $(TIDIED_FILES)
 
 tidy: uncrustify uncrustify-clean fix-dbg rm-make-logs
-clean: 
+clean:  do-muon-clean
 	@rm -rf build
 do-meson:
 	@eval cd . && {  meson build || { meson build --reconfigure || { meson build --wipe; } && meson build; }; }	
 rm-make-logs:
 	@rm .make-log* 2>/dev/null||true
 test: do-test
-build: do-meson
+build: do-meson muon
 dev: nodemon
 do-build: do-meson
 	@meson compile -C build
