@@ -3,12 +3,14 @@
 
 
 struct jinja2_render_template_t {
-    bool strict;
-    char *output_file,  *output_dir;
-    char *input_json_string, *stdout_s, *stderr_s;
-    char *template_file;
-    char *input_json_file;
-    bool success;
+  bool strict;
+  char *output_file, *output_dir, *output_s;
+  char *input_json_string, *stdout_s, *stderr_s;
+  char *template_file;
+  char *template_s;
+  char *input_json_file;
+  bool success;
+  bool debug_mode;
 };
 
 struct jinja2_render_template_t *jinja2_init_config();

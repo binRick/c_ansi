@@ -7,7 +7,7 @@
 ///////////////////////////////
 #include "emojis-test/emojis-test.h"
 #include "emojis/emojis.h"
-#include "greatest/greatest.h"
+#include "submodules/c_greatest/greatest/greatest.h"
 #include "bench/bench.h"
 ///////////////////////////////
 TEST t_list_emojis_t_h(void){

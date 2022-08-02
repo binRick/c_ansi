@@ -23,6 +23,7 @@ TIDIED_FILES = \
 			   ansi-rgb-utils-test/*.c ansi-rgb-utils-test/*.h \
 			   term-termpaint/*.c term-termpaint/*.h  \
 			   term-termpaint-test/*.c term-termpaint-test/*.h  \
+			   jinja*/*.c jinja*/*.h\
 			   term-utils/*.c term-utils/*.h  \
 			   term-utils-test/*.c term-utils-test/*.h \
 			   image-*/*.c image-*/*.h 

@@ -1,10 +1,10 @@
 project('c_ansi',['c'],default_options: ['warning_level=0','c_std=gnu99'],
-  subproject_dir: 'submodules/meson_deps/subprojects',  
+  subproject_dir: 'submodules/c_deps/subprojects',  
   version: '0.0.1',
   )
 passh_program = find_program('passh', required : true)
 cc = meson.get_compiler('c')
-meson_deps_dir = join_paths(meson.current_source_dir(), 'submodules/meson_deps')
+c_deps_dir = join_paths(meson.current_source_dir(), 'submodules/c_deps')
 pwd = meson.current_source_dir()
 inc = [
   include_directories(
@@ -13,13 +13,13 @@ inc = [
     'term-utils',
     'image-utils',
     'ansi-rgb-utils',
-    'submodules/meson_deps/submodules',
-    'submodules/meson_deps',
+    'submodules/c_deps/submodules',
+    'submodules/c_deps',
     'submodules',
-    'submodules/meson_deps/subprojects/cargs/include',
-    'submodules/meson_deps/submodules/c_embed/embeds',
-    'submodules/meson_deps/submodules/c_embed',
-    'submodules/meson_deps/submodules/c_palettes',
+    'submodules/c_deps/subprojects/cargs/include',
+    'submodules/c_deps/submodules/c_embed/embeds',
+    'submodules/c_deps/submodules/c_embed',
+    'submodules/c_deps/submodules/c_palettes',
     '.',
   ),
 ]
