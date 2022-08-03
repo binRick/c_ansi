@@ -223,6 +223,8 @@ void color_reset();
 
 #define AC_SELECTION_BACKGROUND_RED    "\x1b]17;31\\"
 
+#define AC_CURSOR_SAVE                 "\x1b7"
+#define AC_CURSOR_RESTORE              "\x1b8"
 #define AC_CURSOR_BAR                  "\x1b[5 q"
 #define AC_CURSOR_BLOCK                "\x1b[1 q"
 #define AC_CURSOR_UNDER                "\x1b[3 q"
@@ -242,6 +244,8 @@ void color_reset();
 
 #define AC_SAVE_PALETTE                "\x1b]30001\\"
 #define AC_RESTORE_PALETTE             "\x1b]30101\\"
+#define AC_SAVE_PRIVATE_PALETTE        "\x1b[#P"
+#define AC_RESTORE_PRIVATE_PALETTE     "\x1b[#Q"
 #define AC_LOAD_PALETTE                AC_RESTORE_PALETTE
 
 #define AC_FG8(i)           "\x1b[38;5;"#i "m"
@@ -250,17 +254,30 @@ void color_reset();
 #define AC_FG24(r, g, b)    "\x1b[38;2;"#r ";"#g ";"#b "m"
 #define AC_BG24(r, g, b)    "\x1b[48;2;"#r ";"#g ";"#b "m"
 
-#define AC_BOLD           "\x1b[1m"
-#define AC_FAINT          "\x1b[2m"
-#define AC_ITALIC         "\x1b[3m"
-#define AC_UNDERLINE      "\x1b[4m"
-#define AC_NOUNDERLINE    "\x1b[4:0m"
-#define AC_PLAIN          "\x1b[23m"
-#define AC_BLINK          "\x1b[5m"
-#define AC_NOBLINK        "\x1b[25m"
-#define AC_FAST_BLINK     "\x1b[6m"
-#define AC_INVERSE        "\x1b[7m"
-#define AC_NOINVERSE      "\x1b[27m"
+#define AC_BOLD                     "\x1b[1m"
+#define AC_FAINT                    "\x1b[2m"
+#define AC_ITALIC                   "\x1b[3m"
+#define AC_UNDERLINE                "\x1b[4m"
+#define AC_NO_UNDERLINE             "\x1b[4:0m"
+#define AC_DOUBLE_UNDERLINE         "\x1b[4:2m"
+#define AC_CURLY_UNDERLINE          "\x1b[4:3m"
+#define AC_FOTTED_UNDERLINE         "\x1b[4:4m"
+#define AC_DASHED_UNDERLINE         "\x1b[4:5m"
+#define AC_RESET_UNDERLINE_COLOR    "\x1b[59m"
+#define AC_UNDERLINE_COLOR_RED      "\x1b[58#569cd6m"
+#define AC_NOUNDERLINE              "\x1b[4:0m"
+#define AC_PLAIN                    "\x1b[23m"
+#define AC_BLINK                    "\x1b[5m"
+#define AC_NOBLINK                  "\x1b[25m"
+#define AC_FAST_BLINK               "\x1b[6m"
+#define AC_INVERSE                  "\x1b[7m"
+#define AC_NOINVERSE                "\x1b[27m"
+#define AC_RESET_TERMINAL           "\x1b]\x1b\\\x1bc"
+#define AC_SET_TERMINAL_TITLE(TITLE)    "\x1b]2;" TITLE "\x1b\\"
+#define AC_SET_CLIPBOARD(CONTENT)       "\x1b]52;c;" CONTENT "\a\x1b\\"
+#define AC_CLEAR_CLIPBOARD(CONTENT)     "\x1b]52;c;|\x1b"
+#define AC_CLIPBOARD_REQUEST    "\x1b]52;p;?\a"
+#define AC_BELL                 "\a"
 #ifdef AC_INVERSED
 #undef AC_INVERSED
 #endif

@@ -1,5 +1,6 @@
 jinja2_cli_srcs = [
   'jinja2-cli.c',
+  'jinja2-cli-inc.c',
 ]
 jinja2_cli_dirs = [
   '.',

@@ -28,3 +28,4 @@ subprojects/*/
 .make-*log*
 ansi-codes/.attic
 loc.sh
+jinja2-cli/bin
