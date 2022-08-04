@@ -53,8 +53,8 @@ void color_reset();
 #ifdef AC_RESETALL
 #undef AC_RESETALL
 #endif
-#define AC_RESETALL    AC_ESC "[0m"
-
+#define AC_RESETALL                  AC_ESC "[0m"
+#define B64_ENCODED_COLOR_PREVIEW    "G1szMG1Db2xvciAwDQobWzMxbUNvbG9yIDENChtbMzJtQ29sb3IgMg0KG1szM21Db2xvciAzDQobWzM0bUNvbG9yIDQNChtbMzVtQ29sb3IgNQ0KG1szNm1Db2xvciA2DQobWzM3bUNvbG9yIDcNChtbOTBtQ29sb3IgOA0KG1s5MW1Db2xvciA5DQobWzkybUNvbG9yIDEwDQobWzkzbUNvbG9yIDExDQobWzk0bUNvbG9yIDEyDQobWzk1bUNvbG9yIDEzDQobWzk2bUNvbG9yIDE0DQobWzk3bUNvbG9yIDE1DQoNChtbMG0jIGxzIC0tY29sb3IgLUYNCiAgICBmaWxlDQogICAgG1swMTszNG1kaXIvG1swbQ0KICAgIBtbMDE7MzJtZXhlY3V0YWJsZRtbMG0qDQogICAgG1swMTszNm1zeW1saW5rG1swbQ0KG1swbQ=="
 
 #define acs(s)          AC_RESETALL s AC_RESETALL
 #define acsl(s)         AC_RESETALL s AC_RESETALL "\n"
