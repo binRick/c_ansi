@@ -43,3 +43,4 @@ char * AC_cur_pos(int x, int y, char type);
 #define BRIGHT_COLOR_GOLDEN_RATIO 1.618;
 void bright_color_init( float alpha );
 void bright_color( int i, float color[4] );
+size_t ansi_utils_tty_copy(const char *s);

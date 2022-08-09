@@ -87,6 +87,7 @@ struct HSV {
 //////////////////////////////////////////////////////////
 struct RGB_Double ansi_to_rgb(int ansi_num);
 LabColor ansi_to_lab(int ansi_num);
+char *get_color_boxes(void);
 void print_ansi_color(int red, int green, int blue, int wl, char *word);
 void print_ansi_to_rgb(int ansi_code);
 void ansi_256_fg(FILE *file, int color);

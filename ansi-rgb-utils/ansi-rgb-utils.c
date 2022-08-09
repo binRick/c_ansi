@@ -2,8 +2,14 @@
 /////////////////////////////////////////////////////////
 #include <math.h>
 #include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <strings.h>
 /////////////////////////////////////////////////////////
 #include "ansi-rgb-utils/ansi-rgb-utils.h"
+#include "c_stringfn/include/stringfn.h"
+#include "c_string_buffer/include/stringbuffer.h"
 
 
 LabColor ansi_to_lab(int ansi_num) {
@@ -22,6 +28,48 @@ void show_color(FILE *file, int color) {
   ansi_reset(file);
   fprintf(file, " %3d\n", color);
 }
+
+static const char* top = "  \033[9%dm██████\033[3%dm▄\033[m";
+static const char* mid = "  \033[9%dm██████\033[3%dm█\033[m";
+static const char* bot = "  \033[3%dm ▀▀▀▀▀\033[3%dm▀\033[m";
+
+static uint8_t __colors;
+
+static void po(void) {
+  __colors = 0x7E;
+}
+
+static char *pr(const char* r) {
+  struct StringBuffer *sb = stringbuffer_new();
+  char *s;
+  for (int i = 0; i < 8; i++) {
+    if (__colors & (1 << i)) {
+      asprintf(&s,r, i, i);
+      stringbuffer_append_string(sb,s);
+    }
+  }
+  stringbuffer_append_string(sb,"\n");
+  char *ret = stringbuffer_to_string(sb);
+  stringbuffer_release(sb);
+  return(ret);
+}
+
+char *get_color_boxes(void){
+  struct StringBuffer *sb = stringbuffer_new();
+  po();
+  if (__colors) {
+    printf("\n");
+  stringbuffer_append_string(sb,pr(top));
+  stringbuffer_append_string(sb,pr(mid));
+  stringbuffer_append_string(sb,pr(mid));
+  stringbuffer_append_string(sb,pr(bot));
+  stringbuffer_append_string(sb,"\n");
+  }
+  char *ret = stringbuffer_to_string(sb);
+  stringbuffer_release(sb);
+  return(ret);
+}
+
 
 
 void print_cube(FILE *file, int g) {

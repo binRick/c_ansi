@@ -1,5 +1,6 @@
 emojis_srcs = [
   'emojis.c',
+  'emojis-utils.c',
 ]
 emojis_incs = [
   inc,
@@ -8,6 +9,8 @@ emojis_incs = [
 emojis_deps = [
   c_vector_dep,
   djbhash_dep,
+  c_stringfn_dep,
+  c_string_buffer_dep,
 ]
 
 

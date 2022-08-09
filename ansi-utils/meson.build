@@ -7,6 +7,7 @@ ansi_utils_incs = [
 ]
 ansi_utils_deps = [
   ansi_codes_dep,
+  b64_dep,
 ]
 
 

@@ -1,5 +1,6 @@
 #pragma once
 #include "ansi-utils/ansi-utils.h"
+#include "b64.c/b64.h"
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
@@ -14,6 +15,19 @@ static char *read_csi();
 static bool query_dec_mode(int mode);
 static void do_dec_mode(int mode, BoolQuery val, const char *name);
 
+size_t ansi_utils_tty_copy(const char *s){
+    if(!s)
+        return(0);
+
+    printf("s: %s\n",s);
+    char *enc = b64_encode(s, strlen(s));
+    printf("enc: %s\n",enc);
+    char *copy_seq;
+    asprintf(&copy_seq,"\x1b]52;c;%s\a",enc);
+    printf("copy_seq: %s\n",strdup_escaped(copy_seq));
+    size_t wrote = fprintf(stdout,"%s",copy_seq);
+    return(wrote);
+}
 
 char *strdup_escaped(const char *tmp) {
   char *ret = malloc(strlen(tmp) * 4 + 1);

@@ -8,6 +8,8 @@ ansi_rgb_utils_deps = [
   ansi_codes_dep,
   hsluv_c_dep,
   rgba_dep,
+  c_string_buffer_dep,
+  c_stringfn_dep,
 ]
 
 ansi_rgb_utils_lib = static_library('ansi-rgb-utils', 
