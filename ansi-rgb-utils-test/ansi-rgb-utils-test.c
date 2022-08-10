@@ -52,7 +52,7 @@ rgba_t  RGBA[] = {
 
 int main(int argc, char **argv) {
   (void)argc; (void)argv;
-
+if(false){
   rgb2hsluv(RGB[0][0], RGB[0][1], RGB[0][2], &HSL[0][0], &HSL[0][1], &HSL[0][2]);
   log_debug("<%s> ", MODES[0]);
   log_debug("  r:%f|g:%f|b:%f", RGB[0][0], RGB[0][1], RGB[0][2]);
@@ -93,6 +93,7 @@ int main(int argc, char **argv) {
     rgb2hpluv(_RGBA.r, _RGBA.b, _RGBA.g, &_HSL[0], &_HSL[1], &_HSL[2]);
     log_debug("HPLUV>  hue:%f|saturation:%f|lightness:%f", _HSL[0], _HSL[1], _HSL[2]);
   }
+}
   {
     // printf(AC_CLS);
   }

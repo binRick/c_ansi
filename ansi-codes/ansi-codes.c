@@ -10,14 +10,10 @@
 #include "vt100utils/demos/tuibox.h"
 #include "vt100utils/vt100utils.h"
 #include <assert.h>
-#define DISABLE_MOUSE_SEQUENCE       "\033[?1003l\033[?1002l\033[?1000l\033[?1006l\033[?1015l"
-#define MOUSE_MODE_CLICKS            "\033[?1002l\033[?1003l\033[?1000h"
-#define MOUSE_MODE_DRAG              "\033[?1003l\033[?1000h\033[?1002h"
-#define MOUSE_MODE_MOVEMENT          "\033[?1000h\033[?1002h\033[?1003h"
-#define MOUSE_MODE_X                 "\033[?1015h\033[?1006h"
-#define MOUSE_MODE_DISABLE_SCROLL    "\033[?1049h"
-#define MOUSE_MODE_ALL               MOUSE_MODE_CLICKS MOUSE_MODE_DRAG MOUSE_MODE_MOVEMENT MOUSE_MODE_DISABLE_SCROLL
-#define TEST_STR                     "TEST"
+#define TEST_STR                     "F2DEEA90-F1F2-4C73-9BB8-3593319834D8"
+#define UP_ARROW "[A"
+#define DOWN_ARROW "[B"
+#define TAB_KEY "[A"
 enum change_selection_type_t {
   CHANGE_SELECTION_TYPE_NEXT,
   CHANGE_SELECTION_TYPE_PREV,
@@ -393,6 +389,8 @@ void stop() {
 }
 
 
+
+
 void hover(ui_box_t *b, int x, int y, int down) {
   if (false) {
     fprintf(stderr, "hover.uuid:%s.....%dx%d\n", (char *)b->data2, x, y);
@@ -510,6 +508,8 @@ char *ac_confirm_render_ui(){
   ui_key("r", reload_options, &u);
   ui_key("n", select_next, &u);
   ui_key("p", select_prev, &u);
+  ui_key(UP_ARROW, select_prev, &u);
+  ui_key(DOWN_ARROW, select_next, &u);
 
   reload_options();
   ui_draw(&u);
