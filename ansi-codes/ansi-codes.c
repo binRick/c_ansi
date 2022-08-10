@@ -199,29 +199,32 @@ void select_prev(){
   change_selection_index(CHANGE_SELECTION_TYPE_PREV);
 }
 
+
 void select_next(){
   change_selection_index(CHANGE_SELECTION_TYPE_NEXT);
 }
 
 
 size_t get_index_by_uuid(char *UUID){
-    struct vt100_node_t *tmp_ = head->next;
-    size_t i=0;
-    while (tmp_ != NULL) {
-      if (tmp_->str) {
-        struct ac_confirm_option_t *O = require(ac_confirm)->get_option_by_uuid((char *)(u.b.data[i]->data2));
-        assert(O != NULL);
-        if(strcmp(UUID,O->uuid)==0){
-            return(i);
-        }
-        i++;
+  struct vt100_node_t *tmp_ = head->next;
+  size_t              i     = 0;
+
+  while (tmp_ != NULL) {
+    if (tmp_->str) {
+      struct ac_confirm_option_t *O = require(ac_confirm)->get_option_by_uuid((char *)(u.b.data[i]->data2));
+      assert(O != NULL);
+      if (strcmp(UUID, O->uuid) == 0) {
+        return(i);
       }
-   tmp_ = tmp_->next;
-   }
+      i++;
+    }
+    tmp_ = tmp_->next;
+  }
   fprintf(stderr, AC_RED "NOT FOUND\n"AC_RESETALL);
 
-    return(-1);
+  return(-1);
 }
+
 
 void set_selection_index(size_t NEW_SELECTION_INDEX){
   if (NEW_SELECTION_INDEX < 0) {
@@ -233,38 +236,43 @@ void set_selection_index(size_t NEW_SELECTION_INDEX){
   assert(NEW_SELECTION != NULL);
   for (size_t i = 0; i < require(ac_confirm)->get_options_qty(); i++) {
     struct ac_confirm_option_t *O = (struct ac_confirm_option_t *)vector_get(require(ac_confirm)->options, i);
-      O->selected = false;
+    O->selected = false;
   }
   NEW_SELECTION->selected = true;
   reload_options();
 }
 
+
 void change_selection_by_uuid(char *NEW_SELECTED_UUID){
-    size_t index = get_index_by_uuid(NEW_SELECTED_UUID);
-    assert(index>=0);
-    set_selection_index(index);
+  size_t index = get_index_by_uuid(NEW_SELECTED_UUID);
+
+  assert(index >= 0);
+  set_selection_index(index);
 }
 
 struct vt100_node_t *get_node_by_uuid(char *UUID){
-    struct vt100_node_t *tmp_ = head->next;
-    size_t i=0;
-    while (tmp_ != NULL) {
-      if (tmp_->str) {
-        struct ac_confirm_option_t *O = require(ac_confirm)->get_option_by_uuid((char *)(u.b.data[i]->data2));
-        assert(O != NULL);
-        if(strcmp(UUID,O->uuid)==0){
-            return(u.b.data[i]);
-        }
-        i++;
+  struct vt100_node_t *tmp_ = head->next;
+  size_t              i     = 0;
+
+  while (tmp_ != NULL) {
+    if (tmp_->str) {
+      struct ac_confirm_option_t *O = require(ac_confirm)->get_option_by_uuid((char *)(u.b.data[i]->data2));
+      assert(O != NULL);
+      if (strcmp(UUID, O->uuid) == 0) {
+        return(u.b.data[i]);
       }
-   tmp_ = tmp_->next;
-   }
+      i++;
+    }
+    tmp_ = tmp_->next;
+  }
   fprintf(stderr, AC_RED "NOT FOUND\n"AC_RESETALL);
   return((struct vt100_node_t *)NULL);
 }
 
+
 void change_selection_index(int CHANGE_SELECTION_TYPE) {
   size_t NEW_SELECTION_INDEX = -1;
+
   for (size_t i = 0; i < require(ac_confirm)->get_options_qty(); i++) {
     struct ac_confirm_option_t *O = (struct ac_confirm_option_t *)vector_get(require(ac_confirm)->options, i);
     if (O->selected == true) {
@@ -289,17 +297,18 @@ void change_selection_index(int CHANGE_SELECTION_TYPE) {
 
 
 void reload_options() {
-  fprintf(stderr, "down.....\n");
-  int      ind;
-  ui_box_t *tmpv;
-  vec_foreach(&(u.b), tmpv, ind){
-    fprintf(stderr,
-            "#foreach>%d> uuid:%s|id:%d|len:%d\n",
-            ind,
-            (char *)tmpv->data2,
-            tmpv->id,
-            u.b.length
-            );
+  if (false) {
+    int      ind;
+    ui_box_t *tmpv;
+    vec_foreach(&(u.b), tmpv, ind){
+      fprintf(stderr,
+              "#foreach>%d> uuid:%s|id:%d|len:%d\n",
+              ind,
+              (char *)tmpv->data2,
+              tmpv->id,
+              u.b.length
+              );
+    }
   }
   {
     size_t              i     = 0;
@@ -322,32 +331,34 @@ void reload_options() {
           tmp_->fg.type  = P[0]->fg.type;
           tmp_->fg.value = P[0]->fg.value;
         }
-        fprintf(stderr,
-                "#%lu> Text: %s\n\t  Foreground: %i\n\t  Background: %i\n  Mode: %i|"
-                "data2:%s|id:%d|"
-                "str:%s|"
-                "\n\tO uuid:%s|"
-                "\n\t" "%s" "O selected:%s|" AC_RESETALL
-                "\n\tO selectedcolor:%s|"
-                "\n\tO color:%s|"
-                "\n\tparsed          color fg:%d@%d|bg:%d@%d|"
-                "\n\tparsed selected color fg:%d@%d|bg:%d@%d|"
-                "\n",
-                i,
-                tmp_->str,
-                tmp_->fg.value,
-                tmp_->bg.value,
-                tmp_->mode,
-                (char *)(u.b.data[i]->data2),
-                (u.b.data[i]->id),
-                tmp_->str,
-                O->uuid,
-                (O->selected == true) ? AC_GREEN : AC_RED,
-                (true == O->selected) ? "Yes" : "No",
-                strdup_escaped(O->selected_color), strdup_escaped(O->color),
-                P[0]->fg.type, P[0]->fg.value, P[0]->bg.type, P[0]->bg.value,
-                P[1]->fg.type, P[1]->fg.value, P[1]->bg.type, P[1]->bg.value
-                );
+        if (false) {
+          fprintf(stderr,
+                  "#%lu> Text: %s\n\t  Foreground: %i\n\t  Background: %i\n  Mode: %i|"
+                  "data2:%s|id:%d|"
+                  "str:%s|"
+                  "\n\tO uuid:%s|"
+                  "\n\t" "%s" "O selected:%s|" AC_RESETALL
+                  "\n\tO selectedcolor:%s|"
+                  "\n\tO color:%s|"
+                  "\n\tparsed          color fg:%d@%d|bg:%d@%d|"
+                  "\n\tparsed selected color fg:%d@%d|bg:%d@%d|"
+                  "\n",
+                  i,
+                  tmp_->str,
+                  tmp_->fg.value,
+                  tmp_->bg.value,
+                  tmp_->mode,
+                  (char *)(u.b.data[i]->data2),
+                  (u.b.data[i]->id),
+                  tmp_->str,
+                  O->uuid,
+                  (O->selected == true) ? AC_GREEN : AC_RED,
+                  (true == O->selected) ? "Yes" : "No",
+                  strdup_escaped(O->selected_color), strdup_escaped(O->color),
+                  P[0]->fg.type, P[0]->fg.value, P[0]->bg.type, P[0]->bg.value,
+                  P[1]->fg.type, P[1]->fg.value, P[1]->bg.type, P[1]->bg.value
+                  );
+        }
         i++;
       }
       tmp_ = tmp_->next;
@@ -362,7 +373,9 @@ struct vt100_node_t *parse_seq(char *SEQ){
   struct vt100_node_t *_tmp  = _head;
 
   while (_tmp != NULL) {
-    fprintf(stderr, AC_RED "str:%s\n" AC_RESETALL, _tmp->str);
+    if (false) {
+      fprintf(stderr, AC_RED "str:%s\n" AC_RESETALL, _tmp->str);
+    }
     if (_tmp->str != NULL && (strcmp(_tmp->str, TEST_STR) == 0)) {
       return(_tmp);
     }
@@ -381,7 +394,9 @@ void stop() {
 
 
 void hover(ui_box_t *b, int x, int y, int down) {
-  fprintf(stderr, "hover.uuid:%s.....%dx%d\n", (char *)b->data2, x, y);
+  if (false) {
+    fprintf(stderr, "hover.uuid:%s.....%dx%d\n", (char *)b->data2, x, y);
+  }
 }
 
 
@@ -403,11 +418,25 @@ void draw(ui_box_t *b, char *out) {
 
 void click(ui_box_t *b, int x, int y) {
   struct vt100_node_t *node = b->data1;
-  fprintf(stderr, AC_YELLOW "click....uuid:%s..%dx%d: fg:%d|bg:%d|[%s]|%d|\n" AC_RESETALL, 
-          (char *)b->data2, x, y, node->fg.value, node->bg.value, (char *)node->str, node->len
-          );
-  change_selection_by_uuid((char*)b->data2);
-  //reload_options();
+
+  if (false) {
+    fprintf(stderr, AC_YELLOW "click....uuid:%s..%dx%d: fg:%d|bg:%d|[%s]|%d|\n" AC_RESETALL,
+            (char *)b->data2, x, y, node->fg.value, node->bg.value, (char *)node->str, node->len
+            );
+  }
+  change_selection_by_uuid((char *)b->data2);
+}
+
+
+void mouse_scrolled_down(void *BINDING_DATA){
+  select_next();
+  return(NULL);
+}
+
+
+void mouse_scrolled_up(void *BINDING_DATA){
+  select_prev();
+  return(NULL);
 }
 
 
@@ -418,6 +447,8 @@ char *ac_confirm_render_ui(){
   char *bb = "\x1b[32m\x1b[0m\x1b[32m\x1b[7m Yes \x1b[0m\x1b[32m";
 
   ui_new(0, &u);
+  binding_types[BINDING_MODE_MOUSE_SCROLL_UP]->handler   = mouse_scrolled_up;
+  binding_types[BINDING_MODE_MOUSE_SCROLL_DOWN]->handler = mouse_scrolled_down;
 
   printf("\x1b[?1049h\x1b[0m\x1b[2J\x1b[?1003h\x1b[?1015h\x1b[?1006h\x1b[?25l");
 
@@ -442,17 +473,19 @@ char *ac_confirm_render_ui(){
 
   while (tmp != NULL) {
     if (tmp->str != NULL) {
-      fprintf(stderr,
-              "#%lu> Text: %s\n x:%d|y:%d| Foreground: %i/%d\n  Background: %i/%d\n  Mode: %i\n\n",
-              index,
-              tmp->str,
-              x, y,
-              tmp->fg.value,
-              tmp->fg.type,
-              tmp->bg.value,
-              tmp->bg.type,
-              tmp->mode
-              );
+      if (false) {
+        fprintf(stderr,
+                "#%lu> Text: %s\n x:%d|y:%d| Foreground: %i/%d\n  Background: %i/%d\n  Mode: %i\n\n",
+                index,
+                tmp->str,
+                x, y,
+                tmp->fg.value,
+                tmp->fg.type,
+                tmp->bg.value,
+                tmp->bg.type,
+                tmp->mode
+                );
+      }
       int added_id = ui_add(
         x, y,
         tmp->len, 1,
