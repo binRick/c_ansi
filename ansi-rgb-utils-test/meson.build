@@ -10,6 +10,7 @@ ansi_rgb_utils_test_deps = [
   hsluv_c_dep,
   ansi_codes_dep,
   rgba_dep,
+  module_dep,
   ansi_rgb_utils_dep,
   ansi_utils_dep,
 ]

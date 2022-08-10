@@ -1,4 +1,8 @@
+#include "ansi-codes.h"
 #include "ansi-rgb-utils-test.h"
+#include "module/def.h"
+#include "module/module.h"
+#include "module/require.h"
 
 char    *MODES[] = {
   "RGB to HSLuv",
@@ -89,6 +93,30 @@ int main(int argc, char **argv) {
     rgb2hpluv(_RGBA.r, _RGBA.b, _RGBA.g, &_HSL[0], &_HSL[1], &_HSL[2]);
     log_debug("HPLUV>  hue:%f|saturation:%f|lightness:%f", _HSL[0], _HSL[1], _HSL[2]);
   }
-//  struct RGB_Double rgbd = ansi_to_rgb(1);
+  {
+    printf(AC_CLS);
+  }
+  {
+    printf(AC_BUTTON("Yes", AC_GREEN) "\t");
+    printf(AC_BUTTON("Yes", AC_RED) "\t");
+    printf(AC_BUTTON("Yes", AC_NONE) "\t");
+    printf(AC_BUTTON("No", AC_GREEN) "\t");
+    printf(AC_BUTTON("No", AC_RED) "\t");
+    printf(AC_BUTTON("No", AC_BLUE) "\t");
+    printf(AC_BUTTON("No", AC_NONE) "\n");
+  }
+  {
+    printf(AC_BUTTON("Yes", AC_GREEN) "\t" AC_BUTTON("No", AC_NONE) "\n");
+  }
+  {
+    module(ac_confirm) * B = require(ac_confirm);
+    struct ac_confirm_option_t *O1 = B->init_option("Option 1");
+    B->add_option(O1);
+    struct ac_confirm_option_t *O2 = B->init_option("Option 2");
+    O2->selected = true;
+    B->add_option(O2);
+    printf("# options:  %lu\n", B->get_options_qty());
+    printf("render:  %s\n", B->render());
+  }
   return(0);
 } /* main */

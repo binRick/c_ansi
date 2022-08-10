@@ -3,11 +3,14 @@ ansi_codes_srcs = [
 ]
 ansi_codes_dirs = [
   '.',
-  '../../',
-  '../',
   inc,
 ]
 ansi_codes_deps = [
+  module_dep,
+  c_vector_dep,
+  c_string_buffer_dep,
+  c_stringfn_dep,
+  vt100utils_dep,
 ]
 
 ansi_codes_lib = static_library('ansi-codes', 

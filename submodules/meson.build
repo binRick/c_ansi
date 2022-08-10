@@ -3,6 +3,7 @@ subdir('c_deps/meson/inc')
 #############################################
 subdir('c_deps/meson/deps/timestamp')
 subdir('c_deps/meson/deps/parson')
+subdir('c_deps/meson/deps/module')
 subdir('c_deps/meson/deps/which')
 subdir('c_deps/meson/deps/c_vector')
 subdir('c_deps/meson/deps/b64')

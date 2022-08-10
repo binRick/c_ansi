@@ -1,5 +1,10 @@
 #pragma once
+#include "module/def.h"
+#include "module/module.h"
+#include "module/require.h"
+#include <stdbool.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 void color_reset();
@@ -19,14 +24,6 @@ void color_reset();
 #define color256B_set(code) \
   printf("\x1b[48;5;%dm", code)
 
-#define ACCSI     "\e["
-#define ACCSIP    "\e[?"
-#define ACOSC     "\e]"
-#define ACDCS     "\e(B"
-#define ACDEC     "\e(0"
-#define ACRIS     "\ec"
-#define ACBCK     "\u007f"
-#define ACPAS     "\u001a"
 
 #define ACCUU(times)      (AC_cur(times, 'A'))
 #define ACCUD(times)      (AC_cur(times, 'B'))
@@ -60,6 +57,19 @@ void color_reset();
 #define acsl(s)         AC_RESETALL s AC_RESETALL "\n"
 #define ansistr(s)      s AC_RESETALL
 #define ansistrln(s)    s AC_RESETALL "\n"
+
+#define AC_NONE    "\x1b[0m"
+#define ACCSI      "\e["
+#define ACCSIP     "\e[?"
+#define ACOSC      "\e]"
+#define ACDCS      "\x1b(B"
+#define ACDEC      "\e(0"
+#define ACRIS      "\ec"
+#define ACBCK      "\u007f"
+#define ACPAS      "\u001a"
+
+#define AC_BUTTON(TEXT, COLOR)    COLOR "" ACDCS AC_NONE COLOR AC_INVERSE " " TEXT " " ACDCS AC_NONE COLOR ""
+
 
 #define AC_BLACK                       "\x1b[30m"
 #define AC_BLACK_BLACK                 "\x1b[30m\x1b[40m"
@@ -300,3 +310,58 @@ void color_reset();
 #define AC_HOME    "\x1b[H"
 #define AC_CLS     "\x1b[2J" AC_HOME
 
+
+enum ac_confirm_mode_t {
+  AC_CONFIRM_LOG_NONE,
+  AC_CONFIRM_LOG_INFO,
+  AC_CONFIRM_LOG_ERROR,
+  AC_CONFIRM_LOG_DEBUG,
+  AC_CONFIRM_LOG_QTY,
+};
+
+#define AC_CONFIRM_LOG_DEFAULT    AC_CONFIRM_LOG_INFO
+struct ac_confirm_option_t {
+  char *text;
+  char *selected_color;
+  char *color;
+  bool selected;
+};
+
+// Module Type Interface
+module(ac_confirm) {
+  define(ac_confirm, CLIB_MODULE);
+  //////////////////////////////////////////////////////////////////////////////////////
+  //     Config
+  //////////////////////////////////////////////////////////////////////////////////////
+  enum ac_confirm_mode_t mode;
+  //////////////////////////////////////////////////////////////////////////////////////
+  //     Properties
+  //////////////////////////////////////////////////////////////////////////////////////
+  struct Vector *options;
+  //////////////////////////////////////////////////////////////////////////////////////
+  //     Utility Functions
+  //////////////////////////////////////////////////////////////////////////////////////
+  char                       *(*render)(void);
+  bool                       (*add_option)(struct ac_confirm_option_t *NEW_OPTION);
+  size_t                     (*get_options_qty)(void);
+  struct ac_confirm_option_t *(*init_option)(char *NEW_OPTION_TEXT);
+  //////////////////////////////////////////////////////////////////////////////////////
+};
+
+char *ac_confirm_render(void);
+
+int  ac_confirm_module_init(module(ac_confirm) * exports);
+void ac_confirm_module_deinit(module(ac_confirm) * exports);
+struct ac_confirm_option_t *ac_confirm_init_option(char *NEW_OPTION_TEXT);
+bool ac_confirm_add_option(struct ac_confirm_option_t *NEW_OPTION);
+size_t ac_confirm_get_options_qty(void);
+
+exports(ac_confirm) {
+  .mode            = AC_CONFIRM_LOG_DEFAULT,
+  .init            = ac_confirm_module_init,
+  .deinit          = ac_confirm_module_deinit,
+  .render          = ac_confirm_render,
+  .get_options_qty = ac_confirm_get_options_qty,
+  .init_option     = ac_confirm_init_option,
+  .add_option      = ac_confirm_add_option,
+};
