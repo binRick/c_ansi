@@ -510,6 +510,14 @@ char *ac_confirm_render_ui(){
   ui_key("p", select_prev, &u);
   ui_key(UP_ARROW, select_prev, &u);
   ui_key(DOWN_ARROW, select_next, &u);
+  ui_key("[H", select_prev, &u);
+  ui_key("[H;", select_prev, &u);
+  ui_key("[H~", select_prev, &u);
+  ui_key("[F~", select_next, &u);
+  ui_key("[F", select_next, &u);
+  ui_key("[F;", select_next, &u);
+  ui_key("[5~", select_prev, &u);
+  ui_key("[6~", select_next, &u);
 
   reload_options();
   ui_draw(&u);
