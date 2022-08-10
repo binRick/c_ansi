@@ -12,6 +12,7 @@ ansi_codes_deps = [
   c_stringfn_dep,
   vt100utils_dep,
   ansi_utils_dep,
+  uuid4_dep,
 ]
 
 ansi_codes_lib = static_library('ansi-codes', 
