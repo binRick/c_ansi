@@ -94,7 +94,7 @@ int main(int argc, char **argv) {
     log_debug("HPLUV>  hue:%f|saturation:%f|lightness:%f", _HSL[0], _HSL[1], _HSL[2]);
   }
   {
-    printf(AC_CLS);
+    // printf(AC_CLS);
   }
   {
     printf(AC_BUTTON("Yes", AC_GREEN) "\t");
@@ -110,13 +110,18 @@ int main(int argc, char **argv) {
   }
   {
     module(ac_confirm) * B = require(ac_confirm);
-    struct ac_confirm_option_t *O1 = B->init_option("Option 1");
+    struct ac_confirm_option_t *O1 = B->init_option("Option1");
     B->add_option(O1);
-    struct ac_confirm_option_t *O2 = B->init_option("Option 2");
+    struct ac_confirm_option_t *O2 = B->init_option("Option2");
     O2->selected = true;
     B->add_option(O2);
+    struct ac_confirm_option_t *O3 = B->init_option("Option3");
+    B->add_option(O3);
+    struct ac_confirm_option_t *O4 = B->init_option("Option4");
+    B->add_option(O4);
     printf("# options:  %lu\n", B->get_options_qty());
-    printf("render:  %s\n", B->render());
+    B->render_ui();
+    printf("render ended\n");
   }
   return(0);
 } /* main */

@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+char *ac_confirm_render(void);
 void color_reset();
 
 #define color_set(r, g, b) \
@@ -68,7 +69,7 @@ void color_reset();
 #define ACBCK      "\u007f"
 #define ACPAS      "\u001a"
 
-#define AC_BUTTON(TEXT, COLOR)    COLOR "" ACDCS AC_NONE COLOR AC_INVERSE " " TEXT " " ACDCS AC_NONE COLOR ""
+#define AC_BUTTON(TEXT, COLOR)    COLOR "" AC_NONE COLOR AC_INVERSE " " TEXT " " AC_NONE COLOR ""
 
 
 #define AC_BLACK                       "\x1b[30m"
@@ -325,6 +326,7 @@ struct ac_confirm_option_t {
   char *selected_color;
   char *color;
   bool selected;
+  char *button_s;
 };
 
 // Module Type Interface
@@ -341,14 +343,16 @@ module(ac_confirm) {
   //////////////////////////////////////////////////////////////////////////////////////
   //     Utility Functions
   //////////////////////////////////////////////////////////////////////////////////////
-  char                       *(*render)(void);
+  int                        *(*render_ui)(void);
+  char                       *(*render_option_buttons)(void);
+  struct ac_confirm_option_t *(*render_option)(char *TEXT, char *COLOR);
+  char                       *(*render_option_button)(struct ac_confirm_option_t *OPTION);
   bool                       (*add_option)(struct ac_confirm_option_t *NEW_OPTION);
   size_t                     (*get_options_qty)(void);
   struct ac_confirm_option_t *(*init_option)(char *NEW_OPTION_TEXT);
   //////////////////////////////////////////////////////////////////////////////////////
 };
 
-char *ac_confirm_render(void);
 
 int  ac_confirm_module_init(module(ac_confirm) * exports);
 void ac_confirm_module_deinit(module(ac_confirm) * exports);
@@ -357,11 +361,14 @@ bool ac_confirm_add_option(struct ac_confirm_option_t *NEW_OPTION);
 size_t ac_confirm_get_options_qty(void);
 
 exports(ac_confirm) {
-  .mode            = AC_CONFIRM_LOG_DEFAULT,
-  .init            = ac_confirm_module_init,
-  .deinit          = ac_confirm_module_deinit,
-  .render          = ac_confirm_render,
-  .get_options_qty = ac_confirm_get_options_qty,
-  .init_option     = ac_confirm_init_option,
-  .add_option      = ac_confirm_add_option,
+  .mode                  = AC_CONFIRM_LOG_DEFAULT,
+  .init                  = ac_confirm_module_init,
+  .deinit                = ac_confirm_module_deinit,
+  .render_ui             = NULL,
+  .render_option_buttons = NULL,
+  .render_option_button  = NULL,
+  .render_option         = NULL,
+  .get_options_qty       = ac_confirm_get_options_qty,
+  .init_option           = ac_confirm_init_option,
+  .add_option            = ac_confirm_add_option,
 };
