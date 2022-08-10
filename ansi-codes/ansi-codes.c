@@ -10,10 +10,10 @@
 #include "vt100utils/demos/tuibox.h"
 #include "vt100utils/vt100utils.h"
 #include <assert.h>
-#define TEST_STR                     "F2DEEA90-F1F2-4C73-9BB8-3593319834D8"
-#define UP_ARROW "[A"
-#define DOWN_ARROW "[B"
-#define TAB_KEY "[A"
+#define TEST_STR      "F2DEEA90-F1F2-4C73-9BB8-3593319834D8"
+#define UP_ARROW      "[A"
+#define DOWN_ARROW    "[B"
+#define TAB_KEY       "[A"
 enum change_selection_type_t {
   CHANGE_SELECTION_TYPE_NEXT,
   CHANGE_SELECTION_TYPE_PREV,
@@ -387,8 +387,6 @@ void stop() {
   vt100_free(head);
   exit(0);
 }
-
-
 
 
 void hover(ui_box_t *b, int x, int y, int down) {
