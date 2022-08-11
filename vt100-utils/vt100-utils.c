@@ -28,39 +28,47 @@
 #define UP_ARROW      "[A"
 #define DOWN_ARROW    "[B"
 #define TAB_KEY       "[A"
-enum change_selection_type_t {
-  CHANGE_SELECTION_TYPE_NEXT,
-  CHANGE_SELECTION_TYPE_PREV,
-  CHANGE_SELECTION_TYPES_QTY,
-};
-void reload_options();
-void select_prev();
-void select_next();
-void change_selection_index(int CHANGE_SELECTION_TYPE);
-void set_selection_index(size_t NEW_SELECTION_INDEX);
-struct vt100_node_t *get_node_by_uuid(char *UUID);
-size_t get_index_by_uuid(char *UUID);
-
-
-void clearBuffer() {
-  char c;
-
-  c = getchar();
-}
-
-
-char *__TEST_STR(char *SEQ){
-  char *s;
-
-  asprintf(&s, "%s%s", SEQ, TEST_STR);
-  return(s);
-}
+#define MIN(a, b)    (a < b ? a : b)
+///////////////////////////////////////////////////////
+static ui_t u;
+static struct vt100_node_t        *head;
 static struct ac_confirm_option_t AC_CONFIRM_DEFAULT_OPTION = {
   .text           = "undefined",
   .selected       = false,
   .color          = AC_RED,
   .selected_color = AC_GREEN,
 };
+
+
+static char *__TEST_STR(char *SEQ){
+  char *s;
+
+  asprintf(&s, "%s%s", SEQ, TEST_STR);
+  return(s);
+}
+static int w = 20;
+
+
+static void stop() {
+  ui_free(&u);
+  vt100_free(head);
+  exit(0);
+}
+void click(ui_box_t *b, int x, int y);
+void mouse_scrolled_down(void *BINDING_DATA);
+void mouse_scrolled_down(void *BINDING_DATA);
+void clicked(void *BINDING_DATA);
+void focus_out(void *BINDING_DATA);
+void focus_in(void *BINDING_DATA);
+void reload_options();
+void select_prev();
+void select_next();
+int __do_libterminput(void);
+int do_libterminput(void);
+void change_selection_index(int CHANGE_SELECTION_TYPE);
+void set_selection_index(size_t NEW_SELECTION_INDEX);
+struct vt100_node_t *get_node_by_uuid(char *UUID);
+size_t get_index_by_uuid(char *UUID);
 char *ac_confirm_render_ui(void);
 struct Vector *ac_confirm_render_options();
 struct ac_confirm_option_t *ac_confirm_render_option(char *TEXT, char *COLOR);
@@ -69,6 +77,84 @@ struct Vector *ac_confirm_render_option_buttons();
 struct vt100_node_t *parse_seq(char *SEQ);
 char *ac_confirm_render_option_button(struct ac_confirm_option_t *O);
 
+enum change_selection_type_t {
+  CHANGE_SELECTION_TYPE_NEXT,
+  CHANGE_SELECTION_TYPE_PREV,
+  CHANGE_SELECTION_TYPES_QTY,
+};
+struct unhandled_escaped_handlers_t {
+  char *name;
+  void (*handler)(void *);
+  char *escaped_wildcards[33];
+  char *regex_bind_datas[33];
+} static unhandled_escaped_handlers[] = {
+  { .name             = "click",     .handler = clicked,
+    .regex_bind_datas ={
+      ";[\\d]+;[\\d]+m",
+      NULL,
+    },
+    .escaped_wildcards ={
+      "\\x1b[<0;*",
+      NULL,
+    }, },
+  { .name             = "focus-in",  .handler = focus_in,   .escaped_wildcards  = {
+      "\\x1b[I0;*",
+      "\\x1b[I65;*",
+      "\\x1b[I64;*",
+      "\\xoa[I0;x*",
+      "\\x1b[I~;*",
+      NULL,
+    },
+    .regex_bind_datas ={
+      NULL,
+    }, },
+  { .name             = "focus-out", .handler = focus_out,  .escaped_wildcards  = {
+      "\\x1b[O0;*",
+      "\\x1b[O64;*",
+      "\\x1b[O65;*",
+      "\\x1b[O\\x*",
+      "\\x09[O\\x*",
+      "\\xoa[O0;x*",
+      "\\x1b[O~;*",
+      NULL,
+    },
+    .regex_bind_datas ={
+      NULL,
+    }, },
+  { .name             = "shift-tab", .handler = select_prev,.escaped_wildcards  = {
+      "\\x1b[Z\\x*",
+      "\\x1b[Z~\\x*",
+      "\\x1b[Z0;*",
+      "\\x1b[Z65;*",
+      "\\x1b[Z64;*",
+      NULL,
+    },
+    .regex_bind_datas ={
+      NULL,
+    }, },
+  { .name             = "tab",       .handler = select_next,.escaped_wildcards  = {
+      "\\x09\\xb2i\\x80\\xff\\x7f",
+      "\\x09[A*",
+      "\\x09[B*",
+      "\\x09[6~\\x*",
+      "\\x09[5~\\x*",
+      "\\x09[Z\\x*",
+      "\\x09[I64;*",
+      "\\x09[<64;*",
+      "\\x09[I0;*",
+      "\\x09[Z~\\x*",
+      "\\x09[Z0;*",
+      "\\x09[<0;*",
+      "\\x09[?65;*",
+      "\\x09[<65;*",
+      "s[B\\x*",
+      NULL,
+    },
+    .regex_bind_datas ={
+      NULL,
+    }, },
+  { NULL },
+};
 
 struct ac_confirm_option_t *ac_confirm_init_option(char *NEW_OPTION_TEXT){
   struct ac_confirm_option_t *O = calloc(1, sizeof(struct ac_confirm_option_t));
@@ -92,62 +178,11 @@ size_t ac_confirm_get_options_qty(void){
 }
 
 
-ui_t                u;
-struct vt100_node_t *head;
-
-
-//int                 w = 50;
-
-
 struct ac_confirm_option_t *ac_confirm_render_option(char *TEXT, char *COLOR){
   struct ac_confirm_option_t *O = calloc(1, sizeof(struct ac_confirm_option_t));
   char                       *s = AC_GREEN "" AC_BLACK_GREEN " xxxxxxxx " AC_NOINVERSE AC_GREEN "";
 
   return(O);
-}
-int w = 20;
-
-
-void draw1(ui_box_t *b, char *out) {
-  struct vt100_node_t *tmp = head->next;
-  char                *sgr;
-  int                 len      = 0;
-  int                 full_len = 0;
-
-  while (tmp != NULL) {
-    sgr       = vt100_sgr(tmp, NULL);
-    full_len += sprintf(
-      out + full_len,
-      "%s%.*s",
-      sgr,
-      MAX(0, w - len),
-      tmp->str
-      );
-    len += tmp->len;
-    free(sgr);
-    tmp = tmp->next;
-  }
-  sprintf(
-    out + full_len,
-    "%s\n",
-    w < 47 ? "..." : ""
-    );
-}
-#define MIN(a, b)    (a < b ? a : b)
-
-
-void shrink() {
-  if (w > 4) {
-    w--;
-  }
-}
-
-
-void grow() {
-  if (w < u.ws.ws_col - 3) {
-    w++;
-  }
-  //draw();
 }
 
 
@@ -342,13 +377,6 @@ struct vt100_node_t *parse_seq(char *SEQ){
 }
 
 
-void stop() {
-  ui_free(&u);
-  vt100_free(head);
-  exit(0);
-}
-
-
 void hover(ui_box_t *b, int x, int y, int down) {
   if (false) {
     fprintf(stderr, "hover.uuid:%s.....%dx%d\n", (char *)b->data2, x, y);
@@ -369,7 +397,45 @@ void draw(ui_box_t *b, char *out) {
             node->fg.value, node->bg.value, (char *)node->str, node->len);
   }
   free(sgr);
-}
+
+  {
+    {
+      printf("\x1b[%i;%iH", 1, u.ws.ws_col - 18);
+      printf("\x1b[36m(Press \"q\" to exit)");
+      printf("\x1b[%i;%iH", 2, u.ws.ws_col - 17);
+      printf("\x1b[32mColumns   %i\x1b[0m", u.ws.ws_col);
+      printf("\x1b[%i;%iH", 3, u.ws.ws_col - 17);
+      printf("\x1b[32mRows      %i\x1b[0m", u.ws.ws_row);
+      printf("\x1b[%i;%iH", 4, u.ws.ws_col - 17);
+      printf("\x1b[32mOptions   %lu\x1b[0m", require(ac_confirm)->get_options_qty());
+    }
+    {
+      printf("\x1b[%i;%iH", 4, 4);
+      printf("\x1b[35m┌");
+      for (int x = 1; x < 10; x++) {
+        printf("─");
+      }
+      printf("┐");
+    }
+    {
+      for (int i = 0; i < (int)require(ac_confirm)->get_options_qty(); i++) {
+        printf("\x1b[%i;%iH", 5 + i, 4);
+        printf("\x1b[35m│");
+        printf("\x1b[%i;%iH", 5 + i, 4 + 10);
+        printf("\x1b[35m│");
+      }
+    }
+    {
+      printf("\x1b[%i;%iH", (int)require(ac_confirm)->get_options_qty() + 5, 4);
+      printf("\x1b[35m└");
+      for (int x = 1; x < 10; x++) {
+        printf("─");
+      }
+      printf("┘");
+      printf("\x1b[0m");
+    }
+  }
+} /* draw */
 
 
 void click(ui_box_t *b, int x, int y) {
@@ -415,75 +481,6 @@ void mouse_scrolled_up(void *BINDING_DATA){
  * re_t       pattern           = re_compile("[Hh]ello [Ww]orld\\s*[!]?");
  * int        match_idx         = re_matchp(pattern, string_to_search, &match_length);
  */
-struct unhandled_escaped_handlers_t {
-  char *name;
-  void (*handler)(void *);
-  char *escaped_wildcards[33];
-  char *regex_bind_datas[33];
-} unhandled_escaped_handlers[] = {
-  { .name             = "click",     .handler = clicked,
-    .regex_bind_datas ={
-      ";[\\d]+;[\\d]+m",
-      NULL,
-    },
-    .escaped_wildcards ={
-      "\\x1b[<0;*",
-      NULL,
-    }, },
-  { .name             = "focus-in",  .handler = focus_in,   .escaped_wildcards  = {
-      "\\x1b[I0;*",
-      "\\x1b[I\\x*",
-      "\\x1b[I65;*",
-      "\\x1b[I64;*",
-      NULL,
-    },
-    .regex_bind_datas ={
-      NULL,
-    }, },
-  { .name             = "focus-out", .handler = focus_out,  .escaped_wildcards  = {
-      "\\x1b[O0;*",
-      "\\x1b[O64;*",
-      "\\x1b[O65;*",
-      "\\x1b[O\\x*",
-      NULL,
-    },
-    .regex_bind_datas ={
-      NULL,
-    }, },
-  { .name             = "shift-tab", .handler = select_prev,.escaped_wildcards  = {
-      "\\x1b[Z\\x*",
-      "\\x1b[Z~\\x*",
-      "\\x1b[Z0;*",
-      "\\x1b[Z65;*",
-      "\\x1b[Z64;*",
-      NULL,
-    },
-    .regex_bind_datas ={
-      NULL,
-    }, },
-  { .name             = "tab",       .handler = select_next,.escaped_wildcards  = {
-      "\\x09\\xb2i\\x80\\xff\\x7f",
-      "\\x09[A*",
-      "\\x09[B*",
-      "\\x09[6~\\x*",
-      "\\x09[5~\\x*",
-      "\\x09[Z\\x*",
-      "\\x09[I64;*",
-      "\\x09[<64;*",
-      "\\x09[I0;*",
-      "\\x09[Z~\\x*",
-      "\\x09[Z0;*",
-      "\\x09[<0;*",
-      "\\x09[?65;*",
-      "\\x09[<65;*",
-      "s[B\\x*",
-      NULL,
-    },
-    .regex_bind_datas ={
-      NULL,
-    }, },
-  { NULL },
-};
 
 
 void unhandled_input(void *BINDING_DATA){
@@ -519,23 +516,11 @@ void unhandled_input(void *BINDING_DATA){
     tmp++;
   }
   if (false == is_handled) {
-    if (1 == wildcardcmp("\\x09\\x7fM\\xe7\\xfe\\x7f", strdup_escaped((char *)BINDING_DATA))) {
-      fprintf(stderr, "[BINDING_MODE_UNHANDLED_INPUT]  match1!\n");
-    }else if (1 == wildcardcmp("\\x09O\\xdf\\xea\\xfe\\x7f", strdup_escaped((char *)BINDING_DATA))) {
-      fprintf(stderr, "[BINDING_MODE_UNHANDLED_INPUT]  match2!\n");
-    }else if (1 == wildcardcmp("\\x09/\\x18\\xe1\\xfe\\x7f", strdup_escaped((char *)BINDING_DATA))) {
-      fprintf(stderr, "[BINDING_MODE_UNHANDLED_INPUT]  match3!\n");
-    }else if (1 == wildcardcmp("\\x09[B*", strdup_escaped((char *)BINDING_DATA))) {
-      fprintf(stderr, "[BINDING_MODE_UNHANDLED_INPUT]  match4!\n");
-    }else if (1 == wildcardcmp("\\x09[A*", strdup_escaped((char *)BINDING_DATA))) {
-      fprintf(stderr, "[BINDING_MODE_UNHANDLED_INPUT]  match5!\n");
-    }else{
-      fprintf(stderr, "[BINDING_MODE_UNHANDLED_INPUT]      escaped:'%s' (%lu chars)"
-              "\n",
-              strdup_escaped((char *)BINDING_DATA),
-              strlen((char *)BINDING_DATA)
-              );
-    }
+    fprintf(stderr, "[BINDING_MODE_UNHANDLED_INPUT]      escaped:'%s' (%lu chars)"
+            "\n",
+            strdup_escaped((char *)BINDING_DATA),
+            strlen((char *)BINDING_DATA)
+            );
   }
 
   return;
@@ -543,24 +528,17 @@ void unhandled_input(void *BINDING_DATA){
 
 
 char *ac_confirm_render_ui(){
-  //fflush(STDIN_FILENO);
   struct Vector *RenderedOptionButtons = require(ac_confirm)->render_option_buttons();
-
-//  fprintf(stderr, "%lu rendered buttons\n", vector_size(RenderedOptionButtons));
-  char *bb = "\x1b[32m\x1b[0m\x1b[32m\x1b[7m Yes \x1b[0m\x1b[32m";
+  char          *bb                    = "\x1b[32m\x1b[0m\x1b[32m\x1b[7m Yes \x1b[0m\x1b[32m";
 
   ui_new(0, &u);
   binding_types[BINDING_MODE_MOUSE_SCROLL_UP]->handler   = mouse_scrolled_up;
   binding_types[BINDING_MODE_MOUSE_SCROLL_DOWN]->handler = mouse_scrolled_down;
   binding_types[BINDING_MODE_UNHANDLED_INPUT]->handler   = unhandled_input;
-
-  // fprintf(stderr, "\x1b[?1049h\x1b[0m\x1b[2J\x1b[?1003h\x1b[?1015h\x1b[?1006h\x1b[?25l");
-
 //  x = (u.ws.ws_col - 50) / 2;
 //  y = (u.ws.ws_row - 10) / 2;
   size_t              index = 0;
-  //head = vt100_decode("\x1b[38;5;106;48;5;20mOption 1" AC_RESETALL "\x1B[38;5;125m❌\x1B[38;5;112m☑\x1B[38;5;120m🔳\x1B[38;5;106m✖️");
-  struct StringBuffer *sb = stringbuffer_new();
+  struct StringBuffer *sb   = stringbuffer_new();
 
   for (size_t i = 0; i < vector_size(RenderedOptionButtons); i++) {
     char *RenderedOptionButton = vector_get(RenderedOptionButtons, i);
@@ -568,9 +546,7 @@ char *ac_confirm_render_ui(){
   }
   char *seq = stringbuffer_to_string(sb);
 
-//  fprintf(stderr, "rendered seqs:         '%s'\n", strdup_escaped(seq));
   head = vt100_decode(seq);
-  //"\x1b[38;5;106;48;5;20mOption 1" AC_RESETALL "\x1B[38;5;125m❌\x1B[38;5;112m☑\x1B[38;5;120m🔳\x1B[38;5;106m✖️");
   struct vt100_node_t *tmp = head->next;
   int                 y = 5, x = 5;
   size_t              added_qty = 0;
@@ -610,7 +586,6 @@ char *ac_confirm_render_ui(){
     tmp = tmp->next;
   }
   assert(added_qty == vector_size(RenderedOptionButtons));
-  //fflush(STDIN_FILENO);
   ui_key("q", stop, &u);
   ui_key("r", reload_options, &u);
   ui_key("n", select_next, &u);
@@ -690,12 +665,5 @@ struct ac_confirm_option_t *ac_confirm_get_option_by_uuid(char *UUID){
 }
 
 
-int __do_libterminput(void);
-
-pthread_t t;
-
-
 int do_libterminput(void){
-  //__do_libterminput();
-  //  assert(pthread_create(&t, NULL, __do_libterminput, (void *)0) == 0);
 }

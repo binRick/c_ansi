@@ -11,14 +11,15 @@
 #include <sys/stat.h>
 #include <time.h>
 #include <unistd.h>
-
+/////////////////////////////////////////////////////////////////
 module(ac_confirm) * B;
 
 
+/////////////////////////////////////////////////////////////////
 int main(const int argc, const char **argv) {
   if (!isatty(STDOUT_FILENO)) {
     fprintf(stderr, "NO TTY!\n");
-    return(0);
+    return(1);
   }
   {
     B = require(ac_confirm);
@@ -42,6 +43,10 @@ int main(const int argc, const char **argv) {
     B->add_option(O6);
     struct ac_confirm_option_t *O7 = B->init_option("Option 7");
     B->add_option(O7);
+    struct ac_confirm_option_t *O8 = B->init_option("Option 8");
+    B->add_option(O8);
+    struct ac_confirm_option_t *O9 = B->init_option("Option 9");
+    B->add_option(O9);
     printf("# options:  %lu\n", B->get_options_qty());
     fflush(STDIN_FILENO);
     fflush(stdout);
@@ -51,4 +56,4 @@ int main(const int argc, const char **argv) {
     printf("render ended\n");
   }
   return(EXIT_SUCCESS);
-}
+} /* main */
