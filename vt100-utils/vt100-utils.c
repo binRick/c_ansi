@@ -18,6 +18,7 @@
 #include "module/def.h"
 #include "module/module.h"
 #include "module/require.h"
+#include "tiny-regex-c/re.h"
 #include "vt100-utils/vt100-utils.h"
 #include "vt100utils/demos/tuibox.h"
 #include "vt100utils/vt100utils.h"
@@ -389,32 +390,96 @@ void mouse_scrolled_down(void *BINDING_DATA){
 }
 
 
+void focus_out(void *BINDING_DATA){
+  fprintf(stderr, "focus out!\n");
+}
+
+
+void clicked(void *BINDING_DATA){
+  fprintf(stderr, "clicked!\n");
+}
+
+
+void focus_in(void *BINDING_DATA){
+  fprintf(stderr, "focus in!\n");
+}
+
+
 void mouse_scrolled_up(void *BINDING_DATA){
   select_prev();
   return;
 }
-
+/*
+ * int        match_length;
+ * const char *string_to_search = "ahem.. 'hello world !' ..";
+ * re_t       pattern           = re_compile("[Hh]ello [Ww]orld\\s*[!]?");
+ * int        match_idx         = re_matchp(pattern, string_to_search, &match_length);
+ */
 struct unhandled_escaped_handlers_t {
   char *name;
   void (*handler)(void *);
   char *escaped_wildcards[33];
+  char *regex_bind_datas[33];
 } unhandled_escaped_handlers[] = {
-  { .name = "shift-tab", .handler = select_prev, .escaped_wildcards = {
-      "\\x1b[Z\\x*",
-      "\\x1b[Z~\\x*",
+  { .name             = "click",     .handler = clicked,
+    .regex_bind_datas ={
+      ";[\\d]+;[\\d]+m",
+      NULL,
+    },
+    .escaped_wildcards ={
+      "\\x1b[<0;*",
       NULL,
     }, },
-  { .name = "tab",       .handler = select_next, .escaped_wildcards = {
-      "\\x09\\xbf\\x*",
-      "\\x09\\x9*\\x*",
-      "\\x09\\x8fD\\x*",
+  { .name             = "focus-in",  .handler = focus_in,   .escaped_wildcards  = {
+      "\\x1b[I0;*",
+      "\\x1b[I\\x*",
+      "\\x1b[I65;*",
+      "\\x1b[I64;*",
+      NULL,
+    },
+    .regex_bind_datas ={
+      NULL,
+    }, },
+  { .name             = "focus-out", .handler = focus_out,  .escaped_wildcards  = {
+      "\\x1b[O0;*",
+      "\\x1b[O64;*",
+      "\\x1b[O65;*",
+      "\\x1b[O\\x*",
+      NULL,
+    },
+    .regex_bind_datas ={
+      NULL,
+    }, },
+  { .name             = "shift-tab", .handler = select_prev,.escaped_wildcards  = {
+      "\\x1b[Z\\x*",
+      "\\x1b[Z~\\x*",
+      "\\x1b[Z0;*",
+      "\\x1b[Z65;*",
+      "\\x1b[Z64;*",
+      NULL,
+    },
+    .regex_bind_datas ={
+      NULL,
+    }, },
+  { .name             = "tab",       .handler = select_next,.escaped_wildcards  = {
+      "\\x09\\xb2i\\x80\\xff\\x7f",
       "\\x09[A*",
       "\\x09[B*",
       "\\x09[6~\\x*",
       "\\x09[5~\\x*",
       "\\x09[Z\\x*",
+      "\\x09[I64;*",
+      "\\x09[<64;*",
+      "\\x09[I0;*",
       "\\x09[Z~\\x*",
+      "\\x09[Z0;*",
+      "\\x09[<0;*",
+      "\\x09[?65;*",
+      "\\x09[<65;*",
       "s[B\\x*",
+      NULL,
+    },
+    .regex_bind_datas ={
       NULL,
     }, },
   { NULL },
@@ -427,8 +492,19 @@ void unhandled_input(void *BINDING_DATA){
 
   while (tmp != NULL && tmp->handler != NULL && *(tmp->escaped_wildcards) != NULL) {
     char **tmp1 = tmp->escaped_wildcards;
+    char **tmp2 = tmp->regex_bind_datas;
     while (*tmp1 != NULL) {
       if (1 == wildcardcmp(*tmp1, strdup_escaped((char *)BINDING_DATA))) {
+        while (*tmp2 != NULL) {
+          fprintf(stderr, "[BINDING_MODE_UNHANDLED_INPUT]  checking regex '%s'\n", *tmp2);
+
+          int  match_length;
+          re_t pattern   = re_compile(*tmp2);
+          int  match_idx = re_matchp(pattern, strdup_escaped((char *)BINDING_DATA), &match_length);
+          fprintf(stderr, "[BINDING_MODE_UNHANDLED_INPUT]  checked regex '%s'    match len: %d | match_idx: %d | target len: %lu|\n", *tmp2, match_length, match_idx, strlen(strdup_escaped((char *)BINDING_DATA)));
+
+          *(tmp2)++;
+        }
         fprintf(stderr, "[BINDING_MODE_UNHANDLED_INPUT]  match for %s!- '%s' -> '%s'\n",
                 tmp->name,
                 *tmp1,

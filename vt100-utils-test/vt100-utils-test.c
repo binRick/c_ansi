@@ -43,7 +43,11 @@ int main(const int argc, const char **argv) {
     struct ac_confirm_option_t *O7 = B->init_option("Option 7");
     B->add_option(O7);
     printf("# options:  %lu\n", B->get_options_qty());
+    fflush(STDIN_FILENO);
+    fflush(stdout);
+    printf(AC_HIDE_CURSOR);
     B->render_ui();
+    printf(AC_SHOW_CURSOR);
     printf("render ended\n");
   }
   return(EXIT_SUCCESS);

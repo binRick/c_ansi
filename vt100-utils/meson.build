@@ -17,6 +17,7 @@ vt100_utils_deps = [
   uuid4_dep,  
   ansi_codes_dep,
   wildcardcmp_dep,
+  tiny_regex_c_dep,
   ansi_utils_dep,
 ]
 
