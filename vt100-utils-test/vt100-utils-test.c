@@ -24,9 +24,7 @@ int main(const int argc, const char **argv) {
   {
     B = require(ac_confirm);
   }
-  {
-    //require(ac_confirm)->terminput();
-  }
+
   {
     struct ac_confirm_option_t *O1 = B->init_option("Option 1");
     B->add_option(O1);

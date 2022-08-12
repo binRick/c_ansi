@@ -47,3 +47,4 @@ subdir('vt100-utils-test')
 #subdir('term-termpaint')
 #subdir('term-termpaint-test')
 #//////////////////////////////////////////////////////////////////////
+subdir('tuibox-dev1-test')

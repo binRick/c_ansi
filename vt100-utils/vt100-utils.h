@@ -46,7 +46,6 @@ module(ac_confirm) {
   //     Utility Functions
   //////////////////////////////////////////////////////////////////////////////////////
   int                        (*render_ui)(void);
-  int                        (*terminput)(void);
   char                       *(*render_option_buttons)(void);
   struct ac_confirm_option_t *(*render_option)(char *TEXT, char *COLOR);
   struct ac_confirm_option_t *(*get_option_by_uuid)(char *UUID);
@@ -63,7 +62,6 @@ void ac_confirm_module_deinit(module(ac_confirm) * exports);
 struct ac_confirm_option_t *ac_confirm_init_option(char *NEW_OPTION_TEXT);
 bool ac_confirm_add_option(struct ac_confirm_option_t *NEW_OPTION);
 size_t ac_confirm_get_options_qty(void);
-int do_libterminput(void);
 
 exports(ac_confirm) {
   .mode                  = AC_CONFIRM_LOG_DEFAULT,
@@ -74,7 +72,6 @@ exports(ac_confirm) {
   .render_option_button  = NULL,
   .render_option         = NULL,
   .get_option_by_uuid    = NULL,
-  .terminput             = NULL,
   .get_options_qty       = ac_confirm_get_options_qty,
   .init_option           = ac_confirm_init_option,
   .add_option            = ac_confirm_add_option,

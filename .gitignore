@@ -29,3 +29,5 @@ subprojects/*/
 ansi-codes/.attic
 loc.sh
 jinja2-cli/bin
+input.log
+submodules/c_deps

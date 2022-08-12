@@ -1,6 +1,5 @@
 vt100_utils_srcs = [
   'vt100-utils.c',
-  'vt100-utils-libterminput.c',
 ]
 vt100_utils_include_dirs = [
   '.',
@@ -11,7 +10,6 @@ vt100_utils_deps = [
   module_dep,
   c_vector_dep,
   c_string_buffer_dep,
-  libterminput_dep,
   c_stringfn_dep,
   vt100utils_dep,
   uuid4_dep,  

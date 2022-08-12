@@ -14,7 +14,6 @@
 #include "c_string_buffer/include/stringbuffer.h"
 #include "c_stringfn/include/stringfn.h"
 #include "c_vector/include/vector.h"
-#include "libterminput/libterminput.h"
 #include "module/def.h"
 #include "module/module.h"
 #include "module/require.h"
@@ -24,13 +23,19 @@
 #include "vt100utils/vt100utils.h"
 #include "wildcardcmp/wildcardcmp.h"
 ////////////////////////////////////////////////////
-#define TEST_STR      "F2DEEA90-F1F2-4C73-9BB8-3593319834D8"
 #define UP_ARROW      "[A"
 #define DOWN_ARROW    "[B"
 #define TAB_KEY       "[A"
 #define MIN(a, b)    (a < b ? a : b)
 ///////////////////////////////////////////////////////
-static ui_t u;
+enum change_selection_type_t {
+  CHANGE_SELECTION_TYPE_NEXT,
+  CHANGE_SELECTION_TYPE_PREV,
+  CHANGE_SELECTION_TYPES_QTY,
+};
+static const char                 *TEST_STR = "F2DEEA90-F1F2-4C73-9BB8-3593319834D8";
+static ui_t                       u;
+static int                        w = 20;
 static struct vt100_node_t        *head;
 static struct ac_confirm_option_t AC_CONFIRM_DEFAULT_OPTION = {
   .text           = "undefined",
@@ -38,22 +43,7 @@ static struct ac_confirm_option_t AC_CONFIRM_DEFAULT_OPTION = {
   .color          = AC_RED,
   .selected_color = AC_GREEN,
 };
-
-
-static char *__TEST_STR(char *SEQ){
-  char *s;
-
-  asprintf(&s, "%s%s", SEQ, TEST_STR);
-  return(s);
-}
-static int w = 20;
-
-
-static void stop() {
-  ui_free(&u);
-  vt100_free(head);
-  exit(0);
-}
+void ac_confirm_module_deinit(module(ac_confirm) *exports);
 void click(ui_box_t *b, int x, int y);
 void mouse_scrolled_down(void *BINDING_DATA);
 void mouse_scrolled_down(void *BINDING_DATA);
@@ -63,25 +53,33 @@ void focus_in(void *BINDING_DATA);
 void reload_options();
 void select_prev();
 void select_next();
-int __do_libterminput(void);
-int do_libterminput(void);
 void change_selection_index(int CHANGE_SELECTION_TYPE);
 void set_selection_index(size_t NEW_SELECTION_INDEX);
-struct vt100_node_t *get_node_by_uuid(char *UUID);
+int ac_confirm_module_init(module(ac_confirm) *exports);
 size_t get_index_by_uuid(char *UUID);
 char *ac_confirm_render_ui(void);
+char *ac_confirm_render_option_button(struct ac_confirm_option_t *O);
 struct Vector *ac_confirm_render_options();
+struct Vector *ac_confirm_render_option_buttons();
 struct ac_confirm_option_t *ac_confirm_render_option(char *TEXT, char *COLOR);
 struct ac_confirm_option_t *ac_confirm_get_option_by_uuid(char *UUID);
-struct Vector *ac_confirm_render_option_buttons();
 struct vt100_node_t *parse_seq(char *SEQ);
-char *ac_confirm_render_option_button(struct ac_confirm_option_t *O);
+struct vt100_node_t *get_node_by_uuid(char *UUID);
 
-enum change_selection_type_t {
-  CHANGE_SELECTION_TYPE_NEXT,
-  CHANGE_SELECTION_TYPE_PREV,
-  CHANGE_SELECTION_TYPES_QTY,
-};
+
+static char *__TEST_STR(char *SEQ){
+  char *s;
+
+  asprintf(&s, "%s%s", SEQ, TEST_STR);
+  return(s);
+}
+
+
+static void stop() {
+  ui_free(&u);
+  vt100_free(head);
+  exit(0);
+}
 struct unhandled_escaped_handlers_t {
   char *name;
   void (*handler)(void *);
@@ -528,6 +526,7 @@ void unhandled_input(void *BINDING_DATA){
 
 
 char *ac_confirm_render_ui(){
+//  signal(SIGWINCH, tb_sig_handler);
   struct Vector *RenderedOptionButtons = require(ac_confirm)->render_option_buttons();
   char          *bb                    = "\x1b[32m\x1b[0m\x1b[32m\x1b[7m Yes \x1b[0m\x1b[32m";
 
@@ -626,7 +625,6 @@ int ac_confirm_module_init(module(ac_confirm) *exports) {
   exports->render_option_buttons = ac_confirm_render_option_buttons;
   exports->render_option         = ac_confirm_render_option;
   exports->render_option_button  = ac_confirm_render_option_button;
-  exports->terminput             = do_libterminput;
   return(0);
 }
 
@@ -640,6 +638,11 @@ char *ac_confirm_render_option_button(struct ac_confirm_option_t *O){
            (true == O->selected) ? O->selected_color : O->color
            );
   return(b);
+}
+
+
+void ac_confirm_redraw(){
+  ui_redraw(&u);
 }
 
 struct Vector *ac_confirm_render_option_buttons(){
@@ -665,5 +668,12 @@ struct ac_confirm_option_t *ac_confirm_get_option_by_uuid(char *UUID){
 }
 
 
-int do_libterminput(void){
+void tb_sig_handler(int sig){
+  if (SIGWINCH == sig) {
+    struct winsize winsz;
+
+    ioctl(0, TIOCGWINSZ, &winsz);
+    fprintf(stderr, "SIGWINCH raised, window size: %d rows / %d columns\n", winsz.ws_row, winsz.ws_col);
+    ac_confirm_redraw();
+  }
 }
