@@ -6,7 +6,7 @@ vt100_utils_include_dirs = [
   inc,
 ]
 vt100_utils_test_deps = [
-       vt100_utils_dep,
+  vt100_utils_dep,
 ]
 
 if get_option('enable-binaries')

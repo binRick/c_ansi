@@ -19,8 +19,11 @@
 #include "module/require.h"
 #include "tiny-regex-c/re.h"
 #include "vt100-utils/vt100-utils.h"
-#include "vt100utils/demos/tuibox.h"
+////////////////////////////////////////////////////
 #include "vt100utils/vt100utils.h"
+////////////////////////////////////////////////////
+#include "vt100utils/tuibox.h"
+////////////////////////////////////////////////////
 #include "wildcardcmp/wildcardcmp.h"
 ////////////////////////////////////////////////////
 #define UP_ARROW      "[A"
@@ -65,6 +68,7 @@ struct ac_confirm_option_t *ac_confirm_render_option(char *TEXT, char *COLOR);
 struct ac_confirm_option_t *ac_confirm_get_option_by_uuid(char *UUID);
 struct vt100_node_t *parse_seq(char *SEQ);
 struct vt100_node_t *get_node_by_uuid(char *UUID);
+extern struct binding_type_t *binding_types[];
 
 
 static char *__TEST_STR(char *SEQ){
@@ -523,7 +527,6 @@ void unhandled_input(void *BINDING_DATA){
 
   return;
 } /* unhandled_input */
-
 
 char *ac_confirm_render_ui(){
 //  signal(SIGWINCH, tb_sig_handler);
