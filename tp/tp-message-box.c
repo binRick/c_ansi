@@ -40,17 +40,15 @@
 #define BOTTOM_MSG_FG_COLOR      TERMPAINT_RGB_COLOR(BORDER_FG_COLOR_RED, BORDER_FG_COLOR_GREEN, BORDER_FG_COLOR_BLUE)
 #define BOTTOM_MSG_BG_COLOR      TERMPAINT_RGB_COLOR(BORDER_BG_COLOR_RED, BORDER_BG_COLOR_GREEN, BORDER_BG_COLOR_BLUE)
 #define BOTTOM_MSG_COLORS        BOTTOM_MSG_FG_COLOR, BOTTOM_MSG_BG_COLOR
-extern termpaint_surface *surface;
-extern termpaint_terminal *terminal;
 const char
-                          BOTTOM_MSG_BOX_TOP_SINGLE[] = "┌───────────────────────────────────────────────────────────────────────────────────────────────────────┐",
-  BOTTOM_MSG_BOX_SIDE_SINGLE[] = "│                                                                                                       │",
-  BOTTOM_MSG_BOX_BOTTOM_SINGLE[] = "└───────────────────────────────────────────────────────────────────────────────────────────────────────┘", BOTTOM_MSG_BOX_TOP_DOUBLE[] = "╔═══════════════════════════════════════════════════════════════════════════════════════════════════════╗",
-  BOTTOM_MSG_BOX_SIDE_DOUBLE[]   = "║                                                                                                       ║",
-  BOTTOM_MSG_BOX_BOTTOM_DOUBLE[] = "╚═══════════════════════════════════════════════════════════════════════════════════════════════════════╝",
-  *BOTTOM_MSG_BOX_TOPS[]         = { BOTTOM_MSG_BOX_TOP_SINGLE, BOTTOM_MSG_BOX_TOP_DOUBLE },
-  *BOTTOM_MSG_BOX_SIDES[]        = { BOTTOM_MSG_BOX_SIDE_SINGLE, BOTTOM_MSG_BOX_SIDE_DOUBLE },
-  *BOTTOM_MSG_BOX_BOTTOMS[]      = { BOTTOM_MSG_BOX_BOTTOM_SINGLE, BOTTOM_MSG_BOX_BOTTOM_DOUBLE }
+BOTTOM_MSG_BOX_TOP_SINGLE[]    = "┌───────────────────────────────────────────────────────────────────────────────────────────────────────┐",
+BOTTOM_MSG_BOX_SIDE_SINGLE[]   = "│                                                                                                       │",
+BOTTOM_MSG_BOX_BOTTOM_SINGLE[] = "└───────────────────────────────────────────────────────────────────────────────────────────────────────┘", BOTTOM_MSG_BOX_TOP_DOUBLE[] = "╔═══════════════════════════════════════════════════════════════════════════════════════════════════════╗",
+BOTTOM_MSG_BOX_SIDE_DOUBLE[]   = "║                                                                                                       ║",
+BOTTOM_MSG_BOX_BOTTOM_DOUBLE[] = "╚═══════════════════════════════════════════════════════════════════════════════════════════════════════╝",
+*BOTTOM_MSG_BOX_TOPS[]         = { BOTTOM_MSG_BOX_TOP_SINGLE, BOTTOM_MSG_BOX_TOP_DOUBLE },
+*BOTTOM_MSG_BOX_SIDES[]        = { BOTTOM_MSG_BOX_SIDE_SINGLE, BOTTOM_MSG_BOX_SIDE_DOUBLE },
+*BOTTOM_MSG_BOX_BOTTOMS[]      = { BOTTOM_MSG_BOX_BOTTOM_SINGLE, BOTTOM_MSG_BOX_BOTTOM_DOUBLE }
 ;
 termpaint_attr
 *attr_bottom_msg

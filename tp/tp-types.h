@@ -1,3 +1,6 @@
+#pragma once
+#ifndef TPTH
+#define TPTH
 #include <stdbool.h>
 ///////////////////////////////////////////////
 ///        TYPES                            ///
@@ -22,3 +25,4 @@ typedef struct event_ {
   const char    *string;
   struct event_ *next;
 } event;
+#endif

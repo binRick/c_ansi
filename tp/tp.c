@@ -1,35 +1,11 @@
 #pragma once
-#include "term-termpaint.h"
-#include "term-termpaint.h"
-#include "termpaint.h"
-#include "termpaint_image.h"
-#include "termpaintx.h"
-#include "termpaintx_ttyrescue.h"
-#include "tp-message-box.h"
-#include "tp-utils.h"
-#include <assert.h>
-#include <fcntl.h>
-#include <pthread.h>
-#include <signal.h>
-#include <stdarg.h>
-#include <stdio.h>
+#ifndef TPC
+#define TPC
+#include <stdint.h>
 #include <stdlib.h>
-#include <string.h>
-#include <termios.h>
-#include <unistd.h>
-////////////////////////////////////////////////////
-#include "ansi-codes.h"
-#include "ansi-utils/ansi-utils.h"
-#include "c_string_buffer/include/stringbuffer.h"
-#include "c_stringfn/include/stringfn.h"
-#include "c_vector/include/vector.h"
-#include "module/def.h"
-#include "module/module.h"
-////////////////////////////////////////////////////
-#include "wildcardcmp/wildcardcmp.h"
-////////////////////////////////////////////////////
-#include "module/require.h"
-#include "tiny-regex-c/re.h"
+//////////////////////////////////////////////////////////////////
+#include "tp-internal.h"
+//////////////////////////////////////////////////////////////////
 #include "tp.h"
 //////////////////////////////////////////////////////////////////
 extern termpaint_attr *attr_bottom_msg;
@@ -74,45 +50,23 @@ unsigned int          BORDER_STYLE = 0,
       TERMINAL_KEY_MENU_ITEM(8, "Esc", "   Undo Choice ❌");            \
       TERMINAL_KEY_MENU_ITEM(9, "Enter", " Follow Menu Path");         \
     }while (0); }
-enum change_selection_type_t {
-  CHANGE_SELECTION_TYPE_NEXT,
-  CHANGE_SELECTION_TYPE_PREV,
-  CHANGE_SELECTION_TYPE_FIRST,
-  CHANGE_SELECTION_TYPE_LAST,
-  CHANGE_SELECTION_TYPE_PAGE_DOWN,
-  CHANGE_SELECTION_TYPE_PAGE_UP,
-  CHANGE_SELECTION_TYPES_QTY,
-};
 volatile size_t
   surface_updates_qty = 0
 ;
 cursor_profile_t
-           *cursor_profile
+*cursor_profile
 ;
-const char *TITLE_CHARS[] = { "🯰", "🯱", "🯲", "🯳", "🯴", "🯵", "🯶", "🯷", "🯸", "🯹" };
 static event *key_wait(void);
-static char *tp__basename(const char *path);
 
-static volatile unsigned int
-                                  title_updates_qty         = 0;
-static struct tp_confirm_option_t AC_CONFIRM_DEFAULT_OPTION = {
-  .text           = "undefined",
-  .selected       = false,
-  .color          = AC_RED,
-  .selected_color = AC_GREEN,
-};
+static volatile unsigned int title_updates_qty = 0;
 const int
-                                  screen_bg = TERMPAINT_COLOR_BRIGHT_YELLOW,
-  ui_fg                                     = TERMPAINT_COLOR_BLACK,
-  win_message                               = TERMPAINT_COLOR_GREEN,
-  tile_border                               = TERMPAINT_COLOR_BLACK,
-  tile_background                           = TERMPAINT_COLOR_LIGHT_GREY
+                             screen_bg = TERMPAINT_COLOR_BRIGHT_YELLOW,
+  ui_fg                                = TERMPAINT_COLOR_BLACK,
+  win_message                          = TERMPAINT_COLOR_GREEN,
+  tile_border                          = TERMPAINT_COLOR_BLACK,
+  tile_background                      = TERMPAINT_COLOR_LIGHT_GREY
 ;
 
-void tp_confirm_module_deinit(module(tp_confirm) *exports) {
-  clib_module_deinit(tp_confirm);
-  return;
-}
 //////////////////////////////////////////////////////////////////////////
 ///        PROTOTYPES                ///
 //////////////////////////////////////////////////////////////////////////
@@ -132,45 +86,10 @@ cleanup(void),
 update_current_key_display(termpaint_attr * attr_ui, event * evt),
 named_color_menu(termpaint_attr * attr_ui, termpaint_attr * attr_to_change, int which_color),
 menu(termpaint_attr * attr_ui, termpaint_attr * attr_sample),
-draw_box(),
-select_prev(void),
-select_next(void),
-select_first(void),
-select_page_down(void),
-select_last(void),
-select_page_up(void);
+draw_box();
 int term_tests_main(const int argc, const char **argv), tp_get_max_option_text_size();
-char *str_repeat(char str[], unsigned int times), *cell_at(board_t *, int, int);
 void render_tp_options(void);
 //////////////////////////////////////////////////////////////////////////
-
-int tp_confirm_module_init(module(tp_confirm) *exports) {
-  clib_module_init(tp_confirm, exports);
-  uuid4_init();
-  exports->mode    = AC_CONFIRM_LOG_DEFAULT;
-  exports->options = vector_new();
-
-  return(0);
-}
-
-struct tp_confirm_option_t *tp_confirm_init_option(char *NEW_OPTION_TEXT){
-  struct tp_confirm_option_t *O = calloc(1, sizeof(struct tp_confirm_option_t));
-
-  O->text           = NEW_OPTION_TEXT ? NEW_OPTION_TEXT : AC_CONFIRM_DEFAULT_OPTION.text;
-  O->selected       = AC_CONFIRM_DEFAULT_OPTION.selected;
-  O->color          = AC_CONFIRM_DEFAULT_OPTION.color;
-  O->selected_color = AC_CONFIRM_DEFAULT_OPTION.selected_color;
-  uuid4_generate(O->uuid);
-  return(O);
-}
-
-bool tp_confirm_add_option(struct tp_confirm_option_t *NEW_OPTION){
-  vector_push(TP->options, (void *)NEW_OPTION);
-}
-
-size_t tp_confirm_get_options_qty(void){
-  return(vector_size(TP->options));
-}
 
 ///////////////////////////////////////////////
 ///        GLOBAL VARIABLES                 ///
@@ -188,24 +107,6 @@ volatile bool
 ;
 volatile unsigned int
   cursor_x = 0, cursor_y = 1
-;
-termpaint_terminal
-*terminal
-;
-termpaint_surface
-*surface
-;
-termpaint_integration
-*integration
-;
-termpaint_attr
-*attr_ui,
-*attr_sample;
-event
-*event_current
-;
-cursor_profile_t
-*cursor_profile
 ;
 
 ///////////////////////////////////////////////
@@ -372,25 +273,25 @@ static void event_callback(void *userdata, termpaint_event *tp_event) {
 } /* event_callback */
 
 void tb_sig_handler(int sig){
-  LOG("SIGWINCH");
   if (SIGWINCH == sig) {
+    long unsigned  started_ts = timestamp();
+    char           *msg;
     struct winsize winsz;
     ioctl(0, TIOCGWINSZ, &winsz);
-    //fprintf(stderr, "SIGWINCH raised, window size: %d rows / %d columns\n", winsz.ws_row, winsz.ws_col);
+    int            was_width  = surface_size.width,
+                   was_height = surface_size.height;
     surface_size.height = (int)winsz.ws_row;
     surface_size.width  = (int)winsz.ws_col;
-    int  was_width  = termpaint_surface_width(surface);
-    int  was_height = termpaint_surface_height(surface);
     termpaint_surface_resize(surface, surface_size.width, surface_size.height);
-    char *msg;
-    asprintf(&msg, "surface size changed from %dx%d to %dx%d", was_width, was_height, termpaint_surface_width(surface), termpaint_surface_height(surface));
-    fprintf(stderr, "%s\n", msg);
-    repaint_all(attr_ui, attr_sample);
-    menu(attr_ui, attr_sample);
-    REDRAW_SURFACE_OBJECTS();
-    bool force = true;
-    termpaint_terminal_flush_logged(terminal, force);
-    LOG(msg);
+    asprintf(&msg, "[SIGWINCH] surface size changed from %dx%d to %dx%d", was_width, was_height, termpaint_surface_width(surface), termpaint_surface_height(surface));
+    //dbge(msg,%s);
+    {
+      repaint_all(attr_ui, attr_sample);
+      REDRAW_SURFACE_OBJECTS();
+      termpaint_terminal_flush_logged(terminal, true);
+    }
+    long unsigned tb_sig_handler_dur_ms = timestamp() - started_ts;
+//    dbge(tb_sig_handler_dur_ms,%ld);
   }
 }
 
@@ -416,7 +317,6 @@ int term_init(void) {
   }
 
 //  termpaint_terminal_set_log_mask(terminal, TERMPAINT_LOG_AUTO_DETECT_TRACE | TERMPAINT_LOG_TRACE_RAW_INPUT);
-
   termpaint_terminal_set_mouse_mode(terminal, TERMPAINT_MOUSE_MODE_CLICKS);
   termpaint_terminal_set_mouse_mode(terminal, TERMPAINT_MOUSE_MODE_DRAG);
   termpaint_terminal_set_mouse_mode(terminal, TERMPAINT_MOUSE_MODE_MOVEMENT);
@@ -429,17 +329,16 @@ int term_init(void) {
     .sa_handler = tb_sig_handler,
     .sa_flags   = SA_NODEFER
   }, 0);
-//  signal(SIGWINCH, tb_sig_handler);
   LOG("SIGWINCH LOADED");
 
   cursor_profile->visible = DEFAULT_CURSOR_VISIBLE;
   update_cursor_profile();
 
-  char *d = "B";
-  termpaint_terminal_add_input_data(terminal, d, strlen(d));
+  //char *d = "B";
+  //termpaint_terminal_add_input_data(terminal, d, strlen(d));
 
   clear_bottom_msg(false, false);
-  REDRAW_SURFACE_OBJECTS();
+  //REDRAW_SURFACE_OBJECTS();
   return(EXIT_SUCCESS);
 } /* term_init */
 
@@ -762,7 +661,6 @@ static void rgb_color_menu(termpaint_attr *attr_ui, termpaint_attr *attr_to_chan
 } /* rgb_color_menu */
 
 ////////////////////////////////////////////////////////
-int get_selected_index();
 ////////////////////////////////////////////////////////
 #define ICON0                                          ">"
 #define ICON1                                          "▶"
@@ -777,17 +675,23 @@ int get_selected_index();
 #define ICON10                                         "🚩"
 #define ICON11                                         "✅"
 #define ICON12                                         "⭐"
+#define ICON13                                         "✔️"
+#define ICON14                                         "☑️"
+#define ICON15                                         "✳️"
 ////////////////////////////////////////////////////////
-#define SELECTED_LEFT_ICON                             ICON3
+#define SELECTED_LEFT_ICON                             ICON1
 #define SELECTED_RIGHT_ICON                            ICON3
 #define SELECTED_LEFT_ICON_SIZE                        1
-#define OPTION_ROW_PADDING                             1
+#define OPTION_RIGHT_EDGE_PADDING                      1
 #define SELECTED_STYLE                                 (TERMPAINT_STYLE_INVERSE | TERMPAINT_STYLE_BOLD)
 #define UNSELECTED_STYLE                               -1
 ////////////////////////////////////////////////////////
 #define TERMINAL_TP_OPTIONS_ROW_TOP_OFFSET             2
 #define TERMINAL_TP_OPTIONS_ROW_BOTTOM_OFFSET          2
 #define TERMINAL_TP_OPTIONS_RIGHT_PERCENTAGE_OFFSET    .75
+#define TERMINAL_TP_OPTIONS_RIGHT_MAX_COLS_OFFSET      2
+#define TP_OPTIONS_SELECTED_LEFT_ICON_FG_COLOR         TERMPAINT_COLOR_BRIGHT_YELLOW
+#define TP_OPTIONS_SELECTED_LEFT_ICON_BG_COLOR         TERMPAINT_COLOR_BLACK
 #define TP_OPTIONS_UNSELECTED_FG_COLOR                 TERMPAINT_COLOR_WHITE
 #define TP_OPTIONS_SELECTED_FG_COLOR                   TERMPAINT_COLOR_GREEN
 #define TP_OPTIONS_UNSELECTED_BG_COLOR                 TERMPAINT_DEFAULT_COLOR
@@ -795,179 +699,6 @@ int get_selected_index();
 #define SELECTED_LEFT_MARKER_PREFIX                    "  "
 #define SELECTED_LEFT_MARKER_SUFFIX                    "  "
 #define SELECTED_LEFT_MARKER                           SELECTED_LEFT_MARKER_PREFIX SELECTED_LEFT_ICON SELECTED_LEFT_MARKER_SUFFIX
-
-char *str_repeat(char str[], unsigned int times){
-  if (times < 1) {
-    return(NULL);
-  }
-
-  char   *result;
-  size_t str_len = strlen(str);
-  result = malloc(sizeof(char) * str_len + 1);
-
-  while (times--) {
-    strcat(result, str);
-  }
-  return(result);
-}
-
-static struct tp_confirm_option_t *o;
-
-void render_tp_options(void){
-  char *text, *marker;
-
-  asprintf(&marker, "%s", SELECTED_LEFT_MARKER);
-  termpaint_attr *o_attr_unselected = termpaint_attr_new(TP_OPTIONS_UNSELECTED_FG_COLOR, TP_OPTIONS_UNSELECTED_BG_COLOR);
-  termpaint_attr *o_attr_selected = termpaint_attr_new(TP_OPTIONS_SELECTED_FG_COLOR, TP_OPTIONS_SELECTED_BG_COLOR);
-  termpaint_attr *marker_attr = termpaint_attr_new(TERMPAINT_DEFAULT_COLOR, TERMPAINT_DEFAULT_COLOR);
-  const int      screen_width = termpaint_surface_width(surface),
-                 screen_height = termpaint_surface_height(surface);
-  int            o_row = -1, o_col = ((surface_size.width * 100) * TERMINAL_TP_OPTIONS_RIGHT_PERCENTAGE_OFFSET / 100);
-  int            max_option_text_size = tp_get_max_option_text_size();
-  int            option_width         = max_option_text_size + (OPTION_ROW_PADDING * 2);
-  char           *unselected_marker   = str_repeat(" ", strlen(SELECTED_LEFT_MARKER_PREFIX) + strlen(SELECTED_LEFT_MARKER_SUFFIX) + SELECTED_LEFT_ICON_SIZE);
-  int            max_option_rows      = screen_height - TERMINAL_TP_OPTIONS_ROW_TOP_OFFSET - TERMINAL_TP_OPTIONS_ROW_BOTTOM_OFFSET - BOTTOM_MSG_BOX_HEIGHT;
-  {
-    char *msg;
-    asprintf(&msg,"ending on row #%d",max_option_rows);
-    LOG(msg);
-    assert(o_col < screen_width && o_col > 0);
-    for (size_t i = 0; (i < vector_size(TP->options)) && (i <= max_option_rows); i++) {
-      o = vector_get(TP->options, i);
-      assert(o != NULL && o->text != NULL && strlen(o->text)>0);
-      assert(o->uuid != NULL && strlen(o->uuid)>10);
-      asprintf(&text, "%s", o->text);
-      assert(strlen(text) > 0);
-      o_row = TERMINAL_TP_OPTIONS_ROW_TOP_OFFSET + i;
-      assert(o_row < screen_height && o_row > 0);
-
-      while (strlen(text) < option_width) {
-        asprintf(&text, "%s%s", text, " ");
-        if (strlen(text) >= option_width) {
-          break;
-        }
-      }
-
-      termpaint_surface_clear_rect_with_attr(surface, o_col - strlen(marker), o_row, strlen(marker) + max_option_text_size, 1, attr_ui);
-      termpaint_surface_write_with_attr(surface, o_col, o_row, text, o->selected ? o_attr_selected : o_attr_unselected);
-      if (o->selected) {
-        termpaint_surface_write_with_attr(surface, o_col - strlen(marker) - 0, o_row, marker, marker_attr);
-      }
-    }
-  }
-} /* render_tp_options */
-
-void set_selection_index(size_t NEW_SELECTION_INDEX){
-  if (NEW_SELECTION_INDEX < 0) {
-    NEW_SELECTION_INDEX = TP->get_options_qty() - 1;
-  }else if (NEW_SELECTION_INDEX > TP->get_options_qty() - 1) {
-    NEW_SELECTION_INDEX = 0;
-  }
-  struct tp_confirm_option_t *NEW_SELECTION = (struct tp_confirm_option_t *)vector_get(TP->options, NEW_SELECTION_INDEX);
-  assert(NEW_SELECTION != NULL);
-  for (size_t i = 0; i < TP->get_options_qty(); i++) {
-    struct tp_confirm_option_t *O = (struct tp_confirm_option_t *)vector_get(TP->options, i);
-    O->selected = false;
-  }
-  NEW_SELECTION->selected = true;
-  render_tp_options();
-  termpaint_terminal_flush_logged(terminal, false);
-}
-
-void change_selection_index(int CHANGE_SELECTION_TYPE) {
-  char   *msg;
-  size_t was                 = get_selected_index();
-  size_t NEW_SELECTION_INDEX = -1;
-
-  for (size_t i = 0; i < TP->get_options_qty(); i++) {
-    struct tp_confirm_option_t *O = (struct tp_confirm_option_t *)vector_get(TP->options, i);
-    if (O->selected == true) {
-      O->selected = false;
-      switch (CHANGE_SELECTION_TYPE) {
-      case CHANGE_SELECTION_TYPE_PAGE_UP:
-        NEW_SELECTION_INDEX = i - (TP->get_options_qty() / 3);
-        NEW_SELECTION_INDEX = (NEW_SELECTION_INDEX < 0) ? 0 : NEW_SELECTION_INDEX;
-        break;
-      case CHANGE_SELECTION_TYPE_PAGE_DOWN:
-        NEW_SELECTION_INDEX = i + (TP->get_options_qty() / 3);
-        NEW_SELECTION_INDEX = (NEW_SELECTION_INDEX > TP->get_options_qty() - 1) ? TP->get_options_qty() - 1 : NEW_SELECTION_INDEX;
-
-        break;
-      case CHANGE_SELECTION_TYPE_FIRST:
-        NEW_SELECTION_INDEX = 0;
-        break;
-      case CHANGE_SELECTION_TYPE_LAST:
-        NEW_SELECTION_INDEX = TP->get_options_qty() - 1;
-        break;
-      case CHANGE_SELECTION_TYPE_NEXT:
-        NEW_SELECTION_INDEX = i + 1;
-        break;
-      case CHANGE_SELECTION_TYPE_PREV:
-        if (i == 0) {
-          NEW_SELECTION_INDEX = TP->get_options_qty() - 1;
-        }else{
-          NEW_SELECTION_INDEX = i - 1;
-        }
-        break;
-      }
-      set_selection_index(NEW_SELECTION_INDEX);
-      int is = get_selected_index();
-      asprintf(&msg, "selected index was %lu and is now %d :: selection type: %d", was, is, CHANGE_SELECTION_TYPE);
-      LOG(msg);
-      return;
-    }
-  }
-  return;
-} /* change_selection_index */
-
-void select_page_up(void){
-  change_selection_index(CHANGE_SELECTION_TYPE_PAGE_UP);
-}
-
-void select_page_down(void){
-  change_selection_index(CHANGE_SELECTION_TYPE_PAGE_DOWN);
-}
-
-void select_first(void){
-  change_selection_index(CHANGE_SELECTION_TYPE_FIRST);
-}
-
-void select_last(void){
-  change_selection_index(CHANGE_SELECTION_TYPE_LAST);
-}
-
-void select_next(void){
-  change_selection_index(CHANGE_SELECTION_TYPE_NEXT);
-}
-
-void select_prev(void){
-  change_selection_index(CHANGE_SELECTION_TYPE_PREV);
-}
-
-int tp_get_max_option_text_size(){
-  int                        s = 0;
-  struct tp_confirm_option_t *O;
-
-  for (size_t i = 0; i < TP->get_options_qty(); i++) {
-    O = (struct tp_confirm_option_t *)vector_get(TP->options, i);
-    if (strlen(O->text) > s) {
-      s = strlen(O->text);
-    }
-  }
-  return(s);
-}
-
-int get_selected_index(){
-  struct tp_confirm_option_t *O;
-
-  for (size_t i = 0; i < TP->get_options_qty(); i++) {
-    O = (struct tp_confirm_option_t *)vector_get(TP->options, i);
-    if (O->selected) {
-      return(i);
-    }
-  }
-  return(-1);
-}
 
 ////////////////////////////////////////////////////////
 static void menu(termpaint_attr *attr_ui, termpaint_attr *attr_sample) {
@@ -1014,7 +745,7 @@ static void menu(termpaint_attr *attr_ui, termpaint_attr *attr_sample) {
       select_last();
     } else if (evt->type == TERMPAINT_EV_CHAR && strcmp(evt->string, "t") == 0) {
       title_updates_qty++;
-      char *title_chars = TITLE_CHARS[title_updates_qty < 10 ? title_updates_qty : title_updates_qty % 10];
+      char *title_chars = TITLE_CHARS[(title_updates_qty < 10) ? (title_updates_qty) : (title_updates_qty % 10)];
       fwprintf(stderr, L""
                AC_RESETALL AC_RED AC_ITALIC "title chars size" AC_RESETALL ": "
                AC_RESETALL AC_REVERSED AC_BLUE AC_BOLD "%lu" AC_RESETALL
@@ -1155,20 +886,4 @@ static void menu(termpaint_attr *attr_ui, termpaint_attr *attr_sample) {
   }
 } /* menu */
 
-#define WRITE_LIT(fd, lit)    write(fd, lit, sizeof lit - 1)
-
-void handler(int sig){
-  if (sig == SIGINT) {
-    WRITE_LIT(2, "Signal caught\n");
-    execl("./recreate", "./recreate", (char *)NULL);
-    WRITE_LIT(2, "Couldn't run ./recreate\n");
-    _exit(127);
-  }
-}
-
-int main(){
-  while (1) {
-  }
-  return(0);
-}
-#undef TP
+#endif

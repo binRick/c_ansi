@@ -3,6 +3,8 @@ tp_srcs = [
   'tp-message-box.c',
   'term-termpaint.c',
   'tp-utils.c',
+  'tp-internal.c',
+  'tp-selection.c',
 ]
 
 tp_include_dirs = [
@@ -27,7 +29,7 @@ tp_deps = [
   ansi_utils_dep,  
 ]
 
-tp_lib = both_libraries('tp',
+tp_lib = static_library('tp',
   tp_srcs,
   install: false,
   dependencies: tp_deps,
