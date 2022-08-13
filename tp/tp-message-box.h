@@ -46,9 +46,8 @@ volatile char
   MSG[1024],
   CACHED_BOTTOM_MSG[1024]
 ;
-const char *TITLE_CHARS;
 const int
-           screen_bg,
+  screen_bg,
   ui_fg,
   win_message,
   tile_border,

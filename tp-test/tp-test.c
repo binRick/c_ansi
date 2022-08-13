@@ -15,7 +15,7 @@ module(tp_confirm) * B;
 #define NEW_OPTION(NUM, SELECTED)                         \
   do {                                                    \
     char                       *text;                     \
-    asprintf(&text, "Option %d", NUM);                    \
+    asprintf(&text, "Option %lu", (size_t)NUM);                    \
     struct tp_confirm_option_t *O = B->init_option(text); \
     O->selected = SELECTED;                               \
     B->add_option(O);                                     \
@@ -25,6 +25,7 @@ int main(int argc, char **argv) {
   assert(term_init() == EXIT_SUCCESS);
   {
     B = require(tp_confirm);
+NEW_OPTION(99999999999999,false);
     for (int i = 1; i <= OPTIONS_QTY; i++) {
       if (i == (int)(OPTIONS_QTY / 2)) {
         NEW_OPTION(i, true);
@@ -32,9 +33,6 @@ int main(int argc, char **argv) {
         NEW_OPTION(i, false);
       }
     }
-    struct tp_confirm_option_t *O = B->init_option("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
-    B->add_option(O);
-
     printf("# options:  %lu\n", B->get_options_qty());
     fflush(STDIN_FILENO);
     fflush(stdout);

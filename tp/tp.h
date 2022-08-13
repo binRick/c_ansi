@@ -98,7 +98,7 @@ static struct surface_size_t surface_size = { .width = 0, .height = 0 };
 #define termpaint_terminal_flush_logged(TERMINAL, FORCE)                                                         \
   { do {                                                                                                         \
       LOG("flush...........\n");                                                                                 \
-      bool          _FORCE     = FORCE;                                                                          \
+      bool          _FORCE = FORCE;                                                                              \
       static size_t last_flush_ts;                                                                               \
       static char   termpaint_terminal_flush_msg[512];                                                           \
       unsigned long ts = timestamp();                                                                            \
@@ -121,10 +121,10 @@ static struct surface_size_t surface_size = { .width = 0, .height = 0 };
 //////////////////////////////////////////////////////////////////
 #define REDRAW_BOTTOM_MSG_MIN_MS     50
 //////////////////////////////////////////////////////////////////
-#define REDRAW_SURFACE_OBJECTS()    { do {                   \
-                                        render_tp_options(); \
-                                        TERMINAL_KEY_MENU(); \
-  termpaint_terminal_flush(terminal, true);\
+#define REDRAW_SURFACE_OBJECTS()    { do {                                        \
+                                        render_tp_options();                      \
+                                        TERMINAL_KEY_MENU();                      \
+                                        termpaint_terminal_flush(terminal, true); \
                                       } while (0); }
 //////////////////////////////////////////////////////////////////
 #define LOG(STR)                    fprintf(stderr, AC_RESETALL AC_YELLOW "%s\n" AC_RESETALL, STR)

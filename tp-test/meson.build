@@ -20,6 +20,6 @@ if get_option('enable-binaries')
      ],
   )
   if get_option('enable-binary-tests')
-    test('tp-test', tp_test_exec, args: ['--test'])
+    #    test('tp-test', tp_test_exec, args: ['--test'])
   endif
 endif
