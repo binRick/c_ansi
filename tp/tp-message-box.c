@@ -3,18 +3,17 @@
 #define TPMBC
 
 #include "term-termpaint.h"
+#include "term-termpaint.h"
 #include "termpaint.h"
 #include "termpaint_image.h"
 #include "termpaintx.h"
 #include "termpaintx_ttyrescue.h"
-#include <termios.h>
-#include "term-termpaint.h"
 #include "tp-utils.h"
 #include "tp.h"
 #include <assert.h>
-#include <stdarg.h>
 #include <fcntl.h>
 #include <pthread.h>
+#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -33,29 +32,30 @@
 ////////////////////////////////////////////////////
 #include "module/require.h"
 #include "tiny-regex-c/re.h"
-#include "tp.h"
 #include "tp-message-box.h"
-#define BOTTOM_MSG_BOX_TOP               BOTTOM_MSG_BOX_TOPS[BORDER_STYLE]
-#define BOTTOM_MSG_BOX_BOTTOM            BOTTOM_MSG_BOX_BOTTOMS[BORDER_STYLE]
-#define BOTTOM_MSG_BOX_SIDE              BOTTOM_MSG_BOX_SIDES[BORDER_STYLE]
-#define BOTTOM_MSG_FG_COLOR              TERMPAINT_RGB_COLOR(BORDER_FG_COLOR_RED, BORDER_FG_COLOR_GREEN, BORDER_FG_COLOR_BLUE)
-#define BOTTOM_MSG_BG_COLOR              TERMPAINT_RGB_COLOR(BORDER_BG_COLOR_RED, BORDER_BG_COLOR_GREEN, BORDER_BG_COLOR_BLUE)
-#define BOTTOM_MSG_COLORS                BOTTOM_MSG_FG_COLOR, BOTTOM_MSG_BG_COLOR
+#include "tp.h"
+#define BOTTOM_MSG_BOX_TOP       BOTTOM_MSG_BOX_TOPS[BORDER_STYLE]
+#define BOTTOM_MSG_BOX_BOTTOM    BOTTOM_MSG_BOX_BOTTOMS[BORDER_STYLE]
+#define BOTTOM_MSG_BOX_SIDE      BOTTOM_MSG_BOX_SIDES[BORDER_STYLE]
+#define BOTTOM_MSG_FG_COLOR      TERMPAINT_RGB_COLOR(BORDER_FG_COLOR_RED, BORDER_FG_COLOR_GREEN, BORDER_FG_COLOR_BLUE)
+#define BOTTOM_MSG_BG_COLOR      TERMPAINT_RGB_COLOR(BORDER_BG_COLOR_RED, BORDER_BG_COLOR_GREEN, BORDER_BG_COLOR_BLUE)
+#define BOTTOM_MSG_COLORS        BOTTOM_MSG_FG_COLOR, BOTTOM_MSG_BG_COLOR
 extern termpaint_surface *surface;
 extern termpaint_terminal *terminal;
-const char 
-BOTTOM_MSG_BOX_TOP_SINGLE[]    = "┌───────────────────────────────────────────────────────────────────────────────────────────────────────┐",
-BOTTOM_MSG_BOX_SIDE_SINGLE[]   = "│                                                                                                       │",
-BOTTOM_MSG_BOX_BOTTOM_SINGLE[] = "└───────────────────────────────────────────────────────────────────────────────────────────────────────┘",BOTTOM_MSG_BOX_TOP_DOUBLE[]    = "╔═══════════════════════════════════════════════════════════════════════════════════════════════════════╗",
-BOTTOM_MSG_BOX_SIDE_DOUBLE[]   = "║                                                                                                       ║",
-BOTTOM_MSG_BOX_BOTTOM_DOUBLE[] = "╚═══════════════════════════════════════════════════════════════════════════════════════════════════════╝",
-*BOTTOM_MSG_BOX_TOPS[]         = { BOTTOM_MSG_BOX_TOP_SINGLE, BOTTOM_MSG_BOX_TOP_DOUBLE },
-*BOTTOM_MSG_BOX_SIDES[]        = { BOTTOM_MSG_BOX_SIDE_SINGLE, BOTTOM_MSG_BOX_SIDE_DOUBLE },
-*BOTTOM_MSG_BOX_BOTTOMS[]      = { BOTTOM_MSG_BOX_BOTTOM_SINGLE, BOTTOM_MSG_BOX_BOTTOM_DOUBLE }
+const char
+                          BOTTOM_MSG_BOX_TOP_SINGLE[] = "┌───────────────────────────────────────────────────────────────────────────────────────────────────────┐",
+  BOTTOM_MSG_BOX_SIDE_SINGLE[] = "│                                                                                                       │",
+  BOTTOM_MSG_BOX_BOTTOM_SINGLE[] = "└───────────────────────────────────────────────────────────────────────────────────────────────────────┘", BOTTOM_MSG_BOX_TOP_DOUBLE[] = "╔═══════════════════════════════════════════════════════════════════════════════════════════════════════╗",
+  BOTTOM_MSG_BOX_SIDE_DOUBLE[]   = "║                                                                                                       ║",
+  BOTTOM_MSG_BOX_BOTTOM_DOUBLE[] = "╚═══════════════════════════════════════════════════════════════════════════════════════════════════════╝",
+  *BOTTOM_MSG_BOX_TOPS[]         = { BOTTOM_MSG_BOX_TOP_SINGLE, BOTTOM_MSG_BOX_TOP_DOUBLE },
+  *BOTTOM_MSG_BOX_SIDES[]        = { BOTTOM_MSG_BOX_SIDE_SINGLE, BOTTOM_MSG_BOX_SIDE_DOUBLE },
+  *BOTTOM_MSG_BOX_BOTTOMS[]      = { BOTTOM_MSG_BOX_BOTTOM_SINGLE, BOTTOM_MSG_BOX_BOTTOM_DOUBLE }
 ;
-   termpaint_attr
-  *attr_bottom_msg
-  ;
+termpaint_attr
+*attr_bottom_msg
+;
+
 void draw_box() {
   const int screen_width     = termpaint_surface_width(surface),
             screen_height    = termpaint_surface_height(surface),
@@ -160,16 +160,16 @@ void clear_bottom_msg(bool SKIP_FLUSH, bool FORCE_FLUSH){
                                       BOTTOM_MSG_COLORS
                                       );
   if (!SKIP_FLUSH) {
-    termpaint_terminal_flush_logged(terminal, FORCE_FLUSH);
+//    termpaint_terminal_flush_logged(terminal, FORCE_FLUSH);
   }
   cursor_profile->visible = cursor_visible;
 }
 
-
-  void redraw_bottom_msg(){
+void redraw_bottom_msg(){
   static long unsigned last_redraw_bottom_msg_ts = 0;
-    long unsigned ts = timestamp();
-    if((last_redraw_bottom_msg_ts == 0) || ((ts - last_redraw_bottom_msg_ts) > REDRAW_BOTTOM_MSG_MIN_MS)){
+  long unsigned        ts                        = timestamp();
+
+  if ((last_redraw_bottom_msg_ts == 0) || ((ts - last_redraw_bottom_msg_ts) > REDRAW_BOTTOM_MSG_MIN_MS)) {
     clear_bottom_msg(true, false);
     termpaint_surface_write_with_colors(surface,
                                         BOTTOM_MSG_BOX_COL + BOTTOM_MSG_BOX_COL_MSG_OFFSET,
@@ -177,14 +177,14 @@ void clear_bottom_msg(bool SKIP_FLUSH, bool FORCE_FLUSH){
                                         CACHED_BOTTOM_MSG,
                                         BOTTOM_MSG_COLORS
                                         );
-      termpaint_terminal_flush_logged(terminal, false);
-      last_redraw_bottom_msg_ts = ts;
-    }
+    termpaint_terminal_flush_logged(terminal, false);
+    last_redraw_bottom_msg_ts = ts;
   }
+}
 
-  void write_bottom_msg(const char *BOTTOM_MSG){
-    sprintf(CACHED_BOTTOM_MSG, "%s", BOTTOM_MSG);
-      redraw_bottom_msg();
-  }
+void write_bottom_msg(const char *BOTTOM_MSG){
+  sprintf(CACHED_BOTTOM_MSG, "%s", BOTTOM_MSG);
+  redraw_bottom_msg();
+}
 
 #endif

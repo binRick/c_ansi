@@ -2,8 +2,8 @@
 #ifndef TPH
 #define TPH
 #include "term-termpaint.h"
-#include "tp-utils.h"
 #include "tp-message-box.h"
+#include "tp-utils.h"
 /////////////////////////////////////////////////////////////////
 #include <ctype.h>
 #include <dirent.h>
@@ -62,10 +62,12 @@ struct tp_confirm_option_t {
   char uuid[UUID4_LEN];
 };
 
+int term_init(void), min(int a, int b);
+void tb_sig_handler(int sig);
 module(tp_confirm) {
   define(tp_confirm, CLIB_MODULE);
-  enum tp_confirm_mode_t mode;
-  struct Vector *options;
+  enum tp_confirm_mode_t     mode;
+  struct Vector              *options;
   bool                       (*add_option)(struct tp_confirm_option_t *NEW_OPTION);
   size_t                     (*get_options_qty)(void);
   struct tp_confirm_option_t *(*init_option)(char *NEW_OPTION_TEXT);
@@ -87,49 +89,57 @@ exports(tp_confirm) {
   .options         = NULL,
 };
 
-#define termpaint_terminal_flush_logged(TERMINAL, FORCE){ do { \
-  bool _FORCE = FORCE;\
-  static size_t last_flush_ts;\
-  static char termpaint_terminal_flush_msg[512];\
-  unsigned long ts = timestamp();\
-  if(LOG_TERMINAL_FLUSH_EVENTS){\
-    sprintf(termpaint_terminal_flush_msg,"%s<%lu> [%s] (%lums since last) Terminal Flushed %s" AC_RESETALL, \
-        (_FORCE==true) ? AC_RED : AC_YELLOW, \
-        (size_t)ts, \
-        __FUNCTION__, \
-        (size_t)ts-last_flush_ts,\
-        (_FORCE==true) ? "(forced)" : ""\
-        ); \
-    LOG(termpaint_terminal_flush_msg); \
-  }\
-  last_flush_ts = ts;\
-  termpaint_terminal_flush(TERMINAL, _FORCE);\
-}  while(0); }
+struct surface_size_t {
+  int height;
+  int width;
+};
+static struct surface_size_t surface_size = { .width = 0, .height = 0 };
 
-#define LOG_TERMINAL_FLUSH_EVENTS true
-#define DEFAULT_CURSOR_VISIBLE    false
+#define termpaint_terminal_flush_logged(TERMINAL, FORCE)                                                         \
+  { do {                                                                                                         \
+      LOG("flush...........\n");                                                                                 \
+      bool          _FORCE     = FORCE;                                                                          \
+      static size_t last_flush_ts;                                                                               \
+      static char   termpaint_terminal_flush_msg[512];                                                           \
+      unsigned long ts = timestamp();                                                                            \
+      if (LOG_TERMINAL_FLUSH_EVENTS) {                                                                           \
+        sprintf(termpaint_terminal_flush_msg, "%s<%lu> [%s] (%lums since last) Terminal Flushed %s" AC_RESETALL, \
+                (_FORCE == true) ? AC_RED : AC_YELLOW,                                                           \
+                (size_t)ts,                                                                                      \
+                __FUNCTION__,                                                                                    \
+                (size_t)ts - last_flush_ts,                                                                      \
+                (_FORCE == true) ? "(forced)" : ""                                                               \
+                );                                                                                               \
+        LOG(termpaint_terminal_flush_msg);                                                                       \
+      }                                                                                                          \
+      last_flush_ts = ts;                                                                                        \
+      termpaint_terminal_flush(TERMINAL, _FORCE);                                                                \
+    }  while (0); }
+
+#define LOG_TERMINAL_FLUSH_EVENTS    true
+#define DEFAULT_CURSOR_VISIBLE       false
 //////////////////////////////////////////////////////////////////
-#define REDRAW_BOTTOM_MSG_MIN_MS 50
+#define REDRAW_BOTTOM_MSG_MIN_MS     50
 //////////////////////////////////////////////////////////////////
-#define REDRAW_SURFACE_OBJECTS(){ do { \
-      WRITE_TP_OPTIONS(); \
-      TERMINAL_KEY_MENU(); \
-} while(0); }
+#define REDRAW_SURFACE_OBJECTS()    { do {                   \
+                                        render_tp_options(); \
+                                        TERMINAL_KEY_MENU(); \
+  termpaint_terminal_flush(terminal, true);\
+                                      } while (0); }
 //////////////////////////////////////////////////////////////////
-#define LOG(STR)    fprintf(stderr, AC_RESETALL AC_YELLOW "%s\n" AC_RESETALL, STR)
+#define LOG(STR)                    fprintf(stderr, AC_RESETALL AC_YELLOW "%s\n" AC_RESETALL, STR)
 #define TP    require(tp_confirm)
 
-
-  unsigned int BORDER_STYLE,
-    BORDER_FG_COLOR_RED,
-    BORDER_FG_COLOR_GREEN,
-    BORDER_FG_COLOR_BLUE,
-    BORDER_BG_COLOR_RED,
-    BORDER_BG_COLOR_GREEN,
-    BORDER_BG_COLOR_BLUE;
+unsigned int BORDER_STYLE,
+             BORDER_FG_COLOR_RED,
+             BORDER_FG_COLOR_GREEN,
+             BORDER_FG_COLOR_BLUE,
+             BORDER_BG_COLOR_RED,
+             BORDER_BG_COLOR_GREEN,
+             BORDER_BG_COLOR_BLUE;
 
 cursor_profile_t
-  *cursor_profile
-  ;
+*cursor_profile
+;
 
 #endif

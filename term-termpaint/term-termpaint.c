@@ -212,8 +212,8 @@ bool init(void) {
   event_current->next   = NULL;
   event_current->string = NULL;
   integration           = termpaint_full_integration_setup_terminal_fullscreen("+kbdsigint +kbdsigtstp",
-                                                                                event_callback, NULL,
-                                                                                &terminal);
+                                                                               event_callback, NULL,
+                                                                               &terminal);
   surface = termpaint_terminal_get_surface(terminal);
   termpaint_integration_set_logging_func(integration, debug_log);
 

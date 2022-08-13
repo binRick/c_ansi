@@ -3,11 +3,11 @@
 #define TERM_TESTS_UTILS_C
 #include "tp.h"
 
-static int min(int a, int b) {
+int min(int a, int b) {
   return((a < b) ? a : b);
 }
 
-static char *tp__basename(const char *path){
+char *tp__basename(const char *path){
   const char *slash = strrchr(path, '/');
 
   if (slash) {

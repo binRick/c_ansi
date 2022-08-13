@@ -2,21 +2,21 @@
 #ifndef TPMB
 #define TPMB
 #include "term-termpaint.h"
+#include "term-termpaint.h"
 #include "termpaint.h"
 #include "termpaint_image.h"
 #include "termpaintx.h"
 #include "termpaintx_ttyrescue.h"
-#include <termios.h>
-#include "term-termpaint.h"
 #include "tp-utils.h"
 #include "tp.h"
 #include <assert.h>
-#include <stdarg.h>
 #include <fcntl.h>
 #include <pthread.h>
+#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <termios.h>
 #include <termios.h>
 #include <unistd.h>
 ////////////////////////////////////////////////////
@@ -48,7 +48,7 @@ volatile char
 ;
 const char *TITLE_CHARS;
 const int
-  screen_bg,
+           screen_bg,
   ui_fg,
   win_message,
   tile_border,
