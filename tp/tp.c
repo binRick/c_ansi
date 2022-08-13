@@ -1,7 +1,15 @@
 #pragma once
-#include "term-termpaint.c"
-#include "tp-utils.c"
+#include "term-termpaint.h"
+#include "termpaint.h"
+#include "termpaint_image.h"
+#include "termpaintx.h"
+#include "termpaintx_ttyrescue.h"
+#include <termios.h>
+#include "term-termpaint.h"
+#include "tp-utils.h"
+#include "tp-message-box.h"
 #include <assert.h>
+#include <stdarg.h>
 #include <fcntl.h>
 #include <pthread.h>
 #include <stdio.h>
@@ -9,7 +17,6 @@
 #include <string.h>
 #include <termios.h>
 #include <unistd.h>
-
 ////////////////////////////////////////////////////
 #include "ansi-codes.h"
 #include "ansi-utils/ansi-utils.h"
@@ -24,67 +31,36 @@
 #include "module/require.h"
 #include "tiny-regex-c/re.h"
 #include "tp.h"
-#define LOG(STR)    fprintf(stderr, AC_RESETALL AC_YELLOW "%s\n" AC_RESETALL, STR)
-enum change_selection_type_t {
-  CHANGE_SELECTION_TYPE_NEXT,
-  CHANGE_SELECTION_TYPE_PREV,
-  CHANGE_SELECTION_TYPES_QTY,
-};
-static const char                 *TEST_STR                 = "F2DEEA90-F1F2-4C73-9BB8-3593319834D8";
-static struct tp_confirm_option_t AC_CONFIRM_DEFAULT_OPTION = {
-  .text           = "undefined",
-  .selected       = false,
-  .color          = AC_RED,
-  .selected_color = AC_GREEN,
-};
-#define TP    require(tp_confirm)
+//////////////////////////////////////////////////////////////////
+extern termpaint_attr   *attr_bottom_msg;
 
-void tp_confirm_module_deinit(module(tp_confirm) *exports) {
-  clib_module_deinit(tp_confirm);
-  return;
-}
-void select_prev(void);
-void select_next(void);
-
-int tp_confirm_module_init(module(tp_confirm) *exports) {
-  printf("tp init\n");
-  clib_module_init(tp_confirm, exports);
-  uuid4_init();
-  exports->mode    = AC_CONFIRM_LOG_DEFAULT;
-  exports->options = vector_new();
-
-  return(0);
-}
-struct tp_confirm_option_t *tp_confirm_init_option(char *NEW_OPTION_TEXT){
-  struct tp_confirm_option_t *O = calloc(1, sizeof(struct tp_confirm_option_t));
-
-  O->text           = NEW_OPTION_TEXT ? NEW_OPTION_TEXT : AC_CONFIRM_DEFAULT_OPTION.text;
-  O->selected       = AC_CONFIRM_DEFAULT_OPTION.selected;
-  O->color          = AC_CONFIRM_DEFAULT_OPTION.color;
-  O->selected_color = AC_CONFIRM_DEFAULT_OPTION.selected_color;
-  uuid4_generate(O->uuid);
-  return(O);
-}
-
-bool tp_confirm_add_option(struct tp_confirm_option_t *NEW_OPTION){
-  vector_push(require(tp_confirm)->options, (void *)NEW_OPTION);
-}
-
-size_t tp_confirm_get_options_qty(void){
-  return(vector_size(require(tp_confirm)->options));
-}
+  unsigned int BORDER_STYLE          = 0,
+    BORDER_FG_COLOR_RED   = 255,    BORDER_FG_COLOR_GREEN = 255,
+    BORDER_FG_COLOR_BLUE  = 255,    BORDER_BG_COLOR_RED   = 17,
+    BORDER_BG_COLOR_GREEN = 0,    BORDER_BG_COLOR_BLUE  = 255;
 
 ///////////////////////////////////////////////
 ///        Menus                            ///
 ///////////////////////////////////////////////
+#define CYCLE_BORDER_STYLE()              { do { BORDER_STYLE = BORDER_STYLE >= (BORDER_STYLES_QTY - 1) ? 0 : BORDER_STYLE + 1; } while (0); }
+#define INCREASE_BOTTOM_MSG_FG_RED()      { do { BORDER_FG_COLOR_RED = BORDER_FG_COLOR_RED >= MAX_RGB ? 0 : BORDER_FG_COLOR_RED + 1; redraw_bottom_msg(); } while (0); }
+#define INCREASE_BOTTOM_MSG_FG_GREEN()    { do { BORDER_FG_COLOR_GREEN = BORDER_FG_COLOR_GREEN >= MAX_RGB ? 0 : BORDER_FG_COLOR_GREEN + 1; redraw_bottom_msg(); } while (0); }
+#define INCREASE_BOTTOM_MSG_FG_BLUE()     { do { BORDER_FG_COLOR_BLUE = BORDER_FG_COLOR_BLUE >= MAX_RGB ? 0 : BORDER_FG_COLOR_BLUE + 1; redraw_bottom_msg(); } while (0); }
+#define INCREASE_BOTTOM_MSG_BG_RED()      { do { BORDER_BG_COLOR_RED = BORDER_BG_COLOR_RED >= MAX_RGB ? 0 : BORDER_BG_COLOR_RED + 1; redraw_bottom_msg(); } while (0); }
+#define INCREASE_BOTTOM_MSG_BG_GREEN()    { do { BORDER_BG_COLOR_GREEN = BORDER_BG_COLOR_GREEN >= MAX_RGB ? 0 : BORDER_BG_COLOR_GREEN + 1; redraw_bottom_msg(); } while (0); }
+#define INCREASE_BOTTOM_MSG_BG_BLUE()     { do { BORDER_BG_COLOR_BLUE = BORDER_BG_COLOR_BLUE >= MAX_RGB ? 0 : BORDER_BG_COLOR_BLUE + 1; redraw_bottom_msg(); } while (0); }
 #define BOTTOM_MSG_ROW_O
 #define TERMINAL_KEY_MENU_ROW_OFFSET    26
 #define TERMINAL_KEY_MENU_COL_OFFSET    3
-#define TERMINAL_KEY_MENU_ITEM(ROW, LETTER, TEXT)                                                                                              \
-  { do{                                                                                                                                        \
-      termpaint_surface_write_with_attr(surface, TERMINAL_KEY_MENU_COL_OFFSET, TERMINAL_KEY_MENU_ROW_OFFSET + ROW, LETTER "> " TEXT, attr_ui); \
-    }while (0); }
-
+#define TERMINAL_KEY_MENU_ITEM(ROW, LETTER, TEXT)\
+{ do{\
+ termpaint_surface_write_with_attr(surface, \
+     TERMINAL_KEY_MENU_COL_OFFSET, \
+     TERMINAL_KEY_MENU_ROW_OFFSET + ROW, \
+     LETTER "> " TEXT, \
+     attr_ui\
+     ); \
+}while (0); }
 #define TERMINAL_KEY_MENU()                                            \
   { do{                                                                \
       TERMINAL_KEY_MENU_ITEM(0, "B", "     Toggle Border Style");      \
@@ -98,112 +74,111 @@ size_t tp_confirm_get_options_qty(void){
       TERMINAL_KEY_MENU_ITEM(8, "Esc", "   Undo Choice ❌");            \
       TERMINAL_KEY_MENU_ITEM(9, "Enter", " Follow Menu Path");         \
     }while (0); }
-///////////////////////////////////////////////
-///        GLOBAL CONSTANTS                 ///
-///////////////////////////////////////////////
-static const wchar_t
-*orig = L";aABcCeEgHiIjKMNoOpPsSTxXyYZëËïÏöÖ",
-*repl = L";аАВϲСеЕɡНіΙϳКМΝоОрРѕЅТхХуΥΖёЁїЇӧӦ"
+enum change_selection_type_t {
+  CHANGE_SELECTION_TYPE_NEXT,
+  CHANGE_SELECTION_TYPE_PREV,
+  CHANGE_SELECTION_TYPE_FIRST,
+  CHANGE_SELECTION_TYPE_LAST,
+  CHANGE_SELECTION_TYPE_PAGE_DOWN,
+  CHANGE_SELECTION_TYPE_PAGE_UP,
+  CHANGE_SELECTION_TYPES_QTY,
+};
+volatile size_t
+  surface_updates_qty = 0
 ;
-static const char
-  *TITLE_CHARS[] = { "🯰", "🯱", "🯲", "🯳", "🯴", "🯵", "🯶", "🯷", "🯸", "🯹" }
+cursor_profile_t
+*cursor_profile
 ;
-const int
-  screen_bg       = TERMPAINT_COLOR_BRIGHT_YELLOW,
-  ui_fg           = TERMPAINT_COLOR_BLACK,
-  win_message     = TERMPAINT_COLOR_GREEN,
-  tile_border     = TERMPAINT_COLOR_BLACK,
-  tile_background = TERMPAINT_COLOR_LIGHT_GREY
-;
-///////////////////////////////////////////////
-///        GLOBAL PROTOTYPES                ///
-///////////////////////////////////////////////
+struct surface_size_t { 
+  int height; 
+  int width; 
+};
+static struct surface_size_t surface_size = { .width = 0, .height = 0 };
+static event *key_wait(void);
+static char *tp__basename(const char *path);
+static int term_init(void), min(int a, int b);
+static void tb_sig_handler(int sig);
+
+
+
+static volatile unsigned int
+  title_updates_qty     = 0;
+static struct tp_confirm_option_t AC_CONFIRM_DEFAULT_OPTION = {
+  .text           = "undefined",
+  .selected       = false,
+  .color          = AC_RED,
+  .selected_color = AC_GREEN,
+};
+  const int
+    screen_bg       = TERMPAINT_COLOR_BRIGHT_YELLOW,
+    ui_fg           = TERMPAINT_COLOR_BLACK,
+    win_message     = TERMPAINT_COLOR_GREEN,
+    tile_border     = TERMPAINT_COLOR_BLACK,
+    tile_background = TERMPAINT_COLOR_LIGHT_GREY
+  ;
+void tp_confirm_module_deinit(module(tp_confirm) *exports) {
+  clib_module_deinit(tp_confirm);
+  return;
+}
+//////////////////////////////////////////////////////////////////////////
+///        PROTOTYPES                ///
+//////////////////////////////////////////////////////////////////////////
 static void
-event_callback(void *userdata, termpaint_event *tp_event),
-redraw_bottom_msg(),
-rgb_color_menu(termpaint_attr * attr_ui, termpaint_attr * attr_to_change, int which_color),
-update_current_key_display(termpaint_attr * attr_ui, event * evt),
-indexed_color_menu(termpaint_attr * attr_ui, termpaint_attr * attr_to_change, int which_color),
-write_sample(termpaint_attr * attr_ui, termpaint_attr * attr_sample, int line, char const *name, int style),
-write_bottom_msg(const char *BOTTOM_MSG),
-repaint_samples(termpaint_attr *, termpaint_attr *),
-cycle_cursor_style(),
-cycle_cursor_visiblity(),
-cycle_cursor_blink(),
-update_cursor_profile(),
-clear_bottom_msg(bool SKIP_FLUSH, bool FORCE_FLUSH),
-repaint_all(termpaint_attr * attr_ui, termpaint_attr * attr_sample),
-cleanup(void),
-update_current_key_display(termpaint_attr * attr_ui, event * evt),
-named_color_menu(termpaint_attr * attr_ui, termpaint_attr * attr_to_change, int which_color),
-menu(termpaint_attr * attr_ui, termpaint_attr * attr_sample),
-draw_box()
-;
+  event_callback(void *userdata, termpaint_event *tp_event),
+  rgb_color_menu(termpaint_attr * attr_ui, termpaint_attr * attr_to_change, int which_color),
+  update_current_key_display(termpaint_attr * attr_ui, event * evt),
+  indexed_color_menu(termpaint_attr * attr_ui, termpaint_attr * attr_to_change, int which_color),
+  write_sample(termpaint_attr * attr_ui, termpaint_attr * attr_sample, int line, char const *name, int style),
+  repaint_samples(termpaint_attr *, termpaint_attr *),
+  cycle_cursor_style(),
+  cycle_cursor_visiblity(),
+  cycle_cursor_blink(),
+  update_cursor_profile(),
+  repaint_all(termpaint_attr * attr_ui, termpaint_attr * attr_sample),
+  cleanup(void),
+  update_current_key_display(termpaint_attr * attr_ui, event * evt),
+  named_color_menu(termpaint_attr * attr_ui, termpaint_attr * attr_to_change, int which_color),
+  menu(termpaint_attr * attr_ui, termpaint_attr * attr_sample),
+  draw_box(),
+  select_prev(void),
+  select_next(void),
+  select_first(void),
+  select_page_down(void),
+  select_last(void),
+  select_page_up(void);
+int term_tests_main(const int argc, const char **argv), tp_get_max_option_text_size();
+char *str_repeat(char str[], unsigned int times), *cell_at(board_t *, int, int);
+void WRITE_TP_OPTIONS(void);
+//////////////////////////////////////////////////////////////////////////
 
-static event *
-key_wait(void)
-;
+int tp_confirm_module_init(module(tp_confirm) *exports) {
+  clib_module_init(tp_confirm, exports);
+  uuid4_init();
+  exports->mode    = AC_CONFIRM_LOG_DEFAULT;
+  exports->options = vector_new();
 
-static char
-*tp__basename(const char *path)
-;
+  return(0);
+}
 
-static int
-term_init(void),
-min(int a, int b)
-;
+struct tp_confirm_option_t *tp_confirm_init_option(char *NEW_OPTION_TEXT){
+  struct tp_confirm_option_t *O = calloc(1, sizeof(struct tp_confirm_option_t));
 
-int
-term_tests_main(const int argc, const char **argv)
-;
+  O->text           = NEW_OPTION_TEXT ? NEW_OPTION_TEXT : AC_CONFIRM_DEFAULT_OPTION.text;
+  O->selected       = AC_CONFIRM_DEFAULT_OPTION.selected;
+  O->color          = AC_CONFIRM_DEFAULT_OPTION.color;
+  O->selected_color = AC_CONFIRM_DEFAULT_OPTION.selected_color;
+  uuid4_generate(O->uuid);
+  return(O);
+}
 
-char
-*cell_at(board_t *, int, int)
-;
+bool tp_confirm_add_option(struct tp_confirm_option_t *NEW_OPTION){
+  vector_push(TP->options, (void *)NEW_OPTION);
+}
 
-volatile unsigned int
-  title_updates_qty     = 0,
-  BORDER_STYLE          = 0,
-  BORDER_FG_COLOR_RED   = 255,
-  BORDER_FG_COLOR_GREEN = 255,
-  BORDER_FG_COLOR_BLUE  = 255,
-  BORDER_BG_COLOR_RED   = 17,
-  BORDER_BG_COLOR_GREEN = 0,
-  BORDER_BG_COLOR_BLUE  = 255
-;
-///////////////////////////////////////////////
-///        BOTTOM MSG COMPONENTS            ///
-///////////////////////////////////////////////
-#define MAX_RGB                          255
-#define BORDER_STYLES_QTY                2
-#define BOTTOM_MSG_BOX_HEIGHT            3
-#define BOTTOM_MSG_BOX_COL_MSG_OFFSET    2
-#define BOTTOM_MSG_BOX_COL               10
-#define BOTTOM_MSG_BOX_TOP               BOTTOM_MSG_BOX_TOPS[BORDER_STYLE]
-#define BOTTOM_MSG_BOX_BOTTOM            BOTTOM_MSG_BOX_BOTTOMS[BORDER_STYLE]
-#define BOTTOM_MSG_BOX_SIDE              BOTTOM_MSG_BOX_SIDES[BORDER_STYLE]
-#define BOTTOM_MSG_FG_COLOR              TERMPAINT_RGB_COLOR(BORDER_FG_COLOR_RED, BORDER_FG_COLOR_GREEN, BORDER_FG_COLOR_BLUE)
-#define BOTTOM_MSG_BG_COLOR              TERMPAINT_RGB_COLOR(BORDER_BG_COLOR_RED, BORDER_BG_COLOR_GREEN, BORDER_BG_COLOR_BLUE)
-#define BOTTOM_MSG_COLORS                BOTTOM_MSG_FG_COLOR, BOTTOM_MSG_BG_COLOR
-#define CYCLE_BORDER_STYLE()              { do { BORDER_STYLE = BORDER_STYLE >= (BORDER_STYLES_QTY - 1) ? 0 : BORDER_STYLE + 1; } while (0); }
-#define INCREASE_BOTTOM_MSG_FG_RED()      { do { BORDER_FG_COLOR_RED = BORDER_FG_COLOR_RED >= MAX_RGB ? 0 : BORDER_FG_COLOR_RED + 1; redraw_bottom_msg(); } while (0); }
-#define INCREASE_BOTTOM_MSG_FG_GREEN()    { do { BORDER_FG_COLOR_GREEN = BORDER_FG_COLOR_GREEN >= MAX_RGB ? 0 : BORDER_FG_COLOR_GREEN + 1; redraw_bottom_msg(); } while (0); }
-#define INCREASE_BOTTOM_MSG_FG_BLUE()     { do { BORDER_FG_COLOR_BLUE = BORDER_FG_COLOR_BLUE >= MAX_RGB ? 0 : BORDER_FG_COLOR_BLUE + 1; redraw_bottom_msg(); } while (0); }
-#define INCREASE_BOTTOM_MSG_BG_RED()      { do { BORDER_BG_COLOR_RED = BORDER_BG_COLOR_RED >= MAX_RGB ? 0 : BORDER_BG_COLOR_RED + 1; redraw_bottom_msg(); } while (0); }
-#define INCREASE_BOTTOM_MSG_BG_GREEN()    { do { BORDER_BG_COLOR_GREEN = BORDER_BG_COLOR_GREEN >= MAX_RGB ? 0 : BORDER_BG_COLOR_GREEN + 1; redraw_bottom_msg(); } while (0); }
-#define INCREASE_BOTTOM_MSG_BG_BLUE()     { do { BORDER_BG_COLOR_BLUE = BORDER_BG_COLOR_BLUE >= MAX_RGB ? 0 : BORDER_BG_COLOR_BLUE + 1; redraw_bottom_msg(); } while (0); }
-const char
-*BORDER_STYLES[]               = { "single", "double" },
-BOTTOM_MSG_BOX_TOP_SINGLE[]    = "┌───────────────────────────────────────────────────────────────────────────────────────────────────────┐",
-BOTTOM_MSG_BOX_SIDE_SINGLE[]   = "│                                                                                                       │",
-BOTTOM_MSG_BOX_BOTTOM_SINGLE[] = "└───────────────────────────────────────────────────────────────────────────────────────────────────────┘",
-BOTTOM_MSG_BOX_TOP_DOUBLE[]    = "╔═══════════════════════════════════════════════════════════════════════════════════════════════════════╗",
-BOTTOM_MSG_BOX_SIDE_DOUBLE[]   = "║                                                                                                       ║",
-BOTTOM_MSG_BOX_BOTTOM_DOUBLE[] = "╚═══════════════════════════════════════════════════════════════════════════════════════════════════════╝",
-*BOTTOM_MSG_BOX_TOPS[]         = { BOTTOM_MSG_BOX_TOP_SINGLE, BOTTOM_MSG_BOX_TOP_DOUBLE },
-*BOTTOM_MSG_BOX_SIDES[]        = { BOTTOM_MSG_BOX_SIDE_SINGLE, BOTTOM_MSG_BOX_SIDE_DOUBLE },
-*BOTTOM_MSG_BOX_BOTTOMS[]      = { BOTTOM_MSG_BOX_BOTTOM_SINGLE, BOTTOM_MSG_BOX_BOTTOM_DOUBLE }
-;
+size_t tp_confirm_get_options_qty(void){
+  return(vector_size(TP->options));
+}
+
 ///////////////////////////////////////////////
 ///        GLOBAL VARIABLES                 ///
 ///////////////////////////////////////////////
@@ -221,13 +196,6 @@ volatile bool
 volatile unsigned int
   cursor_x = 0, cursor_y = 1
 ;
-volatile char
-  MSG[1024],
-  CACHED_BOTTOM_MSG[1024]
-;
-volatile size_t
-  surface_updates_qty = 0
-;
 termpaint_terminal
 *terminal
 ;
@@ -239,9 +207,7 @@ termpaint_integration
 ;
 termpaint_attr
 *attr_ui,
-*attr_sample,
-*attr_bottom_msg
-;
+*attr_sample;
 event
 *event_current
 ;
@@ -255,15 +221,13 @@ static void logging_func(termpaint_integration *integration, const char *data, i
 }
 
 int term_tests_main(const int argc, const char **argv) {
+  signal(SIGWINCH, tb_sig_handler);
   if (term_init() != EXIT_SUCCESS) {
     return(1);
   }
-
   repaint_all(attr_ui, attr_sample);
   menu(attr_ui, attr_sample);
 
-  termpaint_attr_free(attr_bottom_msg);
-  attr_bottom_msg = NULL;
   termpaint_attr_free(attr_sample);
   attr_sample = NULL;
   termpaint_attr_free(attr_ui);
@@ -304,7 +268,7 @@ static void draw_box() {
                                       screen_width / 2 - 12, screen_height / 2 + 2,
                                       "└───────────────────────┘",
                                       ui_fg, win_message);
-  termpaint_terminal_flush(terminal, false);
+  termpaint_terminal_flush_logged(terminal, false);
   // repaint_all(attr_ui, attr_sample);
 } /* popup_box */
 
@@ -416,7 +380,26 @@ static void event_callback(void *userdata, termpaint_event *tp_event) {
     prev->next = my_event;
   }
 } /* event_callback */
+static void tb_sig_handler(int sig){
+  if (SIGWINCH == sig) {
+    struct winsize winsz;
+    ioctl(0, TIOCGWINSZ, &winsz);
+    fprintf(stderr, "SIGWINCH raised, window size: %d rows / %d columns\n", winsz.ws_row, winsz.ws_col);
+    surface_size.width = (int)winsz.ws_row;
+    surface_size.height = (int)winsz.ws_col;
+    int was_width = termpaint_surface_width(surface);
+    int was_height = termpaint_surface_height(surface);
+    termpaint_surface_resize(surface,surface_size.width,surface_size.height);
+    REDRAW_SURFACE_OBJECTS();
+    bool force = true;
+    termpaint_terminal_flush_logged(terminal, force);
+    char *msg;
+    asprintf(&msg,"surface size changed from %dx%d to %dx%d",was_width,was_height,termpaint_surface_width(surface), termpaint_surface_height(surface));
+    fprintf(stderr,"%s\n",msg);
 
+    LOG(msg);
+  }
+}
 static int term_init(void) {
   attr_ui         = termpaint_attr_new(TERMPAINT_DEFAULT_COLOR, TERMPAINT_DEFAULT_COLOR);
   attr_sample     = termpaint_attr_new(TERMPAINT_DEFAULT_COLOR, TERMPAINT_DEFAULT_COLOR);
@@ -445,7 +428,7 @@ static int term_init(void) {
   termpaint_terminal_set_mouse_mode(terminal, TERMPAINT_MOUSE_MODE_MOVEMENT);
   termpaint_terminal_request_focus_change_reports(terminal, true);
 
-  cursor_profile->visible = true;
+  cursor_profile->visible = DEFAULT_CURSOR_VISIBLE;
   update_cursor_profile();
 
   char *d = "B";
@@ -725,6 +708,7 @@ static void rgb_color_menu(termpaint_attr *attr_ui, termpaint_attr *attr_to_chan
         update_cursor_profile();
       }
     } else if (evt->type == TERMPAINT_EV_KEY) {
+      LOG("event key");
       if (evt->type == TERMPAINT_EV_KEY && strcmp(evt->string, "ArrowLeft") == 0) {
         if (selected == &green) {
           selected = &red;
@@ -772,98 +756,105 @@ static void rgb_color_menu(termpaint_attr *attr_ui, termpaint_attr *attr_to_chan
   }
 } /* rgb_color_menu */
 
-static void clear_bottom_msg(bool SKIP_FLUSH, bool FORCE_FLUSH){
-  bool cursor_visible = cursor_profile->visible;
-
-  if (cursor_visible) {
-    cursor_profile->visible = false;
-  }
-  termpaint_surface_clear_rect_with_attr(surface,
-                                         0,
-                                         termpaint_surface_height(surface) - BOTTOM_MSG_BOX_HEIGHT + 1,
-                                         termpaint_surface_width(surface),
-                                         BOTTOM_MSG_BOX_HEIGHT,
-                                         attr_bottom_msg
-                                         );
-  termpaint_surface_write_with_colors(surface,
-                                      BOTTOM_MSG_BOX_COL,
-                                      termpaint_surface_height(surface) - 3,
-                                      BOTTOM_MSG_BOX_TOP,
-                                      BOTTOM_MSG_COLORS
-                                      );
-  termpaint_surface_write_with_colors(surface,
-                                      BOTTOM_MSG_BOX_COL,
-                                      termpaint_surface_height(surface) - 2,
-                                      BOTTOM_MSG_BOX_SIDE,
-                                      BOTTOM_MSG_COLORS
-                                      );
-  termpaint_surface_write_with_colors(surface,
-                                      BOTTOM_MSG_BOX_COL,
-                                      termpaint_surface_height(surface) - 1,
-                                      BOTTOM_MSG_BOX_BOTTOM,
-                                      BOTTOM_MSG_COLORS
-                                      );
-  if (!SKIP_FLUSH) {
-    termpaint_terminal_flush(terminal, FORCE_FLUSH);
-  }
-  cursor_profile->visible = cursor_visible;
-}
-
-void redraw_bottom_msg(){
-  clear_bottom_msg(true, false);
-  termpaint_surface_write_with_colors(surface,
-                                      BOTTOM_MSG_BOX_COL + BOTTOM_MSG_BOX_COL_MSG_OFFSET,
-                                      termpaint_surface_height(surface) - 2,
-                                      CACHED_BOTTOM_MSG,
-                                      BOTTOM_MSG_COLORS
-                                      );
-  termpaint_terminal_flush(terminal, false);
-}
-
-static void write_bottom_msg(const char *BOTTOM_MSG){
-  sprintf(CACHED_BOTTOM_MSG, "%s", BOTTOM_MSG);
-  redraw_bottom_msg();
-}
 
 ////////////////////////////////////////////////////////
 int get_selected_index();
-char *SELECTED_MARKER = " > ";
-#define TERMINAL_TP_OPTIONS_ROW_OFFSET                 2
+////////////////////////////////////////////////////////
+#define ICON0                                          ">"
+#define ICON1                                          "▶"
+#define ICON2                                          "➡"
+#define ICON3                                          ""
+#define ICON4                                          "➡"
+#define ICON5                                          "▶️"
+#define ICON6                                          "➡️"
+#define ICON7                                          "🔛"
+#define ICON8                                          "↪"
+#define ICON9                                          "👉"
+#define ICON10                                         "🚩"
+#define ICON11                                         "✅"
+#define ICON12                                         "⭐"
+////////////////////////////////////////////////////////
+#define SELECTED_LEFT_ICON                             ICON3
+#define SELECTED_RIGHT_ICON                            ICON3
+#define SELECTED_LEFT_ICON_SIZE                        1
+#define OPTION_ROW_PADDING                             1
+#define SELECTED_STYLE                                 (TERMPAINT_STYLE_INVERSE | TERMPAINT_STYLE_BOLD)
+#define UNSELECTED_STYLE                               -1
+////////////////////////////////////////////////////////
+#define TERMINAL_TP_OPTIONS_ROW_TOP_OFFSET                 2
+#define TERMINAL_TP_OPTIONS_ROW_BOTTOM_OFFSET              5
 #define TERMINAL_TP_OPTIONS_RIGHT_PERCENTAGE_OFFSET    .75
 #define TP_OPTIONS_UNSELECTED_FG_COLOR                 TERMPAINT_COLOR_WHITE
 #define TP_OPTIONS_SELECTED_FG_COLOR                   TERMPAINT_COLOR_GREEN
 #define TP_OPTIONS_UNSELECTED_BG_COLOR                 TERMPAINT_DEFAULT_COLOR
 #define TP_OPTIONS_SELECTED_BG_COLOR                   TERMPAINT_DEFAULT_COLOR
+#define SELECTED_LEFT_MARKER_PREFIX                    "  "
+#define SELECTED_LEFT_MARKER_SUFFIX                    "  "
+#define SELECTED_LEFT_MARKER                           SELECTED_LEFT_MARKER_PREFIX SELECTED_LEFT_ICON SELECTED_LEFT_MARKER_SUFFIX
 
-void CREATE_TP_OPTIONS(){
-  struct tp_confirm_option_t *o;
-  char                       *text;
+char *str_repeat(char str[], unsigned int times){
+  if (times < 1) {
+    return(NULL);
+  }
+
+  char   *result;
+  size_t str_len = strlen(str);
+  result = malloc(sizeof(char) * str_len + 1);
+
+  while (times--) {
+    strcat(result, str);
+  }
+  return(result);
+}
+
+static struct tp_confirm_option_t *o;
+void WRITE_TP_OPTIONS(void){
+  char                       *text, *marker;
   termpaint_attr             *o_attr;
-  int                        o_col;
+  int                        o_col, o_row;
+  int                        max_option_text_size = tp_get_max_option_text_size();
+  int                        option_width         = max_option_text_size + (OPTION_ROW_PADDING * 2);
+  char                       *unselected_marker   = str_repeat(" ", strlen(SELECTED_LEFT_MARKER_PREFIX) + strlen(SELECTED_LEFT_MARKER_SUFFIX) + SELECTED_LEFT_ICON_SIZE);
+  int max_option_rows = termpaint_surface_height(surface) - TERMINAL_TP_OPTIONS_ROW_TOP_OFFSET - TERMINAL_TP_OPTIONS_ROW_BOTTOM_OFFSET;
+  int surface_width = termpaint_surface_width(surface);
   {
-    for (size_t i = 0; i < vector_size(TP->options); i++) {
+    for (size_t i = 0; i < vector_size(TP->options) && i <= max_option_rows; i++) {
       o = vector_get(TP->options, i);
       assert(o != NULL);
       assert(o->text != NULL);
       assert(o->uuid != NULL);
       assert(strlen(o->uuid) > 10);
-      asprintf(&text, "%s%s",
-               (o->selected == false)
-              ? "   "
-              : SELECTED_MARKER,
+      asprintf(&marker, "%s", (o->selected) ? SELECTED_LEFT_MARKER : unselected_marker);
+      asprintf(&text, "%s",
                o->text
                );
-      o_col = ((termpaint_surface_width(surface) * 100) * TERMINAL_TP_OPTIONS_RIGHT_PERCENTAGE_OFFSET / 100);
 
+      while (strlen(text)< option_width){
+        asprintf(&text, "%s%s",text," ");
+        if (strlen(text) >= option_width)
+          break;
+      }
+
+      o_col  = ((surface_width * 100) * TERMINAL_TP_OPTIONS_RIGHT_PERCENTAGE_OFFSET / 100);
+      o_row  = TERMINAL_TP_OPTIONS_ROW_TOP_OFFSET + i;
       o_attr = termpaint_attr_new(
         o->selected ? TP_OPTIONS_SELECTED_FG_COLOR : TP_OPTIONS_UNSELECTED_FG_COLOR,
         o->selected ? TP_OPTIONS_SELECTED_BG_COLOR : TP_OPTIONS_UNSELECTED_BG_COLOR
         );
-
-      termpaint_surface_write_with_attr(surface, o_col, TERMINAL_TP_OPTIONS_ROW_OFFSET + i, text, o_attr); \
+      if (o->selected) {
+        termpaint_attr_set_style(o_attr, SELECTED_STYLE);
+      }else{
+        termpaint_attr_reset_style(o_attr);
+        if (UNSELECTED_STYLE != -1) {
+          termpaint_attr_set_style(o_attr, UNSELECTED_STYLE);
+        }
+      }
+//termpaint_surface_clear_rect_with_attr(surface, o_col - 10, TERMINAL_TP_OPTIONS_ROW_OFFSET + i, 40, 20, attr_ui);
+      termpaint_surface_write_with_attr(surface, o_col, o_row, text, o_attr);
+//      termpaint_surface_write_with_attr(surface, o_col, o_row-strlen(marker), marker, o_attr);
     }
   }
-}
+} /* WRITE_TP_OPTIONS */
 
 void set_selection_index(size_t NEW_SELECTION_INDEX){
   if (NEW_SELECTION_INDEX < 0) {
@@ -878,8 +869,9 @@ void set_selection_index(size_t NEW_SELECTION_INDEX){
     O->selected = false;
   }
   NEW_SELECTION->selected = true;
-  CREATE_TP_OPTIONS();
-  termpaint_terminal_flush(terminal, true);
+  WRITE_TP_OPTIONS();
+  termpaint_terminal_flush_logged(terminal, false);
+//  termpaint_terminal_flush(terminal, false);
 //  reload_options();
 }
 
@@ -893,6 +885,21 @@ void change_selection_index(int CHANGE_SELECTION_TYPE) {
     if (O->selected == true) {
       O->selected = false;
       switch (CHANGE_SELECTION_TYPE) {
+      case CHANGE_SELECTION_TYPE_PAGE_UP:
+        NEW_SELECTION_INDEX = i - (TP->get_options_qty() / 3);
+        NEW_SELECTION_INDEX = (NEW_SELECTION_INDEX < 0) ? 0 : NEW_SELECTION_INDEX;
+        break;
+      case CHANGE_SELECTION_TYPE_PAGE_DOWN:
+        NEW_SELECTION_INDEX = i + (TP->get_options_qty() / 3);
+        NEW_SELECTION_INDEX = (NEW_SELECTION_INDEX > TP->get_options_qty() - 1) ? TP->get_options_qty() - 1 : NEW_SELECTION_INDEX;
+
+        break;
+      case CHANGE_SELECTION_TYPE_FIRST:
+        NEW_SELECTION_INDEX = 0;
+        break;
+      case CHANGE_SELECTION_TYPE_LAST:
+        NEW_SELECTION_INDEX = TP->get_options_qty() - 1;
+        break;
       case CHANGE_SELECTION_TYPE_NEXT:
         NEW_SELECTION_INDEX = i + 1;
         break;
@@ -906,25 +913,56 @@ void change_selection_index(int CHANGE_SELECTION_TYPE) {
       }
       set_selection_index(NEW_SELECTION_INDEX);
       int is = get_selected_index();
-      asprintf(&msg, "selected index was %d and is now %d", was, is);
+      asprintf(&msg, "selected index was %lu and is now %d :: selection type: %d", was, is, CHANGE_SELECTION_TYPE);
       LOG(msg);
       return;
     }
   }
   return;
+} /* change_selection_index */
+
+void select_page_up(void){
+  change_selection_index(CHANGE_SELECTION_TYPE_PAGE_UP);
 }
 
-void select_prev(void){
-  change_selection_index(CHANGE_SELECTION_TYPE_PREV);
+void select_page_down(void){
+  change_selection_index(CHANGE_SELECTION_TYPE_PAGE_DOWN);
+}
+
+void select_first(void){
+  change_selection_index(CHANGE_SELECTION_TYPE_FIRST);
+}
+
+void select_last(void){
+  change_selection_index(CHANGE_SELECTION_TYPE_LAST);
 }
 
 void select_next(void){
   change_selection_index(CHANGE_SELECTION_TYPE_NEXT);
 }
 
-int get_selected_index(){
+void select_prev(void){
+  change_selection_index(CHANGE_SELECTION_TYPE_PREV);
+}
+
+int tp_get_max_option_text_size(){
+  int                        s = 0;
+  struct tp_confirm_option_t *O;
+
   for (size_t i = 0; i < TP->get_options_qty(); i++) {
-    struct tp_confirm_option_t *O = (struct tp_confirm_option_t *)vector_get(TP->options, i);
+    O = (struct tp_confirm_option_t *)vector_get(TP->options, i);
+    if (strlen(O->text) > s) {
+      s = strlen(O->text);
+    }
+  }
+  return(s);
+}
+
+int get_selected_index(){
+  struct tp_confirm_option_t *O;
+
+  for (size_t i = 0; i < TP->get_options_qty(); i++) {
+    O = (struct tp_confirm_option_t *)vector_get(TP->options, i);
     if (O->selected) {
       return(i);
     }
@@ -941,7 +979,7 @@ static void menu(termpaint_attr *attr_ui, termpaint_attr *attr_sample) {
     if (reset) {
       repaint_all(attr_ui, attr_sample);
       TERMINAL_KEY_MENU();
-      CREATE_TP_OPTIONS();
+      WRITE_TP_OPTIONS();
 
       reset = false;
     }
@@ -962,36 +1000,39 @@ static void menu(termpaint_attr *attr_ui, termpaint_attr *attr_sample) {
       cycle_cursor_blink();
     } else if (evt->type == TERMPAINT_EV_CHAR && strcmp(evt->string, "v") == 0) {
       cycle_cursor_visiblity();
+    } else if (evt->type == TERMPAINT_EV_KEY && strcmp(evt->string, "ArrowUp") == 0) {
+      select_prev();
+    } else if (evt->type == TERMPAINT_EV_KEY && strcmp(evt->string, "ArrowDown") == 0) {
+      select_next();
     } else if (evt->type == TERMPAINT_EV_CHAR && strcmp(evt->string, "p") == 0) {
-      LOG("previous option");
       select_prev();
     } else if (evt->type == TERMPAINT_EV_CHAR && strcmp(evt->string, "n") == 0) {
-      LOG("next option");
       select_next();
+    } else if (evt->type == TERMPAINT_EV_KEY && strcmp(evt->string, "PageUp") == 0) {
+      select_page_up();
+    } else if (evt->type == TERMPAINT_EV_KEY && strcmp(evt->string, "Home") == 0) {
+      select_first();
+    } else if (evt->type == TERMPAINT_EV_KEY && strcmp(evt->string, "PageDown") == 0) {
+      select_page_down();
+    } else if (evt->type == TERMPAINT_EV_KEY && strcmp(evt->string, "End") == 0) {
+      select_last();
     } else if (evt->type == TERMPAINT_EV_CHAR && strcmp(evt->string, "t") == 0) {
       title_updates_qty++;
 
-      char *NEW_TITLE   = malloc(1024);
+      static char *NEW_TITLE;
       char *title_chars = TITLE_CHARS[title_updates_qty < 10 ? title_updates_qty : title_updates_qty % 10];
-      fwprintf(stderr,
-               L""
+      fwprintf(stderr, L""
                AC_RESETALL AC_RED AC_ITALIC "title chars size" AC_RESETALL ": "
                AC_RESETALL AC_REVERSED AC_BLUE AC_BOLD "%lu" AC_RESETALL
                "\n",
                wcslen(title_chars)
                );
 
-      sprintf(NEW_TITLE,
-              "|\t%d\t|"
-              "\t%s\t|",
-              title_updates_qty,
-              title_chars
-              );
-      sprintf(MSG, "%s",
-              NEW_TITLE
-              );
-      write_bottom_msg(MSG);
+      asprintf(&NEW_TITLE,"|\t%d\t|" "\t%s\t|", title_updates_qty, title_chars);
+      sprintf(MSG, "%s", NEW_TITLE);
       termpaint_terminal_set_title(terminal, NEW_TITLE, TERMPAINT_TITLE_MODE_PREFER_RESTORE);
+
+      write_bottom_msg(MSG);
       free(NEW_TITLE);
     } else if (evt->type == TERMPAINT_EV_CHAR && strcmp(evt->string, "5") == 0) {
       INCREASE_BOTTOM_MSG_BG_RED();
@@ -1013,7 +1054,7 @@ static void menu(termpaint_attr *attr_ui, termpaint_attr *attr_sample) {
       write_bottom_msg(MSG);
     } else if (evt->type == TERMPAINT_EV_CHAR && strcmp(evt->string, "B") == 0) {
       CYCLE_BORDER_STYLE();
-      sprintf(MSG, "Border Style: #%d | %s", BORDER_STYLE, BORDER_STYLES[BORDER_STYLE]);
+     // sprintf(MSG, "Border Style: #%d | %s", BORDER_STYLE, BORDER_STYLES[BORDER_STYLE]);
       write_bottom_msg(MSG);
     } else if (evt->type == TERMPAINT_EV_CHAR && strcmp(evt->string, "T") == 0) {
       draw_box();

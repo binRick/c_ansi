@@ -1,2 +1,1 @@
-#include <termpaint.h>
-#include <termpaintx.h>
+#include "termpaint/termpaint.h"

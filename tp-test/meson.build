@@ -6,6 +6,7 @@ tp_test_inc = [
 ]
 tp_test_deps = [
   tp_dep,
+  termpaint_dep,
 ]
 
 if get_option('enable-binaries')

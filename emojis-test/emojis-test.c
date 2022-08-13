@@ -187,7 +187,7 @@ TEST t_list_emojis_t_v(void){
 
   for (size_t i = 0; i < vector_size(emojis); i++) {
     e = get_emoji_t(i);
-    printf(" #%.5lu %s -> %s (%lu chars)\n", i, e->name, e->emoji, e->chars);
+    printf("%s  | #%.5lu %s -> %s (%lu chars)\n", e->emoji, i, e->name, e->emoji, e->chars);
   }
   printf("%lu emojis\n", vector_size(emojis));
   BENCHMARK_SUMMARY(benchmark_list_emojis);

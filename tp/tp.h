@@ -1,4 +1,9 @@
 #pragma once
+#ifndef TPH
+#define TPH
+#include "term-termpaint.h"
+#include "tp-utils.h"
+#include "tp-message-box.h"
 /////////////////////////////////////////////////////////////////
 #include <ctype.h>
 #include <dirent.h>
@@ -57,24 +62,13 @@ struct tp_confirm_option_t {
   char uuid[UUID4_LEN];
 };
 
-// Module Type Interface
 module(tp_confirm) {
   define(tp_confirm, CLIB_MODULE);
-  //////////////////////////////////////////////////////////////////////////////////////
-  //     Config
-  //////////////////////////////////////////////////////////////////////////////////////
   enum tp_confirm_mode_t mode;
-  //////////////////////////////////////////////////////////////////////////////////////
-  //     Properties
-  //////////////////////////////////////////////////////////////////////////////////////
   struct Vector *options;
-  //////////////////////////////////////////////////////////////////////////////////////
-  //     Utility Functions
-  //////////////////////////////////////////////////////////////////////////////////////
   bool                       (*add_option)(struct tp_confirm_option_t *NEW_OPTION);
   size_t                     (*get_options_qty)(void);
   struct tp_confirm_option_t *(*init_option)(char *NEW_OPTION_TEXT);
-  //////////////////////////////////////////////////////////////////////////////////////
 };
 
 int  tp_confirm_module_init(module(tp_confirm) * exports);
@@ -92,3 +86,50 @@ exports(tp_confirm) {
   .add_option      = tp_confirm_add_option,
   .options         = NULL,
 };
+
+#define termpaint_terminal_flush_logged(TERMINAL, FORCE){ do { \
+  bool _FORCE = FORCE;\
+  static size_t last_flush_ts;\
+  static char termpaint_terminal_flush_msg[512];\
+  unsigned long ts = timestamp();\
+  if(LOG_TERMINAL_FLUSH_EVENTS){\
+    sprintf(termpaint_terminal_flush_msg,"%s<%lu> [%s] (%lums since last) Terminal Flushed %s" AC_RESETALL, \
+        (_FORCE==true) ? AC_RED : AC_YELLOW, \
+        (size_t)ts, \
+        __FUNCTION__, \
+        (size_t)ts-last_flush_ts,\
+        (_FORCE==true) ? "(forced)" : ""\
+        ); \
+    LOG(termpaint_terminal_flush_msg); \
+  }\
+  last_flush_ts = ts;\
+  termpaint_terminal_flush(TERMINAL, _FORCE);\
+}  while(0); }
+
+#define LOG_TERMINAL_FLUSH_EVENTS true
+#define DEFAULT_CURSOR_VISIBLE    false
+//////////////////////////////////////////////////////////////////
+#define REDRAW_BOTTOM_MSG_MIN_MS 50
+//////////////////////////////////////////////////////////////////
+#define REDRAW_SURFACE_OBJECTS(){ do { \
+      WRITE_TP_OPTIONS(); \
+      TERMINAL_KEY_MENU(); \
+} while(0); }
+//////////////////////////////////////////////////////////////////
+#define LOG(STR)    fprintf(stderr, AC_RESETALL AC_YELLOW "%s\n" AC_RESETALL, STR)
+#define TP    require(tp_confirm)
+
+
+  unsigned int BORDER_STYLE,
+    BORDER_FG_COLOR_RED,
+    BORDER_FG_COLOR_GREEN,
+    BORDER_FG_COLOR_BLUE,
+    BORDER_BG_COLOR_RED,
+    BORDER_BG_COLOR_GREEN,
+    BORDER_BG_COLOR_BLUE;
+
+cursor_profile_t
+  *cursor_profile
+  ;
+
+#endif

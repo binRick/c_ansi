@@ -1,6 +1,15 @@
 #include "tp-test.h"
 #include "tp.h"
 module(tp_confirm) * B;
+#define OPTIONS_QTY    45
+#define NEW_OPTION(NUM, SELECTED)                         \
+  do {                                                    \
+    char                       *text;                     \
+    asprintf(&text, "Option %d", NUM);                    \
+    struct tp_confirm_option_t *O = B->init_option(text); \
+    O->selected = SELECTED;                               \
+    B->add_option(O);                                     \
+  } while (0)
 
 int main(int argc, char **argv) {
   (void)argc; (void)argv;
@@ -11,25 +20,17 @@ int main(int argc, char **argv) {
 
   {
     B = require(tp_confirm);
-    struct tp_confirm_option_t *O1 = B->init_option("Option 1");
-    B->add_option(O1);
-    struct tp_confirm_option_t *O2 = B->init_option("Option 2");
-    O2->selected = true;
-    B->add_option(O2);
-    struct tp_confirm_option_t *O3 = B->init_option("Option 3");
-    B->add_option(O3);
-    struct tp_confirm_option_t *O4 = B->init_option("Option 4");
-    B->add_option(O4);
-    struct tp_confirm_option_t *O5 = B->init_option("Option 5");
-    B->add_option(O5);
-    struct tp_confirm_option_t *O6 = B->init_option("Option 6");
-    B->add_option(O6);
-    struct tp_confirm_option_t *O7 = B->init_option("Option 7");
-    B->add_option(O7);
-    struct tp_confirm_option_t *O8 = B->init_option("Option 8");
-    B->add_option(O8);
-    struct tp_confirm_option_t *O9 = B->init_option("Option 9");
-    B->add_option(O9);
+    for (int i = 1; i <= OPTIONS_QTY; i++) {
+      if (i == (int)(OPTIONS_QTY / 2)) {
+        NEW_OPTION(i, true);
+      }else{
+        NEW_OPTION(i, false);
+      }
+    }
+
+    struct tp_confirm_option_t *O = B->init_option("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"); 
+    B->add_option(O);                                     
+
     printf("# options:  %lu\n", B->get_options_qty());
     fflush(STDIN_FILENO);
     fflush(stdout);

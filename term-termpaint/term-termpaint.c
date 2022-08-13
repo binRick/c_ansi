@@ -211,7 +211,7 @@ bool init(void) {
   event_current         = malloc(sizeof(event));
   event_current->next   = NULL;
   event_current->string = NULL;
-  integration           = termpaintx_full_integration_setup_terminal_fullscreen("+kbdsigint +kbdsigtstp",
+  integration           = termpaint_full_integration_setup_terminal_fullscreen("+kbdsigint +kbdsigtstp",
                                                                                 event_callback, NULL,
                                                                                 &terminal);
   surface = termpaint_terminal_get_surface(terminal);
@@ -255,7 +255,7 @@ void cleanup(void) {
 event * key_wait(void) {
   termpaint_terminal_flush(terminal, false);
   while (!event_current->next) {
-    if (!termpaintx_full_integration_do_iteration(integration)) {
+    if (!termpaint_full_integration_do_iteration(integration)) {
       cleanup();
       exit(1);
     }

@@ -15,6 +15,7 @@ inc = [
     'image-utils',
     'ansi-rgb-utils',
     'submodules/c_deps/submodules',
+    'submodules/c_deps/submodules/termpaint',
     'submodules/c_deps',
     'submodules',
     'submodules/c_deps/subprojects/cargs/include',

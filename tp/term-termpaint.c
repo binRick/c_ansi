@@ -1,4 +1,4 @@
-#include <termpaint.h>
-#include <termpaint_image.h>
-#include <termpaintx.h>
-#include <termpaintx_ttyrescue.h>
+#include "termpaint.h"
+#include "termpaintx_ttyrescue.h"
+#include "termpaintx.h"
+#include "termpaint_image.h"

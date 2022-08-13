@@ -1,5 +1,8 @@
 tp_srcs = [
   'tp.c',
+  'tp-message-box.c',
+  'term-termpaint.c',
+  'tp-utils.c',
 ]
 
 tp_include_dirs = [
@@ -9,7 +12,6 @@ tp_include_dirs = [
 
 tp_deps = [
   termpaint_dep,  
-  termpaint_image_dep,  
   c_stringfn_dep,  
   c_string_buffer_dep,  
   ansi_codes_dep,  
