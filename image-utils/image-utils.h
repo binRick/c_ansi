@@ -9,7 +9,6 @@
 #include <string.h>
 #include <sys/time.h>
 
-
 bool is_jpeg(uint8_t *buf);
 bool is_gif(uint8_t *buf);
 bool is_png(uint8_t *buf);

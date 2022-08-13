@@ -23,14 +23,12 @@ struct str_wchar_t *str_to_str_wchar_t(const char *STR){
   return(w);
 }
 
-
 size_t str_to_wchar_t_len(const char *STR){
   wchar_t *wcs = calloc(strlen(STR) + 1, sizeof(wchar_t));
   size_t  l    = mbstowcs(wcs, STR, strlen(STR));
 
   return(l);
 }
-
 
 wchar_t *str_to_wchar_t(const char *STR){
   wchar_t *wcs = calloc(strlen(STR) + 1, sizeof(wchar_t));
@@ -61,7 +59,6 @@ struct parsed_emoji_t *get_parsed_emoji_t(char *EMOJI_STRING){
   return(E);
 }
 
-
 utf8_iter *get_emoji_iter(char *EMOJI_STRING){
   utf8_iter *ITER = malloc(sizeof(utf8_iter));
 
@@ -69,9 +66,7 @@ utf8_iter *get_emoji_iter(char *EMOJI_STRING){
   return(ITER);
 }
 
-
 #define MIN(a, b)    (((a) < (b)) ? (a) : (b))
-
 
 size_t u8strwid(const void *beg, const void *end, size_t *width){
   struct Vector *__emojis_v = get_emojis_t_v();

@@ -14,7 +14,6 @@
 ///////////////////////////////////////////////////////////////////
 INCBIN(char, __TEST_INCLUDE_0__, "test-include-0.txt");
 
-
 int main(int argc, char **argv) {
   (void)argc; (void)argv;
 
@@ -23,4 +22,3 @@ int main(int argc, char **argv) {
   printf("OK\n");
   return(0);
 }
-

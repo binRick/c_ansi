@@ -3,7 +3,6 @@
 #include "termpaint-includes.c"
 #define DEBUG_PALETTE_COLORS_TO_STDERR    false
 
-
 termpaint_terminal    *terminal;
 termpaint_surface     *surface;
 termpaint_integration *integration;
@@ -50,7 +49,6 @@ typedef struct event_ {
 } event;
 event *event_current;
 
-
 void draw_center_options(termpaint_attr *attr_ui){
   termpaint_surface_write_with_attr(surface, 29, 11, "up/down: change palette", attr_ui);
   termpaint_surface_write_with_attr(surface, 29, 12, "c: toggle cursor style", attr_ui);
@@ -59,7 +57,6 @@ void draw_center_options(termpaint_attr *attr_ui){
   termpaint_surface_write_with_attr(surface, 29, 15, "up/esc: undo choice", attr_ui);
   termpaint_surface_write_with_attr(surface, 29, 16, "enter: follow menu path", attr_ui);
 }
-
 
 static int min(int a, int b) {
   return((a < b) ? a : b);
@@ -90,7 +87,6 @@ volatile char MSG[1024];
                                termpaint_terminal_flush(terminal, false);                                         \
                              } while (0); }
 
-
 static char *tp__basename(const char *path){
   const char *slash = strrchr(path, '/');
 
@@ -99,7 +95,6 @@ static char *tp__basename(const char *path){
   }
   return((char *)path);
 }
-
 
 void debug_log(termpaint_integration *integration, const char *data, int length) {
   (void)integration;
@@ -122,18 +117,15 @@ void debug_log(termpaint_integration *integration, const char *data, int length)
   debug_used = true;
 }
 
-
 char *cell_at(board_t *board, int x, int y) {
   return(&board->cells[((board->height + y) % board->height) * board->width + ((board->width + x) % board->width)]);
 }
-
 
 void update_cursor_profile(){
   termpaint_terminal_set_cursor_position(terminal, cursor_profile->x, cursor_profile->y);
   termpaint_terminal_set_cursor_visible(terminal, cursor_profile->visible);
   termpaint_terminal_set_cursor_style(terminal, cursor_profile->style, cursor_profile->blink);
 }
-
 
 void cycle_cursor_blink(){
   if (cursor_profile->blink) {
@@ -144,7 +136,6 @@ void cycle_cursor_blink(){
   update_cursor_profile();
 }
 
-
 void cycle_cursor_visiblity(){
   if (cursor_profile->visible) {
     cursor_profile->visible = false;
@@ -153,7 +144,6 @@ void cycle_cursor_visiblity(){
   }
   update_cursor_profile();
 }
-
 
 void cycle_cursor_style(){
   if (cursor_profile->style == TERMPAINT_CURSOR_STYLE_BAR) {
@@ -166,7 +156,6 @@ void cycle_cursor_style(){
 
   update_cursor_profile();
 }
-
 
 void event_callback(void *userdata, termpaint_event *tp_event) {
   (void)userdata;
@@ -217,7 +206,6 @@ void event_callback(void *userdata, termpaint_event *tp_event) {
   }
 } /* event_callback */
 
-
 bool init(void) {
   cursor_profile        = malloc(sizeof(cursor_profile_t));
   event_current         = malloc(sizeof(event));
@@ -253,7 +241,6 @@ bool init(void) {
   return(1);
 }
 
-
 void cleanup(void) {
   termpaint_terminal_free_with_restore(terminal);
 
@@ -264,7 +251,6 @@ void cleanup(void) {
     event_current = next;
   }
 }
-
 
 event * key_wait(void) {
   termpaint_terminal_flush(terminal, false);
@@ -283,14 +269,12 @@ event * key_wait(void) {
   return(next);
 }
 
-
 void write_sample(termpaint_attr *attr_ui, termpaint_attr *attr_sample, int line, char const *name, int style) {
   termpaint_surface_write_with_attr(surface, 0, line, name, attr_ui);
   termpaint_attr_reset_style(attr_sample);
   termpaint_attr_set_style(attr_sample, style);
   termpaint_surface_write_with_attr(surface, 11, line, "Sample", attr_sample);
 }
-
 
 void repaint_samples(termpaint_attr *attr_ui, termpaint_attr *attr_sample){
   write_sample(attr_ui, attr_sample, 3, "No Style:", 0);
@@ -324,7 +308,6 @@ void repaint_samples(termpaint_attr *attr_ui, termpaint_attr *attr_sample){
   update_cursor_profile();
 }
 
-
 char *get_palette_type_name(int CUR_PALETTE_TYPE_ID){
   char N[32];
 
@@ -336,7 +319,6 @@ char *get_palette_type_name(int CUR_PALETTE_TYPE_ID){
   }
   return(strdup(N));
 }
-
 
 void repaint_all(termpaint_attr *attr_ui, termpaint_attr *attr_sample){
   termpaint_surface_clear_with_attr(surface, attr_ui);
@@ -411,7 +393,6 @@ void repaint_all(termpaint_attr *attr_ui, termpaint_attr *attr_sample){
   termpaint_surface_write_with_attr(surface, 2, 20, "q: Quit", attr_ui);
 } /* repaint_all */
 
-
 void update_current_key_display(termpaint_attr *attr_ui, event *evt) {
   if (evt->type == TERMPAINT_EV_CHAR || evt->type == TERMPAINT_EV_KEY) {
     char buff[100];
@@ -420,7 +401,6 @@ void update_current_key_display(termpaint_attr *attr_ui, event *evt) {
     termpaint_surface_write_with_attr(surface, 11, 23, buff, attr_ui);
   }
 }
-
 
 void named_color_menu(termpaint_attr *attr_ui, termpaint_attr *attr_to_change, int which_color) {
   int color = 0;
@@ -483,7 +463,6 @@ void named_color_menu(termpaint_attr *attr_ui, termpaint_attr *attr_to_change, i
     }
   }
 } /* named_color_menu */
-
 
 void indexed_color_menu(termpaint_attr *attr_ui, termpaint_attr *attr_to_change, int which_color) {
   int color = 0;
@@ -561,7 +540,6 @@ void indexed_color_menu(termpaint_attr *attr_ui, termpaint_attr *attr_to_change,
   }
 } /* indexed_color_menu */
 
-
 void rgb_color_menu(termpaint_attr *attr_ui, termpaint_attr *attr_to_change, int which_color) {
   int red   = 0;
   int green = 0;
@@ -574,7 +552,6 @@ void rgb_color_menu(termpaint_attr *attr_ui, termpaint_attr *attr_to_change, int
   termpaint_surface_write_with_attr(surface, 29, 13, "esc: abort", attr_ui);
   termpaint_surface_write_with_attr(surface, 29, 14, "enter: activate color", attr_ui);
   termpaint_surface_write_with_attr(surface, 29, 15, "+: activate cursor visiblity", attr_ui);
-
 
   while (!quit) {
     char buff[40];
@@ -665,7 +642,6 @@ void rgb_color_menu(termpaint_attr *attr_ui, termpaint_attr *attr_to_change, int
   }
 } /* rgb_color_menu */
 
-
 void normalize_palette_type_selection(){
   if (CUR_PALETTE_TYPE_ID < 0) {
     CUR_PALETTE_TYPE_ID = 2;
@@ -704,7 +680,6 @@ void normalize_palette_type_selection(){
   debug_cur_palette();
   repaint_all(attr_ui, attr_sample);
 }
-
 
 void menu(termpaint_attr *attr_ui, termpaint_attr *attr_sample) {
   bool sample = true;
@@ -852,26 +827,21 @@ void menu(termpaint_attr *attr_ui, termpaint_attr *attr_sample) {
   }
 } /* menu */
 
-
 struct Palette get_cur_palette(){
   return(get_palette(get_cur_palette_data()));
 }
-
 
 char *get_cur_palette_filename(){
   return(embedded_palettes_table[cur_palette_index].filename);
 }
 
-
 char *get_cur_palette_data(){
   return(embedded_palettes_table[cur_palette_index].data);
 }
 
-
 char *get_cur_palette_name(){
   return(tp__basename(get_cur_palette_filename()));
 }
-
 
 void debug_cur_palette(){
   if (!DEBUG_PALETTE_COLORS_TO_STDERR) {
@@ -946,7 +916,6 @@ void debug_cur_palette(){
           embedded_palettes_table_qty
           );
 } /* debug_cur_palette */
-
 
 int term_termpaint_main(int argc, char **argv) {
   (void)argc; (void)argv;

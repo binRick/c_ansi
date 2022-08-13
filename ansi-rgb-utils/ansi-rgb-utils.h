@@ -23,7 +23,6 @@
 #include <wctype.h>
 //////////////////////////////////////////////////////////
 #include "hsluv-c/src/hsluv.h"
-#include "hsluv-c/tests/snapshot.h"
 //////////////////////////////////////////////////////////
 //typedef struct RGBColor RGBColor;
 typedef struct SRGBColor                                SRGBColor;
@@ -700,7 +699,6 @@ static const LabColor        ansi_to_lab_map[] = {
   { 0x1.78642ea7f55e1p+6, 0x1.4735fc607fap-8,    -0x1.43b3c60170cp-7   },
 };
 
-
 #define FG_DEFAULT    0xa6a28c
 #define BG_DEFAULT    0x20201d
 
@@ -792,7 +790,6 @@ static uint32_t esc_palette_256[] = {
   0xa8a8a8, 0xb2b2b2, 0xbcbcbc, 0xc6c6c6,
   0xd0d0d0, 0xdadada, 0xe4e4e4, 0xeeeeee
 };
-
 
 struct RGBColor rgb_from_ints(int r, int g, int b);
 void rgb_to_ints(struct RGBColor rgb, int *r, int *g, int *b);

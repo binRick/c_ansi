@@ -49,7 +49,6 @@ struct jinja2_render_template_t *jinja2_init_config(){
   return(C);
 }
 
-
 int jinja2_render_template(struct jinja2_render_template_t *CFG){
   char *cp = getenv("PATH");
 
@@ -169,14 +168,12 @@ int jinja2_render_template(struct jinja2_render_template_t *CFG){
   return(EXIT_SUCCESS);
 } /* jinja2_render_template */
 
-
 int jinja2_release_config(struct jinja2_render_template_t *CFG){
   if (CFG) {
     free(CFG);
   }
   return(EXIT_SUCCESS);
 }
-
 
 static void __attribute__((constructor)) __jinja2_cli_constructor(void){
   if (getenv("DEBUG_MODE") != NULL) {
@@ -186,7 +183,6 @@ static void __attribute__((constructor)) __jinja2_cli_constructor(void){
 }
 static void __attribute__((destructor)) __jinja2_cli_destructor(void){
 }
-
 
 int32_t jinja2_cli_utils_random_int32(uint8_t *out, size_t outlen){
   FILE *fpurandom = fopen("/dev/urandom", "r");

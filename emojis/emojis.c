@@ -20,7 +20,6 @@ struct emojis_t *get_emoji_t_by_name(const char *name){
   return(get_emoji_t(i));
 }
 
-
 int get_emoji_t_index_by_name(const char *name){
   struct Vector *emojis = get_emojis_t_v();
 
@@ -31,7 +30,6 @@ int get_emoji_t_index_by_name(const char *name){
   }
   return(-1);
 }
-
 
 size_t get_emojis_t_qty(){
   return(vector_size(get_emojis_t_v()));
@@ -47,7 +45,6 @@ struct Vector *get_emojis_t_v(){
   __emojis_t = v;
   return(__emojis_t);
 }
-
 
 char **emojis_emojis_a(){
   return(vector_to_array(get_emojis_emojis_v()));
@@ -86,7 +83,6 @@ struct emojis_t *get_emoji_t(size_t index){
   return(e);
 }
 
-
 size_t get_emojis_qty(){
   if (emojis_qty > 0) {
     return(emojis_qty);
@@ -94,4 +90,3 @@ size_t get_emojis_qty(){
   emojis_qty = sizeof(emojis_table) / sizeof(emojis_table[0]);
   return(emojis_qty);
 }
-

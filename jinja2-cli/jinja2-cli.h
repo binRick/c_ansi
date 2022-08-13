@@ -1,7 +1,6 @@
 #pragma once
 #include <stdbool.h>
 
-
 struct jinja2_render_template_t {
   bool strict;
   char *output_file, *output_dir, *output_s;

@@ -1,4 +1,5 @@
-project('c_ansi',['c'],default_options: ['warning_level=0','c_std=gnu99'],
+project('c_ansi',['c'],
+  default_options: ['warning_level=0','c_std=gnu99','default_library=static'],
   subproject_dir: 'submodules/c_deps/subprojects',  
   version: '0.0.1',
   )
@@ -48,3 +49,6 @@ subdir('vt100-utils-test')
 #subdir('term-termpaint-test')
 #//////////////////////////////////////////////////////////////////////
 subdir('tuibox-dev1-test')
+subdir('richard-wow1-test')
+subdir('tp')
+subdir('tp-test')

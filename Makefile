@@ -11,9 +11,8 @@ TIDIED_FILES = \
 			   term-utils/*.c term-utils/*.h  \
 			   vt100-*/*.c vt100-*/*.h \
 			   term-utils-test/*.c term-utils-test/*.h \
-			   submodules/c_deps/submodules/vt100utils/vt100utils.h \
-			   submodules/c_deps/submodules/vt100utils/demos/tuibox.h \
 			   image-*/*.c image-*/*.h \
+			   tp*/*.c tp*/*.h \
 			   tai64n*/*.c tai64n*/*.h \
 			   *emoji*/*.c *emoji*/*.h
 ##############################################################

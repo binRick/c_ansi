@@ -1,7 +1,6 @@
 #include "tai64n/tai64n.h"
 #include <stdlib.h>
 
-
 size_t tai64ts(){
   struct tai64n *t = tai64();
 
@@ -27,4 +26,3 @@ struct tai64n *tai64(){
 
   return(out);
 }
-

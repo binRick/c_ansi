@@ -1,6 +1,5 @@
 #include "term-termpaint-test.h"
 
-
 int main(int argc, char **argv) {
   (void)argc; (void)argv;
   if ((argc >= 2) && (strcmp(argv[1], "--test") == 0)) {

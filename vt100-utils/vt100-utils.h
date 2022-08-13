@@ -12,7 +12,6 @@
 char *ac_confirm_render(void);
 void color_reset();
 
-
 enum ac_confirm_mode_t {
   AC_CONFIRM_LOG_NONE,
   AC_CONFIRM_LOG_INFO,
@@ -55,7 +54,6 @@ module(ac_confirm) {
   struct ac_confirm_option_t *(*init_option)(char *NEW_OPTION_TEXT);
   //////////////////////////////////////////////////////////////////////////////////////
 };
-
 
 int  ac_confirm_module_init(module(ac_confirm) * exports);
 void ac_confirm_module_deinit(module(ac_confirm) * exports);

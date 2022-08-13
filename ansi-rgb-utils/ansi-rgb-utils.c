@@ -11,16 +11,13 @@
 #include "c_string_buffer/include/stringbuffer.h"
 #include "c_stringfn/include/stringfn.h"
 
-
 LabColor ansi_to_lab(int ansi_num) {
   return(ansi_to_lab_map[ansi_num - ANSI_MAP_OFFSET]);
 }
 
-
 unsigned char luminanceFromRGB(unsigned char r, unsigned char g, unsigned char b) {
   return((unsigned char)(0.2126 * r + 0.7152 * g + 0.0722 * b));
 }
-
 
 void show_color(FILE *file, int color) {
   ansi_256_bg(file, color);
@@ -35,11 +32,9 @@ static const char *bot = "  \033[3%dm ▀▀▀▀▀\033[3%dm▀\033[m";
 
 static uint8_t    __colors;
 
-
 static void po(void) {
   __colors = 0x7E;
 }
-
 
 static char *pr(const char *r) {
   struct StringBuffer *sb = stringbuffer_new();
@@ -57,7 +52,6 @@ static char *pr(const char *r) {
   stringbuffer_release(sb);
   return(ret);
 }
-
 
 char *get_color_boxes(void){
   struct StringBuffer *sb = stringbuffer_new();
@@ -77,7 +71,6 @@ char *get_color_boxes(void){
   return(ret);
 }
 
-
 void print_cube(FILE *file, int g) {
   for (int r = 0; r < 6; r++) {
     for (int b = 0; b < 6; b++) {
@@ -91,32 +84,26 @@ void print_cube(FILE *file, int g) {
   }
 }
 
-
 ////////////////////////////////////////////////////////////////////////////
 void ansi_256_fg(FILE *file, int color) {
   fprintf(file, C256_FG_CODE, color);
 }
 
-
 void ansi_256_bg(FILE *file, int color) {
   fprintf(file, C256_BG_CODE, color);
 }
-
 
 void ansi_truecolor_fg(FILE *file, int r, int g, int b) {
   fprintf(file, TRUECOLOR_FG_CODE, r, g, b);
 }
 
-
 void ansi_truecolor_bg(FILE *file, int r, int g, int b) {
   fprintf(file, TRUECOLOR_BG_CODE, r, g, b);
 }
 
-
 void ansi_reset(FILE *file) {
   fputs(RESET_CODE, file);
 }
-
 
 /////////////////////////////////////////////////////////////////////////////////////////
 bool is_in_rgb_range(struct RGB rgb) {
@@ -133,7 +120,6 @@ bool is_in_rgb_range(struct RGB rgb) {
   return(true);
 }
 
-
 float get_rgb_min(struct RGB rgb) {
   if (rgb.red <= rgb.green && rgb.red <= rgb.blue) {
     return(rgb.red);
@@ -143,7 +129,6 @@ float get_rgb_min(struct RGB rgb) {
     return(rgb.blue);
   }
 }
-
 
 float get_rgb_max(struct RGB rgb) {
   if (rgb.red >= rgb.green && rgb.red >= rgb.blue) {
@@ -155,18 +140,15 @@ float get_rgb_max(struct RGB rgb) {
   }
 }
 
-
 /* returns max - min */
 float get_rgb_range(struct RGB rgb) {
   return(get_rgb_max(rgb) - get_rgb_min(rgb));
 }
 
-
 /* rgb -> hsl luminance */
 float rgb_to_hsl_luminance(struct RGB rgb) {
   return((get_rgb_min(rgb) + get_rgb_max(rgb)) / 2);
 }
-
 
 /* rgb -> hsl saturation */
 float rgb_to_hsl_saturation(struct RGB rgb) {
@@ -180,7 +162,6 @@ float rgb_to_hsl_saturation(struct RGB rgb) {
     return((max - min) / (2.0 - max - min));
   }
 }
-
 
 /* rgb -> hue */
 float rgb_to_hue(struct RGB rgb) {
@@ -207,7 +188,6 @@ float rgb_to_hue(struct RGB rgb) {
   return(hue);
 }
 
-
 void print_ansi_color(int red, int green, int blue, int wl, char *word) {
   for (int i = 0; i < wl; i++) {
     red   = ((255 / wl) * i);
@@ -220,7 +200,6 @@ void print_ansi_color(int red, int green, int blue, int wl, char *word) {
   }
 }
 
-
 /* rgb -> hsv value */
 float rgb_to_hsv_value(struct RGB rgb) {
   if (!is_in_rgb_range(rgb)) {
@@ -229,7 +208,6 @@ float rgb_to_hsv_value(struct RGB rgb) {
 
   return(get_rgb_max(rgb));
 }
-
 
 float rgb_to_hsv_saturation(struct RGB rgb) {
   if (!is_in_rgb_range(rgb)) {
@@ -245,13 +223,11 @@ float rgb_to_hsv_saturation(struct RGB rgb) {
   }
 }
 
-
 void rgb_to_ints(struct RGBColor rgb, int *r, int *g, int *b) {
   *r = round(rgb.r * 255.0);
   *g = round(rgb.g * 255.0);
   *b = round(rgb.b * 255.0);
 }
-
 
 struct RGBColor rgb_from_ints(int r, int g, int b) {
   return((struct RGBColor){

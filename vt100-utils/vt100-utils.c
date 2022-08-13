@@ -68,8 +68,8 @@ struct ac_confirm_option_t *ac_confirm_render_option(char *TEXT, char *COLOR);
 struct ac_confirm_option_t *ac_confirm_get_option_by_uuid(char *UUID);
 struct vt100_node_t *parse_seq(char *SEQ);
 struct vt100_node_t *get_node_by_uuid(char *UUID);
-extern struct binding_type_t *binding_types[];
 
+extern struct binding_type_t *binding_types[];
 
 static char *__TEST_STR(char *SEQ){
   char *s;
@@ -77,7 +77,6 @@ static char *__TEST_STR(char *SEQ){
   asprintf(&s, "%s%s", SEQ, TEST_STR);
   return(s);
 }
-
 
 static void stop() {
   ui_free(&u);
@@ -169,16 +168,13 @@ struct ac_confirm_option_t *ac_confirm_init_option(char *NEW_OPTION_TEXT){
   return(O);
 }
 
-
 bool ac_confirm_add_option(struct ac_confirm_option_t *NEW_OPTION){
   vector_push(require(ac_confirm)->options, (void *)NEW_OPTION);
 }
 
-
 size_t ac_confirm_get_options_qty(void){
   return(vector_size(require(ac_confirm)->options));
 }
-
 
 struct ac_confirm_option_t *ac_confirm_render_option(char *TEXT, char *COLOR){
   struct ac_confirm_option_t *O = calloc(1, sizeof(struct ac_confirm_option_t));
@@ -187,16 +183,13 @@ struct ac_confirm_option_t *ac_confirm_render_option(char *TEXT, char *COLOR){
   return(O);
 }
 
-
 void select_prev(){
   change_selection_index(CHANGE_SELECTION_TYPE_PREV);
 }
 
-
 void select_next(void){
   change_selection_index(CHANGE_SELECTION_TYPE_NEXT);
 }
-
 
 size_t get_index_by_uuid(char *UUID){
   struct vt100_node_t *tmp_ = head->next;
@@ -218,7 +211,6 @@ size_t get_index_by_uuid(char *UUID){
   return(-1);
 }
 
-
 void set_selection_index(size_t NEW_SELECTION_INDEX){
   if (NEW_SELECTION_INDEX < 0) {
     NEW_SELECTION_INDEX = require(ac_confirm)->get_options_qty() - 1;
@@ -234,7 +226,6 @@ void set_selection_index(size_t NEW_SELECTION_INDEX){
   NEW_SELECTION->selected = true;
   reload_options();
 }
-
 
 void change_selection_by_uuid(char *NEW_SELECTED_UUID){
   size_t index = get_index_by_uuid(NEW_SELECTED_UUID);
@@ -262,7 +253,6 @@ struct vt100_node_t *get_node_by_uuid(char *UUID){
   return((struct vt100_node_t *)NULL);
 }
 
-
 void change_selection_index(int CHANGE_SELECTION_TYPE) {
   size_t NEW_SELECTION_INDEX = -1;
 
@@ -287,7 +277,6 @@ void change_selection_index(int CHANGE_SELECTION_TYPE) {
   }
   return;
 }
-
 
 void reload_options() {
   if (false) {
@@ -378,13 +367,11 @@ struct vt100_node_t *parse_seq(char *SEQ){
   return((struct vt100_node_t *)NULL);
 }
 
-
 void hover(ui_box_t *b, int x, int y, int down) {
   if (false) {
     fprintf(stderr, "hover.uuid:%s.....%dx%d\n", (char *)b->data2, x, y);
   }
 }
-
 
 void draw(ui_box_t *b, char *out) {
   struct vt100_node_t *node = b->data1;
@@ -439,7 +426,6 @@ void draw(ui_box_t *b, char *out) {
   }
 } /* draw */
 
-
 void click(ui_box_t *b, int x, int y) {
   struct vt100_node_t *node = b->data1;
 
@@ -451,27 +437,22 @@ void click(ui_box_t *b, int x, int y) {
   change_selection_by_uuid((char *)b->data2);
 }
 
-
 void mouse_scrolled_down(void *BINDING_DATA){
   select_next();
   return;
 }
 
-
 void focus_out(void *BINDING_DATA){
   fprintf(stderr, "focus out!\n");
 }
-
 
 void clicked(void *BINDING_DATA){
   fprintf(stderr, "clicked!\n");
 }
 
-
 void focus_in(void *BINDING_DATA){
   fprintf(stderr, "focus in!\n");
 }
-
 
 void mouse_scrolled_up(void *BINDING_DATA){
   select_prev();
@@ -483,7 +464,6 @@ void mouse_scrolled_up(void *BINDING_DATA){
  * re_t       pattern           = re_compile("[Hh]ello [Ww]orld\\s*[!]?");
  * int        match_idx         = re_matchp(pattern, string_to_search, &match_length);
  */
-
 
 void unhandled_input(void *BINDING_DATA){
   bool                                is_handled = false;
@@ -611,12 +591,10 @@ char *ac_confirm_render_ui(){
 } /* ac_confirm_render */
 #undef MIN
 
-
 void ac_confirm_module_deinit(module(ac_confirm) *exports) {
   clib_module_deinit(ac_confirm);
   return;
 }
-
 
 int ac_confirm_module_init(module(ac_confirm) *exports) {
   clib_module_init(ac_confirm, exports);
@@ -631,7 +609,6 @@ int ac_confirm_module_init(module(ac_confirm) *exports) {
   return(0);
 }
 
-
 char *ac_confirm_render_option_button(struct ac_confirm_option_t *O){
   char *b;
 
@@ -642,7 +619,6 @@ char *ac_confirm_render_option_button(struct ac_confirm_option_t *O){
            );
   return(b);
 }
-
 
 void ac_confirm_redraw(){
   ui_redraw(&u);
@@ -669,7 +645,6 @@ struct ac_confirm_option_t *ac_confirm_get_option_by_uuid(char *UUID){
 
   return(NULL);
 }
-
 
 void tb_sig_handler(int sig){
   if (SIGWINCH == sig) {

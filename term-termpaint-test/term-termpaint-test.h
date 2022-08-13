@@ -73,5 +73,4 @@ static struct cag_option options[] = {
     .description    = "Shows the command help" }
 };
 
-
 #endif

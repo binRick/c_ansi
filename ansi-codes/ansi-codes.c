@@ -5,7 +5,6 @@
 #include "c_stringfn/include/stringfn.h"
 #include "c_vector/include/vector.h"
 
-
 void color_reset(){
   printf("\x1b[0m");
 }

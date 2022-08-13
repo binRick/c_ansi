@@ -13,9 +13,7 @@
 #include "emojis-test/emojis-test.h"
 #include "submodules/c_greatest/greatest/greatest.h"
 
-
 ///////////////////////////////
-
 
 TEST t_list_emojis_utf8table(void *EMOJIS_LIMIT){
 //            ft_set_u8strwid_func(&u8strwid);
@@ -66,7 +64,6 @@ TEST t_list_emojis_utf8table(void *EMOJIS_LIMIT){
   printf("%s\n", table_str);
   ft_destroy_table(table);
 } /* t_list_emojis_utf8table */
-
 
 TEST t_list_emojis_utf8table1(void *EMOJIS_LIMIT){
   ft_set_u8strwid_func(&u8strwid);
@@ -125,7 +122,6 @@ TEST t_list_emojis_utf8table1(void *EMOJIS_LIMIT){
   PASS();
 } /* t_list_emojis_table1 */
 
-
 TEST t_list_emojis_table(void *EMOJIS_LIMIT){
   setlocale(LC_CTYPE, "");
   struct Vector *emojis         = get_emojis_t_v();
@@ -177,11 +173,9 @@ TEST t_list_emojis_table(void *EMOJIS_LIMIT){
   PASS();
 } /* t_list_emojis_table1 */
 
-
 TEST t_list_emojis_t_h(void){
   PASS();
 }
-
 
 TEST t_list_emojis_t_v(void){
   struct Vector *emojis;
@@ -200,12 +194,10 @@ TEST t_list_emojis_t_v(void){
   PASS();
 }
 
-
 TEST t_list_emojis_qty(void){
   printf("%lu emojis\n", get_emojis_qty());
   PASS();
 }
-
 
 TEST t_list_emojis_names(void){
   size_t        id              = 0;
@@ -229,7 +221,6 @@ SUITE(s_list_emojis_names) {
 }
 
 GREATEST_MAIN_DEFS();
-
 
 int main(int argc, char **argv) {
   GREATEST_MAIN_BEGIN();

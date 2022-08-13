@@ -8,4 +8,3 @@
 
 INCBIN(jinja2_cli, "bin/jinja2-cli");
 INCBIN(meson, "bin/meson");
-

@@ -1,9 +1,8 @@
 #pragma once
-#ifndef TERM_UTILS_TEST_H
-#define TRUE_UTILS_TEST_H
-#include "../term-utils/term-utils.h"
-#include "cargs.h"
-#include <assert.h>
+#ifndef TERM_TESTS_TEST_H
+#define TERM_TESTS_TEST_H
+#include "cargs/include/cargs.h"
+#include "tp/tp.h"
 #include <ctype.h>
 #include <stdarg.h>
 #include <stdbool.h>
@@ -19,6 +18,7 @@
 #include <sys/time.h>
 
 int parse_args(int argc, char *argv[]);
+
 int debug_args();
 
 typedef struct CLI_ARGS {

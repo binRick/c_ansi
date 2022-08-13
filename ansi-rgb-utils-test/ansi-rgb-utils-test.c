@@ -49,7 +49,6 @@ rgba_t  RGBA[] = {
   { .r = 0.5,     .g = 0.3,  .b = 0.2,  .a = 0.31 },
 };
 
-
 int main(int argc, char **argv) {
   (void)argc; (void)argv;
   if (false) {

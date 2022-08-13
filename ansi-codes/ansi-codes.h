@@ -26,7 +26,6 @@ void color_reset();
 #define color256B_set(code) \
   printf("\x1b[48;5;%dm", code)
 
-
 #define ACCUU(times)      (AC_cur(times, 'A'))
 #define ACCUD(times)      (AC_cur(times, 'B'))
 #define ACCUF(times)      (AC_cur(times, 'C'))
@@ -36,7 +35,6 @@ void color_reset();
 #define ACCHA(times)      (AC_cur(times, 'G'))
 #define ACCUP(x, y)       (AC_cur_pos(x, y, 'H'))
 #define ACHVP(x, y)       (AC_cur_pos(x, y, 'f'))
-
 
 #define ACSSR(t, b, r)    {                                                      \
     r = (char *)calloc(strlen(ACCSI) + 3 + strlen(t) + strlen(b), sizeof(char)); \
@@ -71,7 +69,6 @@ void color_reset();
 #define ACPAS      "\u001a"
 
 #define AC_BUTTON(TEXT, COLOR)    COLOR "" AC_NONE COLOR AC_INVERSE " " TEXT " " AC_NONE COLOR ""
-
 
 #define AC_BLACK                       "\x1b[30m"
 #define AC_BLACK_BLACK                 "\x1b[30m\x1b[40m"
@@ -170,7 +167,6 @@ void color_reset();
 #define AC_BRIGHT_BLUE_CYAN            "\x1b[34;1m\x1b[46m"
 #define AC_BRIGHT_BLUE_WHITE           "\x1b[34;1m\x1b[47m"
 
-
 #define AC_MAGENTA                     "\x1b[35m"
 #define AC_MAGENTA_BLACK               "\x1b[35m\x1b[40m"
 #define AC_MAGENTA_RED                 "\x1b[35m\x1b[41m"
@@ -190,7 +186,6 @@ void color_reset();
 #define AC_BRIGHT_MAGENTA_CYAN         "\x1b[35;1m\x1b[46m"
 #define AC_BRIGHT_MAGENTA_WHITE        "\x1b[35;1m\x1b[47m"
 
-
 #define AC_CYAN                        "\x1b[36m"
 #define AC_CYAN_BLACK                  "\x1b[36m\x1b[40m"
 #define AC_CYAN_RED                    "\x1b[36m\x1b[41m"
@@ -209,7 +204,6 @@ void color_reset();
 #define AC_BRIGHT_CYAN_MAGENTA         "\x1b[36;1m\x1b[45m"
 #define AC_BRIGHT_CYAN_CYAN            "\x1b[36;1m\x1b[46m"
 #define AC_BRIGHT_CYAN_WHITE           "\x1b[36;1m\x1b[47m"
-
 
 #define AC_WHITE                       "\x1b[37m"
 #define AC_WHITE_BLACK                 "\x1b[37m\x1b[40m"
