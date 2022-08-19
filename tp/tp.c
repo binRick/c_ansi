@@ -88,7 +88,6 @@ named_color_menu(termpaint_attr * attr_ui, termpaint_attr * attr_to_change, int 
 menu(termpaint_attr * attr_ui, termpaint_attr * attr_sample),
 draw_box();
 int term_tests_main(const int argc, const char **argv), tp_get_max_option_text_size();
-void render_tp_options(void);
 //////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////
@@ -407,7 +406,7 @@ static void repaint_samples(termpaint_attr *attr_ui, termpaint_attr *attr_sample
 
 static void repaint_all(termpaint_attr *attr_ui, termpaint_attr *attr_sample){
   termpaint_surface_clear_with_attr(surface, attr_ui);
-  termpaint_surface_write_with_attr(surface, 1, 0, "Terminal UI", attr_ui);
+  termpaint_surface_write_with_attr(surface, 1, 1, "Terminal UI", attr_ui);
   repaint_samples(attr_ui, attr_sample);
 
   termpaint_surface_write_with_attr(surface, 25, 2, "Select Color", attr_ui);

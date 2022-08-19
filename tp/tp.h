@@ -23,10 +23,11 @@
 #include "tp-defines.h"
 #include "tp-types.h"
 /////////////////////////////////////////////////////////////////
-#include "submodules/c_ansi/ansi-codes/ansi-codes.h"
-#include "submodules/c_string_buffer/include/stringbuffer.h"
-#include "submodules/c_stringfn/include/stringfn.h"
-#include "submodules/timestamp/timestamp.h"
+#include "c_ansi/ansi-codes/ansi-codes.h"
+#include "c_dbg/dbg.h"
+#include "c_string_buffer/include/stringbuffer.h"
+#include "c_stringfn/include/stringfn.h"
+#include "timestamp/timestamp.h"
 /////////////////////////////////////////////////////////////////
 #pragma once
 #include <stdbool.h>
@@ -42,6 +43,7 @@
 int term_tests_main(const int argc, const char **argv);
 
 char *tp_confirm_render(void);
+char *tp_tabs_render(void);
 void color_reset();
 
 int term_init(void), min(int a, int b);
@@ -80,6 +82,7 @@ static struct surface_size_t surface_size = { .width = 0, .height = 0 };
 #define REDRAW_BOTTOM_MSG_MIN_MS     50
 //////////////////////////////////////////////////////////////////
 #define REDRAW_SURFACE_OBJECTS()    { do {                                        \
+                                        render_tp_tabs();                      \
                                         render_tp_options();                      \
                                         TERMINAL_KEY_MENU();                      \
                                         termpaint_terminal_flush(terminal, true); \

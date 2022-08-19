@@ -3,7 +3,7 @@
 #define TPIH
 #ifndef DBG_H_DEF_ONCE
 #define DBG_H_DEF_ONCE
-#include "dbg.h/dbg.h"
+#include "c_dbg/c_dbg.h"
 #endif
 #include "term-termpaint.h"
 #include "term-termpaint.h"
@@ -28,6 +28,7 @@
 #include "tp-selection.h"
 #include "tp-types.h"
 #include "tp-utils.h"
+#include "tp-tab.h"
 #include "tp.h"
 ////////////////////////////////////////////////////
 #include "ansi-codes.h"
@@ -46,6 +47,7 @@
 ////////////////////////////////////////////////////
 #define LOG(STR)    fprintf(stderr, AC_RESETALL AC_YELLOW "%s\n" AC_RESETALL, STR)
 #define TP    require(tp_confirm)
+#define TB    require(tp_tab)
 extern termpaint_surface  *surface;
 extern termpaint_terminal *terminal;
 extern termpaint_attr     *attr_bottom_msg;

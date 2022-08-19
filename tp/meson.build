@@ -5,6 +5,7 @@ tp_srcs = [
   'tp-utils.c',
   'tp-internal.c',
   'tp-selection.c',
+  'tp-tab.c',
 ]
 
 tp_include_dirs = [
@@ -27,6 +28,7 @@ tp_deps = [
   wildcardcmp_dep,
   tiny_regex_c_dep,
   ansi_utils_dep,  
+  c_dbg_dep,  
 ]
 
 tp_lib = static_library('tp',
