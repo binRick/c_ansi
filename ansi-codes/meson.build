@@ -3,6 +3,11 @@ ansi_codes_srcs = [
 ]
 ansi_codes_dirs = [
   '.',
+  include_directories('.'),
+  include_directories('../'),
+  include_directories('../submodules'),
+  include_directories('../submodules/c_deps/submodules'),
+  include_directories('../submodules/c_deps'),
   inc,
 ]
 ansi_codes_deps = [

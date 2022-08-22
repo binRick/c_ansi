@@ -26,9 +26,9 @@
 #include "tp-defines.h"
 #include "tp-message-box.h"
 #include "tp-selection.h"
+#include "tp-tab.h"
 #include "tp-types.h"
 #include "tp-utils.h"
-#include "tp-tab.h"
 #include "tp.h"
 ////////////////////////////////////////////////////
 #include "ansi-codes.h"

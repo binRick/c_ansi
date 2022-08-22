@@ -82,7 +82,7 @@ static struct surface_size_t surface_size = { .width = 0, .height = 0 };
 #define REDRAW_BOTTOM_MSG_MIN_MS     50
 //////////////////////////////////////////////////////////////////
 #define REDRAW_SURFACE_OBJECTS()    { do {                                        \
-                                        render_tp_tabs();                      \
+                                        render_tp_tabs();                         \
                                         render_tp_options();                      \
                                         TERMINAL_KEY_MENU();                      \
                                         termpaint_terminal_flush(terminal, true); \

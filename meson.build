@@ -50,6 +50,5 @@ subdir('vt100-utils-test')
 #subdir('term-termpaint-test')
 #//////////////////////////////////////////////////////////////////////
 subdir('tuibox-dev1-test')
-subdir('richard-wow1-test')
 subdir('tp')
 subdir('tp-test')

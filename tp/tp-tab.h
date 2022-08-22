@@ -33,16 +33,15 @@ struct tp_tab_t AC_TAB_DEFAULT_OPTION;
 struct tp_tab_t *tp_tab_init(char *NEW_OPTION_TEXT);
 bool tp_tab_add(struct tp_tab_t *NEW_OPTION);
 
-
 ////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////
 module(tp_tab) {
   define(tp_tab, CLIB_MODULE);
-  enum tp_tab_mode_t     mode;
-  struct Vector              *tabs;
-  bool                       (*add_tab)(struct tp_tab_t *NEW_OPTION);
-  size_t                     (*get_tabs_qty)(void);
-  struct tp_tab_t *(*init_tab)(char *NEW_OPTION_TEXT);
+  enum tp_tab_mode_t mode;
+  struct Vector      *tabs;
+  bool               (*add_tab)(struct tp_tab_t *NEW_OPTION);
+  size_t             (*get_tabs_qty)(void);
+  struct tp_tab_t    *(*init_tab)(char *NEW_OPTION_TEXT);
 };
 
 int  tp_tab_module_init(module(tp_tab) * exports);
@@ -52,9 +51,9 @@ bool tp_tab_add(struct tp_tab_t *NEW_OPTION);
 size_t tp_tab_get_qty(void);
 
 exports(tp_tab) {
-  .mode            = AC_TAB_LOG_DEFAULT,
-  .init            = tp_tab_module_init,
-  .deinit          = tp_tab_module_deinit,
+  .mode         = AC_TAB_LOG_DEFAULT,
+  .init         = tp_tab_module_init,
+  .deinit       = tp_tab_module_deinit,
   .get_tabs_qty = tp_tab_get_qty,
   .init_tab     = tp_tab_init,
   .add_tab      = tp_tab_add,
