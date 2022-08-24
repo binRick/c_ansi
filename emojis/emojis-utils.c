@@ -32,7 +32,6 @@ size_t str_to_wchar_t_len(const char *STR){
 
 wchar_t *str_to_wchar_t(const char *STR){
   wchar_t *wcs = calloc(strlen(STR) + 1, sizeof(wchar_t));
-  size_t  l    = mbstowcs(wcs, STR, strlen(STR));
 
   return(wcs);
 }
@@ -70,20 +69,13 @@ utf8_iter *get_emoji_iter(char *EMOJI_STRING){
 
 size_t u8strwid(const void *beg, const void *end, size_t *width){
   struct Vector *__emojis_v = get_emojis_t_v();
-//  const char   **emojis = emojis_emojis_a();
   const char    *__emojis[] = { "😃", "😍", "🧑", "🔢", "👍", "💯", };
   const size_t  sz          = sizeof(__emojis) / sizeof(__emojis[0]);
   const size_t  raw_len     = (const char *)end - (const char *)beg;
 
-  /*
-   * printf("beg: '%s'\n", (char*)beg);
-   * printf("end: '%s'\n", (char*)end);
-   * printf("raw len: '%lu'\n", raw_len);
-   * printf("sz: '%lu'\n", sz);
-   */
   for (size_t i = 0; i < sz; ++i) {
     if (memcmp(beg, __emojis[i], MIN(strlen(__emojis[i]), raw_len)) == 0) {
-      *width = 2;       /* On my terminal emojis have width of 2 chars */
+      *width = 2;
       return(0);
     }
   }

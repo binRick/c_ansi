@@ -24,7 +24,7 @@
 #include "ansi-utils/ansi-utils.h"
 #include "c_string_buffer/include/stringbuffer.h"
 #include "c_stringfn/include/stringfn.h"
-#include "c_vector/include/vector.h"
+#include "c_vector/vector/vector.h"
 #include "module/def.h"
 #include "module/module.h"
 ////////////////////////////////////////////////////
@@ -55,11 +55,10 @@ termpaint_attr
 ;
 
 void draw_box() {
-  const int screen_width     = termpaint_surface_width(surface),
-            screen_height    = termpaint_surface_height(surface),
-            top_left_x       = (screen_width / 2) - 12,
-            top_left_y       = (screen_height / 2) - 2;
-  bool TITLE_RESTORE_CAPABLE = termpaint_terminal_capable(terminal, TERMPAINT_CAPABILITY_TITLE_RESTORE);
+  const int screen_width  = termpaint_surface_width(surface),
+            screen_height = termpaint_surface_height(surface),
+            top_left_x    = (screen_width / 2) - 12,
+            top_left_y    = (screen_height / 2) - 2;
 
   termpaint_terminal_set_title(terminal, "🔥💣💥🔫💊", TERMPAINT_TITLE_MODE_PREFER_RESTORE);
 

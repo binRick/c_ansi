@@ -127,11 +127,10 @@ int term_tests_main(const int argc, const char **argv) {
 }
 
 static void draw_box() {
-  const int screen_width     = termpaint_surface_width(surface),
-            screen_height    = termpaint_surface_height(surface),
-            top_left_x       = (screen_width / 2) - 12,
-            top_left_y       = (screen_height / 2) - 2;
-  bool TITLE_RESTORE_CAPABLE = termpaint_terminal_capable(terminal, TERMPAINT_CAPABILITY_TITLE_RESTORE);
+  const int screen_width  = termpaint_surface_width(surface),
+            screen_height = termpaint_surface_height(surface),
+            top_left_x    = (screen_width / 2) - 12,
+            top_left_y    = (screen_height / 2) - 2;
 
   termpaint_terminal_set_title(terminal, "🔥💣💥🔫💊", TERMPAINT_TITLE_MODE_PREFER_RESTORE);
 
@@ -224,9 +223,7 @@ static void event_callback(void *userdata, termpaint_event *tp_event) {
     my_event->modifier = tp_event->key.modifier;
     my_event->string   = strdup(tp_event->key.atom);
     my_event->next     = NULL;
-//    fprintf(stderr, "TERMPAINT_EV_KEY:  |%d|%s|\n", my_event->modifier, my_event->string);
     if (strcmp(my_event->string, "ArrowUp") == 0) {
-//        termpaint_image_load(terminal,"/tmp/me");
     }
   } else if (tp_event->type == TERMPAINT_EV_MOUSE) {
     if ((tp_event->mouse.action == TERMPAINT_MOUSE_PRESS && tp_event->mouse.button == 0)
@@ -273,7 +270,6 @@ static void event_callback(void *userdata, termpaint_event *tp_event) {
 
 void tb_sig_handler(int sig){
   if (SIGWINCH == sig) {
-    long unsigned  started_ts = timestamp();
     char           *msg;
     struct winsize winsz;
     ioctl(0, TIOCGWINSZ, &winsz);
@@ -283,14 +279,11 @@ void tb_sig_handler(int sig){
     surface_size.width  = (int)winsz.ws_col;
     termpaint_surface_resize(surface, surface_size.width, surface_size.height);
     asprintf(&msg, "[SIGWINCH] surface size changed from %dx%d to %dx%d", was_width, was_height, termpaint_surface_width(surface), termpaint_surface_height(surface));
-    //dbge(msg,%s);
     {
       repaint_all(attr_ui, attr_sample);
       REDRAW_SURFACE_OBJECTS();
       termpaint_terminal_flush_logged(terminal, true);
     }
-    long unsigned tb_sig_handler_dur_ms = timestamp() - started_ts;
-//    dbge(tb_sig_handler_dur_ms,%ld);
   }
 }
 
@@ -744,15 +737,9 @@ static void menu(termpaint_attr *attr_ui, termpaint_attr *attr_sample) {
       select_last();
     } else if (evt->type == TERMPAINT_EV_CHAR && strcmp(evt->string, "t") == 0) {
       title_updates_qty++;
-      char *title_chars = TITLE_CHARS[(title_updates_qty < 10) ? (title_updates_qty) : (title_updates_qty % 10)];
-      fwprintf(stderr, L""
-               AC_RESETALL AC_RED AC_ITALIC "title chars size" AC_RESETALL ": "
-               AC_RESETALL AC_REVERSED AC_BLUE AC_BOLD "%lu" AC_RESETALL
-               "\n",
-               wcslen(title_chars)
-               );
 
-      char *NEW_TITLE;
+      char *NEW_TITLE   = "xxxxxxxxX";
+      char *title_chars = "yyyyy";
       asprintf(&NEW_TITLE, "|\t%d\t|" "\t%s\t|", title_updates_qty, title_chars);
       sprintf(MSG, "%s", NEW_TITLE);
       termpaint_terminal_set_title(terminal, NEW_TITLE, TERMPAINT_TITLE_MODE_PREFER_RESTORE);

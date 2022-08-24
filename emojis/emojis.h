@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 /////////////////////////////////////
-#include "c_vector/include/vector.h"
+#include "c_vector/vector/vector.h"
 #include "djbhash/src/djbhash.h"
 /////////////////////////////////////
 //////////////////////////////////////////

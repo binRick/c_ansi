@@ -7,40 +7,15 @@
 
 static int read_uint32(uint8_t *buf);
 static int read_uint16(uint8_t *buf);
-static void output_css_dimensions(int width, int height);
 static void read_from(const char *path, char *buf, int len, int offset);
 
-static void output_css_dimensions(int width, int height) {
-  printf("width: %dpx;\n", width);
-  printf("height: %dpx;\n", height);
-}
-
-static void output_gif_dimensions(const char *path) {
-  char buf[4];
-
-  read_from(path, buf, 4, 6);
-  output_css_dimensions(
-    read_uint16(buf),
-    read_uint16(buf + 2)
-    );
-}
-
-static void output_png_dimensions(const char *path) {
-  char buf[8];
-
-  read_from(path, buf, 8, 16);
-  output_css_dimensions(
-    read_uint32(buf),
-    read_uint32(buf + 4));
-}
-
-static int read_uint16(uint8_t *buf) {
+__attribute__((unused))static int read_uint16(uint8_t *buf) {
   return(buf[1] << 8
          | buf[0]
          );
 }
 
-static int read_uint32(uint8_t *buf) {
+__attribute__((unused))static int read_uint32(uint8_t *buf) {
   return(buf[0] << 24
          | buf[1] << 16
          | buf[2] << 8
@@ -48,7 +23,7 @@ static int read_uint32(uint8_t *buf) {
          );
 }
 
-static void read_from(const char *path, char *buf, int len, int offset) {
+__attribute__((unused))static void read_from(const char *path, char *buf, int len, int offset) {
   int fd = open(path, O_RDONLY);
 
   if (fd < 0) {

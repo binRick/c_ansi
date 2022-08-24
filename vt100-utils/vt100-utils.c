@@ -13,7 +13,7 @@
 #include "ansi-utils/ansi-utils.h"
 #include "c_string_buffer/include/stringbuffer.h"
 #include "c_stringfn/include/stringfn.h"
-#include "c_vector/include/vector.h"
+#include "c_vector/vector/vector.h"
 #include "module/def.h"
 #include "module/module.h"
 #include "module/require.h"
@@ -38,7 +38,6 @@ enum change_selection_type_t {
 };
 static const char                 *TEST_STR = "F2DEEA90-F1F2-4C73-9BB8-3593319834D8";
 static ui_t                       u;
-static int                        w = 20;
 static struct vt100_node_t        *head;
 static struct ac_confirm_option_t AC_CONFIRM_DEFAULT_OPTION = {
   .text           = "undefined",
@@ -154,7 +153,7 @@ struct unhandled_escaped_handlers_t {
     .regex_bind_datas ={
       NULL,
     }, },
-  { NULL },
+  { 0 },
 };
 
 struct ac_confirm_option_t *ac_confirm_init_option(char *NEW_OPTION_TEXT){
@@ -176,9 +175,10 @@ size_t ac_confirm_get_options_qty(void){
   return(vector_size(require(ac_confirm)->options));
 }
 
-struct ac_confirm_option_t *ac_confirm_render_option(char *TEXT, char *COLOR){
+struct ac_confirm_option_t *ac_confirm_render_option(__attribute__((unused)) char *TEXT, __attribute__((unused)) char *COLOR){
   struct ac_confirm_option_t *O = calloc(1, sizeof(struct ac_confirm_option_t));
-  char                       *s = AC_GREEN "" AC_BLACK_GREEN " xxxxxxxx " AC_NOINVERSE AC_GREEN "";
+
+  __attribute__((unused)) char *s = AC_GREEN "" AC_BLACK_GREEN " xxxxxxxx " AC_NOINVERSE AC_GREEN "";
 
   return(O);
 }
@@ -367,7 +367,7 @@ struct vt100_node_t *parse_seq(char *SEQ){
   return((struct vt100_node_t *)NULL);
 }
 
-void hover(ui_box_t *b, int x, int y, int down) {
+void hover(ui_box_t *b, int x, int y, __attribute__((unused)) int down) {
   if (false) {
     fprintf(stderr, "hover.uuid:%s.....%dx%d\n", (char *)b->data2, x, y);
   }
@@ -437,24 +437,24 @@ void click(ui_box_t *b, int x, int y) {
   change_selection_by_uuid((char *)b->data2);
 }
 
-void mouse_scrolled_down(void *BINDING_DATA){
+void mouse_scrolled_down(__attribute__((unused)) void *BINDING_DATA){
   select_next();
   return;
 }
 
-void focus_out(void *BINDING_DATA){
+void focus_out(__attribute__((unused)) void *BINDING_DATA){
   fprintf(stderr, "focus out!\n");
 }
 
-void clicked(void *BINDING_DATA){
+void clicked(__attribute__((unused)) void *BINDING_DATA){
   fprintf(stderr, "clicked!\n");
 }
 
-void focus_in(void *BINDING_DATA){
+void focus_in(__attribute__((unused)) void *BINDING_DATA){
   fprintf(stderr, "focus in!\n");
 }
 
-void mouse_scrolled_up(void *BINDING_DATA){
+void mouse_scrolled_up(__attribute__((unused)) void *BINDING_DATA){
   select_prev();
   return;
 }
@@ -509,9 +509,9 @@ void unhandled_input(void *BINDING_DATA){
 } /* unhandled_input */
 
 char *ac_confirm_render_ui(){
-//  signal(SIGWINCH, tb_sig_handler);
   struct Vector *RenderedOptionButtons = require(ac_confirm)->render_option_buttons();
-  char          *bb                    = "\x1b[32m\x1b[0m\x1b[32m\x1b[7m Yes \x1b[0m\x1b[32m";
+
+  __attribute__((unused)) char *bb = "\x1b[32m\x1b[0m\x1b[32m\x1b[7m Yes \x1b[0m\x1b[32m";
 
   ui_new(0, &u);
   binding_types[BINDING_MODE_MOUSE_SCROLL_UP]->handler   = mouse_scrolled_up;
@@ -548,7 +548,7 @@ char *ac_confirm_render_ui(){
                 tmp->mode
                 );
       }
-      int added_id = ui_add(
+      size_t added_id = ui_add(
         x, y,
         tmp->len, 1,
         0,
@@ -591,7 +591,7 @@ char *ac_confirm_render_ui(){
 } /* ac_confirm_render */
 #undef MIN
 
-void ac_confirm_module_deinit(module(ac_confirm) *exports) {
+void ac_confirm_module_deinit(__attribute__((unused)) module(ac_confirm) *exports) {
   clib_module_deinit(ac_confirm);
   return;
 }
@@ -625,7 +625,6 @@ void ac_confirm_redraw(){
 }
 
 struct Vector *ac_confirm_render_option_buttons(){
-  char          *s                       = NULL;
   struct Vector *rendered_option_buttons = vector_new();
 
   for (size_t i = 0; i < require(ac_confirm)->get_options_qty(); i++) {

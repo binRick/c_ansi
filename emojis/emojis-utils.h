@@ -6,7 +6,7 @@
 /////////////////////////////////////
 #include "c_string_buffer/include/stringbuffer.h"
 #include "c_stringfn/include/stringfn.h"
-#include "c_vector/include/vector.h"
+#include "c_vector/vector/vector.h"
 #include "emojis/emojis.h"
 #include "emojis/emojis.h"
 #include "utf8-iterator/source/utf-8.h"

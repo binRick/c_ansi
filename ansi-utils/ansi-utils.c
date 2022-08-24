@@ -4,6 +4,11 @@
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/time.h>
+#include "ansi-utils.h"
 
 TerminalCapabilities_t TerminalCapabilities = {
   .RestorePalette            = false,
@@ -13,7 +18,6 @@ TerminalCapabilities_t TerminalCapabilities = {
 static void await_c1(unsigned char c1);
 static char *read_csi();
 static bool query_dec_mode(int mode);
-static void do_dec_mode(int mode, BoolQuery val, const char *name);
 
 size_t ansi_utils_tty_copy(const char *s){
     if(!s)
@@ -143,9 +147,9 @@ static void await_c1(unsigned char c1){
 static char *read_csi(){
   await_c1(0x9B);
   char csi[32];
-  int  i = 0;
+  size_t  i = 0;
 
-  for ( ; i < sizeof(csi) - 1; i++) {
+  for (; i < sizeof(csi) - 1; i++) {
     char c = csi[i] = getchar();
     if (c >= 0x40 && c <= 0x7e) {
       break;
@@ -157,7 +161,7 @@ static char *read_csi(){
 
 
 
-static bool query_dec_mode(int mode){
+__attribute__((unused))static bool query_dec_mode(int mode){
   printf("\x1b[?%d$p", mode);
   char *s = NULL;
 
@@ -194,15 +198,6 @@ static bool query_dec_mode(int mode){
 }
 
 
-static void do_dec_mode(int mode, BoolQuery val, const char *name){
-  if (query_dec_mode(mode)) {
-    printf("%s on\n", name);
-  }else{
-    printf("%s off\n", name);
-  }
-}
-
-
 bool seticanon(bool icanon, bool echo){
   struct termios termios;
 
@@ -223,11 +218,6 @@ bool seticanon(bool icanon, bool echo){
   return(ret);
 }
 
-#include "ansi-utils.h"
-#include <math.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/time.h>
 
 char *random_rgb() {
   struct timeval tv;

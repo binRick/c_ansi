@@ -7,9 +7,8 @@
 /////////////////////////////////////
 #include "emojis/emojis.h"
 /////////////////////////////////////
-static struct Vector  *__emojis_t = NULL, *__emojis_names_v = NULL;
-static size_t         emojis_qty = 0;
-static struct djbhash __emojis_h = { NULL };
+static struct Vector *__emojis_t = NULL, *__emojis_names_v = NULL;
+static size_t        emojis_qty = 0;
 /////////////////////////////////////
 struct emojis_t *get_emoji_t_by_name(const char *name){
   int i = get_emoji_t_index_by_name(name);
@@ -21,8 +20,6 @@ struct emojis_t *get_emoji_t_by_name(const char *name){
 }
 
 int get_emoji_t_index_by_name(const char *name){
-  struct Vector *emojis = get_emojis_t_v();
-
   for (size_t i = 0; i < get_emojis_qty(); i++) {
     if (strcmp(get_emoji_t(i)->name, name) == 0) {
       return(i);

@@ -51,13 +51,6 @@ TEST t_list_emojis_utf8table(void *EMOJIS_LIMIT){
            strlen(E->padding)
            );
     ft_u8write_ln(table, e->name, e->emoji);
-    /*
-     * ft_u8printf_ln(table,
-     *   "%s|%s",
-     *   e->name,
-     *   e->emoji
-     *   );
-     */
   }
   const char *table_str = (const char *)ft_to_u8string(table);
 
@@ -65,11 +58,9 @@ TEST t_list_emojis_utf8table(void *EMOJIS_LIMIT){
   ft_destroy_table(table);
 } /* t_list_emojis_utf8table */
 
-TEST t_list_emojis_utf8table1(void *EMOJIS_LIMIT){
+__attribute__((unused)) TEST t_list_emojis_utf8table1(void *EMOJIS_LIMIT){
   ft_set_u8strwid_func(&u8strwid);
-//  setlocale(LC_CTYPE, "");
   struct Vector *emojis         = get_emojis_t_v();
-  size_t        id              = 0;
   struct Vector *emojis_names_v = get_emojis_names_v();
   printf("%lu emoji names\n", vector_size(emojis_names_v));
   ft_set_u8strwid_func(&u8strwid);
@@ -84,15 +75,6 @@ TEST t_list_emojis_utf8table1(void *EMOJIS_LIMIT){
   ft_set_cell_prop(table, 0, FT_ANY_COLUMN, FT_CPROP_CONT_FG_COLOR, FT_COLOR_GREEN);
   ft_set_cell_prop(table, 0, FT_ANY_COLUMN, FT_CPROP_CONT_BG_COLOR, FT_COLOR_BLACK);
   ft_set_cell_prop(table, 0, FT_ANY_COLUMN, FT_CPROP_ROW_TYPE, FT_ROW_HEADER);
-  /*
-   *  ft_u8write_ln(table,
-   *          "Name",
-   *          "Length",
-   *          "Width",
-   *          "Emoji"
-   *          );
-   */
-  const char *Character;
   for (size_t i = 0; i < vector_size(emojis) && i < (size_t)EMOJIS_LIMIT; i++) {
     struct emojis_t       *e = get_emoji_t(i);
     struct parsed_emoji_t *E = get_parsed_emoji_t(e->emoji);
@@ -102,17 +84,7 @@ TEST t_list_emojis_utf8table1(void *EMOJIS_LIMIT){
            E->chars_qty,
            strlen(E->padding)
            );
-    //if(E->chars_qty != 2)continue;
     ft_write_ln(table, "x", "x", "SMILING FACE WITH OPEN MOUTH", "😃");
-    /*
-     * ft_u8printf_ln(table,
-     *           "%s|%lu|%lu|%s",
-     *           e->name,
-     *           E->chars_qty,
-     *           E->len,
-     *           e->emoji
-     *           );
-     */
   }
 
   const char *tbl_s = ft_to_u8string(table);
@@ -125,7 +97,6 @@ TEST t_list_emojis_utf8table1(void *EMOJIS_LIMIT){
 TEST t_list_emojis_table(void *EMOJIS_LIMIT){
   setlocale(LC_CTYPE, "");
   struct Vector *emojis         = get_emojis_t_v();
-  size_t        id              = 0;
   struct Vector *emojis_names_v = get_emojis_names_v();
   printf("%lu emoji names\n", vector_size(emojis_names_v));
   //ft_set_u8strwid_func(&u8strwid);
@@ -146,7 +117,6 @@ TEST t_list_emojis_table(void *EMOJIS_LIMIT){
               "Width",
               "Emoji"
               );
-  const char *Character;
   for (size_t i = 0; i < vector_size(emojis) && i < (size_t)EMOJIS_LIMIT; i++) {
     struct emojis_t       *e = get_emoji_t(i);
     struct parsed_emoji_t *E = get_parsed_emoji_t(e->emoji);
@@ -156,7 +126,6 @@ TEST t_list_emojis_table(void *EMOJIS_LIMIT){
            E->chars_qty,
            strlen(E->padding)
            );
-    //if(E->chars_qty != 2)continue;
     ft_printf_ln(table,
                  "%s|%lu|%lu|%s",
                  e->name,

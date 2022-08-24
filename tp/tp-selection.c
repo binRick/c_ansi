@@ -11,7 +11,7 @@ struct tp_confirm_option_t AC_CONFIRM_DEFAULT_OPTION = {
 };
 //////////////////////////////////////////////////////////////////
 
-void tp_confirm_module_deinit(module(tp_confirm) *exports) {
+void tp_confirm_module_deinit(__attribute__((unused)) module(tp_confirm) *exports) {
   clib_module_deinit(tp_confirm);
   return;
 }
@@ -88,7 +88,6 @@ int get_selected_index();
 
 void render_tp_options(void){
   static struct tp_confirm_option_t *o;
-  long unsigned                     started_ts = timestamp();
   char                              *text, *marker;
   int                               o_row         = -1;
   const int                         screen_width  = termpaint_surface_width(surface),
@@ -100,13 +99,12 @@ void render_tp_options(void){
   termpaint_attr *marker_attr         = termpaint_attr_new(TERMPAINT_COLOR_BRIGHT_YELLOW, TERMPAINT_COLOR_BLACK);
   int            max_option_text_size = tp_get_max_option_text_size();
   int            o_col                = (screen_width - max_option_text_size) - OPTION_RIGHT_EDGE_PADDING;
-  int            option_width         = max_option_text_size + (OPTION_RIGHT_EDGE_PADDING * 2);
-  char           *unselected_marker   = str_repeat(" ", strlen(SELECTED_LEFT_MARKER_PREFIX) + strlen(SELECTED_LEFT_MARKER_SUFFIX) + SELECTED_LEFT_ICON_SIZE);
-  int            max_option_rows      = screen_height - TERMINAL_TP_OPTIONS_ROW_TOP_OFFSET - TERMINAL_TP_OPTIONS_ROW_BOTTOM_OFFSET - BOTTOM_MSG_BOX_HEIGHT;
+  size_t         option_width         = max_option_text_size + (OPTION_RIGHT_EDGE_PADDING * 2);
+  size_t         max_option_rows      = screen_height - TERMINAL_TP_OPTIONS_ROW_TOP_OFFSET - TERMINAL_TP_OPTIONS_ROW_BOTTOM_OFFSET - BOTTOM_MSG_BOX_HEIGHT;
   size_t         rendered_rows_qty    = 0;
   {
     char *msg;
-    asprintf(&msg, "screen_width=%d|max_option_rows=%d|o_col=%d|ending on row #%d|max_option_text_size=%d", screen_width, max_option_rows, o_col, max_option_rows, max_option_text_size);
+    asprintf(&msg, "screen_width=%d|max_option_rows=%lu|o_col=%d|ending on row #%lu|max_option_text_size=%d", screen_width, max_option_rows, o_col, max_option_rows, max_option_text_size);
     LOG(msg);
     assert(o_col < screen_width && o_col > 0);
     for (size_t i = 0; (i < vector_size(TP->options)) && (i <= max_option_rows); i++) {
@@ -134,7 +132,6 @@ void render_tp_options(void){
       }
     }
   }
-  long unsigned dur_ms = timestamp() - started_ts;
 } /* render_tp_options */
 
 void set_selection_index(size_t NEW_SELECTION_INDEX){
@@ -225,7 +222,7 @@ void select_prev(void){
 }
 
 int tp_get_max_option_text_size(){
-  int                        s = 0;
+  size_t                     s = 0;
   struct tp_confirm_option_t *O;
 
   for (size_t i = 0; i < TP->get_options_qty(); i++) {

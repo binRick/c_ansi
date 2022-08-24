@@ -35,7 +35,7 @@
 #include "ansi-utils/ansi-utils.h"
 #include "c_string_buffer/include/stringbuffer.h"
 #include "c_stringfn/include/stringfn.h"
-#include "c_vector/include/vector.h"
+#include "c_vector/vector/vector.h"
 #include "module/def.h"
 #include "module/module.h"
 #include "ms/ms.h"

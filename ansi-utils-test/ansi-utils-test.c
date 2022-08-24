@@ -26,53 +26,27 @@ int vt100utils_test0(const char *str){
   char *str_tmp = malloc(strlen(str)+32);
   sprintf(str_tmp, "%s" AC_RESETALL, str);
   char *str_escaped = strdup_escaped(str_tmp);
-  struct vt100_node_t *head = vt100_decode(str_tmp),
-                      *tmp = head;
   printf(
     "" AC_RESETALL "%s" AC_RESETALL "" AC_ITALIC AC_FAINT "\n%s\n" AC_RESETALL ""
     "\n"
     , str, str_escaped
   );
-  /*
-  for(int i=0;tmp!=NULL;i++){	  
-    if(tmp->str != NULL && strlen(tmp->str)>0){
-     printf(
-      "\t#%i>  '%s' :: |Foreground:%i|Background:%i|Mode:%i|\n"
-      , i, tmp->str, tmp->fg.value, tmp->bg.value, tmp->mode
-     );
-    }
-//    struct vt100_node_t *t = tmp;
-    tmp = tmp->next;
-  //  free(t);
-  }
-  fflush(stdout);
-  fflush(stderr);
-  if(str_tmp)
-	  free(str_tmp);
-  if(str_escaped)
-	  free(str_escaped);
-//  if(head)
-//	  vt100_free(head);
-*/
   return 0;
 }
 
-int main(int argc, char **argv) {
+int main(__attribute__((unused))int argc, __attribute__((unused))char **argv) {
   float *c;
   static struct StringBuffer *SB;
-  int res = -1,
-      len = (sizeof(TEST_ANSI_STRINGS)/sizeof(TEST_ANSI_STRINGS[0]));
+     size_t len = (sizeof(TEST_ANSI_STRINGS)/sizeof(TEST_ANSI_STRINGS[0]));
 
   SB = stringbuffer_new_with_options(1024,true);
 
-  printf("Testing %d Strings\n",len);
-  for(int i=0;i<len;i++){
+  printf("Testing %lu Strings\n",len);
+  for(size_t i=0;i<len;i++){
     if(TEST_ANSI_STRINGS[i] != NULL){
         stringbuffer_append_string(SB,TEST_ANSI_STRINGS[i]);
-//        stringbuffer_append_string(SB,", ");
     }
   }
-//  assert(vt100utils_test0(stringbuffer_to_string(SB)) == 0);	
 
   stringbuffer_clear(SB);
   for(int i=0;i<3;i++){
@@ -87,7 +61,6 @@ int main(int argc, char **argv) {
               );
         free(c);  
         stringbuffer_append_string(SB,s);
- //       stringbuffer_append_string(SB,", ");
     }
   }
   assert(vt100utils_test0(stringbuffer_to_string(SB)) == 0);	

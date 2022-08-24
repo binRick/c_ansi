@@ -15,7 +15,7 @@
 module(ac_confirm) * B;
 
 /////////////////////////////////////////////////////////////////
-int main(const int argc, const char **argv) {
+int main(__attribute__((unused))const int argc, __attribute__((unused))const char **argv) {
   if (!isatty(STDOUT_FILENO)) {
     fprintf(stderr, "NO TTY!\n");
     return(1);
