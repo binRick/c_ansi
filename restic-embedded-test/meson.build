@@ -14,8 +14,11 @@ restic_embedded_test_deps = [
   c_stringfn_dep,
   subprocess_dep,
   logh_dep,
-  ansi_codes_dep,
+  uuid4_dep,
   tempdir_dep,
+  ms_dep,
+  bytes_dep,
+  timestamp_dep,
   debug_memory_dep,
 ]
 restic_embedded_test_c_args = [

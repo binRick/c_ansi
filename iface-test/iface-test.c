@@ -8,19 +8,20 @@
 #include "c_greatest/greatest/greatest.h"
 #include "c_stringfn/include/stringfn.h"
 #include "c_vector/vector/vector.h"
-#include "interface99/interface99.h"
 #include "iface-test/croak.h"
 #include "iface-test/frog.h"
+#include "interface99/interface99.h"
+
 ////////////////////////////////////////////
 TEST t_iface_test(){
-    Frog *paul = Frog_new("Paul");
-    Frog *steve = Frog_new("Steve");
+  Frog *paul  = Frog_new("Paul");
+  Frog *steve = Frog_new("Steve");
 
-    VCALL(DYN(Frog, Croak, paul), croak);
-    VCALL(DYN(Frog, Croak, steve), croak);
+  VCALL(DYN(Frog, Croak, paul), croak);
+  VCALL(DYN(Frog, Croak, steve), croak);
 
-    Frog_free(paul);
-    Frog_free(steve);
+  Frog_free(paul);
+  Frog_free(steve);
   PASS();
 }
 

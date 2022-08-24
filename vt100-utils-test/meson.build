@@ -19,7 +19,4 @@ if get_option('enable-binaries')
        vt100_utils_include_dirs,
      ],
   )
-  if get_option('enable-binary-tests')
-    #    test('vt100-utils-test', passh_program, args: [vt100_utils_test_exec, '--test'])
-  endif
 endif

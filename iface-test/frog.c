@@ -5,29 +5,30 @@
 #include <stdlib.h>
 
 struct Frog {
-    const char *name;
-    int ncroaks;
+  const char *name;
+  int        ncroaks;
 };
 
 Frog *Frog_new(const char *name) {
-    Frog *self = malloc(sizeof *self);
-    assert(self);
+  Frog *self = malloc(sizeof *self);
 
-    self->name = name;
-    self->ncroaks = 0;
+  assert(self);
 
-    return self;
+  self->name    = name;
+  self->ncroaks = 0;
+
+  return(self);
 }
 
 void Frog_free(Frog *self) {
-    assert(self);
-    free(self);
+  assert(self);
+  free(self);
 }
 
 static void Frog_croak(VSelf) {
-    VSELF(Frog);
-    printf("%s: croak!\n", self->name);
-    self->ncroaks++;
+  VSELF(Frog);
+  printf("%s: croak!\n", self->name);
+  self->ncroaks++;
 }
 
 implExtern(Croak, Frog);
