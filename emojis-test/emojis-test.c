@@ -12,6 +12,7 @@
 ///////////////////////////////
 #include "emojis-test/emojis-test.h"
 #include "submodules/c_greatest/greatest/greatest.h"
+#include "wcwidth/wcwidth.h"
 
 ///////////////////////////////
 
@@ -149,17 +150,17 @@ TEST t_list_emojis_t_h(void){
 TEST t_list_emojis_t_v(void){
   struct Vector *emojis;
 
-  BENCHMARK_QTY(benchmark_list_emojis, 20)
   emojis = get_emojis_t_v();
-  END_BENCHMARK(benchmark_list_emojis)
   struct emojis_t *e;
 
   for (size_t i = 0; i < vector_size(emojis); i++) {
     e = get_emoji_t(i);
-    printf("%s  | #%.5lu %s -> %s (%lu chars)\n", e->emoji, i, e->name, e->emoji, e->chars);
+    printf("%s  | #%.5lu %s -> %s (%lu chars) :: wcwidth: %d\n",
+           e->emoji, i, e->name, e->emoji, e->chars,
+           e->wcwidth
+           );
   }
   printf("%lu emojis\n", vector_size(emojis));
-  BENCHMARK_SUMMARY(benchmark_list_emojis);
   PASS();
 }
 

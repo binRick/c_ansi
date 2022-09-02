@@ -25,6 +25,7 @@ struct emojis_t {
   char   name[128];
   char   emoji[128];
   size_t chars;
+  int    wcwidth;
 } static emojis_table[] = {
   { .name = "+1",                                                      .emoji = "👍",        },
   { .name = "-1",                                                      .emoji = "👎",        },

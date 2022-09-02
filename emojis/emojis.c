@@ -6,6 +6,7 @@
 #include <string.h>
 /////////////////////////////////////
 #include "emojis/emojis.h"
+#include "wcwidth/wcwidth.h"
 /////////////////////////////////////
 static struct Vector *__emojis_t = NULL, *__emojis_names_v = NULL;
 static size_t        emojis_qty = 0;
@@ -76,7 +77,8 @@ struct emojis_t *get_emoji_t(size_t index){
     return(NULL);
   }
   emojis_t *e = &(emojis_table[index]);
-  e->chars = strlen(e->emoji);
+  e->chars   = strlen(e->emoji);
+  e->wcwidth = string_width(e->emoji);
   return(e);
 }
 

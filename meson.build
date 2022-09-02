@@ -36,7 +36,6 @@ subdir('ansi-rgb-utils')
 subdir('term-utils')
 subdir('image-utils')
 subdir('string-utils')
-#subdir('jinja2-cli')
 subdir('vt100-utils')
 #//////////////////////////////////////////////////////////////////////
 subdir('term-utils-test')

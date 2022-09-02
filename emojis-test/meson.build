@@ -9,6 +9,7 @@ emojis_test_emojis = [
   bench_dep,
   fort_dep,
   utf8_iterator_dep,
+  wcwidth_dep,
   djbhash_dep,
   c_vector_dep,
 ]

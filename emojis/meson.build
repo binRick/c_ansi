@@ -11,6 +11,7 @@ emojis_deps = [
   djbhash_dep,
   c_stringfn_dep,
   c_string_buffer_dep,
+  wcwidth_dep,
 ]
 
 
