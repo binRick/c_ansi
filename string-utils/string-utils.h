@@ -14,3 +14,4 @@ char *cstring_from_CFString(CFStringRef cf_string);
 char * CFStringCopyUTF8String(CFStringRef aString);
 char *get_chars_from_CFString(CFStringRef cf_string);
 char * cstring_get_ascii_string(CFStringRef data);
+CFArrayRef cfarray_of_cfnumbers(void *values, size_t size, int count, CFNumberType type);

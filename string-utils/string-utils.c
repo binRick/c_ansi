@@ -8,6 +8,23 @@
 #include "string-utils/string-utils.h"
 
 /////////////////////////////////////////////////////
+
+CFArrayRef cfarray_of_cfnumbers(void *values, size_t size, int count, CFNumberType type){
+  CFNumberRef temp[count];
+
+  for (int i = 0; i < count; ++i) {
+    temp[i] = CFNumberCreate(NULL, type, ((char *)values) + (size * i));
+  }
+
+  CFArrayRef result = CFArrayCreate(NULL, (const void **)temp, count, &kCFTypeArrayCallBacks);
+
+  for (int i = 0; i < count; ++i) {
+    CFRelease(temp[i]);
+  }
+
+  return(result);
+}
+
 char * CFStringCopyUTF8String(CFStringRef aString){
   if (aString == NULL) {
     return(NULL);
