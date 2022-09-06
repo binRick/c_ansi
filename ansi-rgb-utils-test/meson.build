@@ -6,7 +6,7 @@ ansi_rgb_utils_test_incs = [
 ]
 ansi_rgb_utils_test_deps = [
   dbg_dep,
-  logh_dep,
+  log_dep,
   hsluv_c_dep,
   ansi_codes_dep,
   rgba_dep,

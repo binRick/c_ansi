@@ -1,4 +1,6 @@
 #pragma once
+#ifndef ANSI_CODES_H
+#define ANSI_CODES_H
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -8,11 +10,14 @@
 #include "module/module.h"
 #include "module/require.h"
 #include "submodules/uuid4/src/uuid4.h"
-
+int get_terminal_width(void);
+int get_terminal_height(void);
 void color_reset();
 
 #define color_set(r, g, b) \
   printf("\x1b[38;2;%d;%d;%dm", r, g, b)
+
+char *AC_RGB(int R, int G, int B);
 
 #define colorB_set(br, bg, bb) \
   printf("\x1b[48;2;%d;%d;%dm", br, bg, bb)
@@ -305,3 +310,5 @@ void color_reset();
 
 #define AC_HOME    "\x1b[H"
 #define AC_CLS     "\x1b[2J" AC_HOME
+
+#endif

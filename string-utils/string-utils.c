@@ -8,6 +8,66 @@
 #include "string-utils/string-utils.h"
 
 /////////////////////////////////////////////////////
+char *vector_size_ts_to_csv(struct Vector *v, int max_width){
+  struct StringBuffer *sb            = stringbuffer_new();
+  struct StringBuffer *cur_line      = stringbuffer_new();
+  int                 cur_line_index = 0;
+  int                 lines_qty      = 0;
+
+  for (size_t i = 0; i < vector_size(v); i++) {
+    if (strlen(stringbuffer_to_string(cur_line)) > (size_t)max_width) {
+      if (lines_qty > 0) {
+        stringbuffer_append_string(sb, "\n");
+      }
+      stringbuffer_append_string(sb, stringbuffer_to_string(cur_line));
+      stringbuffer_clear(cur_line);
+      cur_line_index = 0;
+      lines_qty++;
+    }else{
+      if (cur_line_index > 0 && i < vector_size(v) - 1) {
+        stringbuffer_append_string(cur_line, ", ");
+      }
+      stringbuffer_append_unsigned_long_long(cur_line, (size_t)vector_get(v, i));
+      cur_line_index++;
+    }
+  }
+  stringbuffer_append_string(sb, stringbuffer_to_string(cur_line));
+  char *s = stringbuffer_to_string(sb);
+
+  stringbuffer_release(cur_line);
+  stringbuffer_release(sb);
+  return(s);
+}
+
+int CFDictionaryGetInt(CFDictionaryRef dict, const void *key) {
+  int value;
+
+  return(CFNumberGetValue(CFDictionaryGetValue(dict, key), kCFNumberIntType, &value) ? value : 0);
+}
+
+char *CFDictionaryCopyCString(CFDictionaryRef dict, const void *key) {
+  const void *dictValue;
+  CFIndex    length;
+  int        maxSize, isSuccess;
+  char       *value;
+
+  dictValue = CFDictionaryGetValue(dict, key);
+  if (dictValue == NULL) {
+    return(NULL);
+  }
+  length  = CFStringGetLength(dictValue);
+  maxSize = CFStringGetMaximumSizeForEncoding(length, kCFStringEncodingUTF8);
+  if (length == 0 || maxSize == 0) {
+    value  = (char *)malloc(1);
+    *value = '\0';
+    return(value);
+  }
+
+  value     = (char *)malloc(maxSize);
+  isSuccess = CFStringGetCString(dictValue, value, maxSize, kCFStringEncodingUTF8);
+
+  return((isSuccess ? value : NULL));
+}
 
 CFArrayRef cfarray_of_cfnumbers(void *values, size_t size, int count, CFNumberType type){
   CFNumberRef temp[count];

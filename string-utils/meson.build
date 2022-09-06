@@ -8,6 +8,7 @@ string_utils_include_dirs = [
 
 string_utils_deps = [
   c_stringfn_dep,
+  c_vector_dep,
   c_string_buffer_dep,  
 ]
 

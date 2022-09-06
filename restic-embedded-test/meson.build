@@ -13,7 +13,7 @@ restic_embedded_test_deps = [
   c_fsio_dep,
   c_stringfn_dep,
   subprocess_dep,
-  logh_dep,
+  log_dep,
   uuid4_dep,
   tempdir_dep,
   ms_dep,
