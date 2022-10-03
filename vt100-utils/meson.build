@@ -19,7 +19,7 @@ vt100_utils_deps = [
   ansi_utils_dep,
 ]
 
-vt100_utils_lib = static_library('vt100-utils',
+vt100_utils_lib = library('vt100-utils',
   vt100_utils_srcs,
   install: false,
   dependencies: vt100_utils_deps,

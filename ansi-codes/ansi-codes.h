@@ -9,7 +9,7 @@
 #include "module/def.h"
 #include "module/module.h"
 #include "module/require.h"
-#include "submodules/uuid4/src/uuid4.h"
+#include "uuid4/src/uuid4.h"
 int get_terminal_width(void);
 int get_terminal_height(void);
 void color_reset();

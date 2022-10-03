@@ -17,6 +17,7 @@ typedef enum {
   QUERY,
 } BoolQuery;
 ///////////////////////////////////////////////////////////////////////////////////yy
+int au_term_size(int *w, int *h);
 char *random_rgb();
 char *strdup_escaped(const char *tmp);
 void restoreicanon(void);

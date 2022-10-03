@@ -12,7 +12,7 @@ ansi_rgb_utils_deps = [
   c_stringfn_dep,
 ]
 
-ansi_rgb_utils_lib = static_library('ansi-rgb-utils', 
+ansi_rgb_utils_lib = library('ansi-rgb-utils', 
   ansi_rgb_utils_srcs,
   install: false, 
   dependencies: ansi_rgb_utils_deps,

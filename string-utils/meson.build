@@ -12,7 +12,7 @@ string_utils_deps = [
   c_string_buffer_dep,  
 ]
 
-string_utils_lib = static_library('string-utils',
+string_utils_lib = library('string-utils',
   string_utils_srcs,
   install: false,
   dependencies: string_utils_deps,
@@ -22,4 +22,5 @@ string_utils_lib = static_library('string-utils',
 string_utils_dep = declare_dependency(
   include_directories: string_utils_include_dirs,
   link_with: string_utils_lib,
+  link_args: osx_ldflags,
 )

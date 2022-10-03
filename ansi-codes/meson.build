@@ -17,7 +17,7 @@ ansi_codes_deps = [
   c_stringfn_dep,
 ]
 
-ansi_codes_lib = static_library('ansi-codes', 
+ansi_codes_lib = library('ansi-codes', 
   ansi_codes_srcs,
   install: false, 
   dependencies: ansi_codes_deps,

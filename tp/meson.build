@@ -31,7 +31,7 @@ tp_deps = [
   c_dbg_dep,  
 ]
 
-tp_lib = static_library('tp',
+tp_lib = library('tp',
   tp_srcs,
   install: false,
   dependencies: tp_deps,

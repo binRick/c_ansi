@@ -109,7 +109,7 @@ volatile unsigned int
 ;
 
 ///////////////////////////////////////////////
-static void logging_func(termpaint_integration *integration, const char *data, int length){
+static void logging_func(__attribute__((unused)) termpaint_integration *integration, const char *data, int length){
   fprintf(stderr, AC_RESETALL AC_GREEN "[logging_func] len:%d|data:'%s'\n" AC_RESETALL "\n", length, data);
 }
 

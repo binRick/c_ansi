@@ -7,7 +7,7 @@ emojis_incs = [
   '../',
 ]
 emojis_deps = [
-  c_vector_dep,
+  c_vector_dep,libutf8_deps,utf8_iterator_dep,
   djbhash_dep,
   c_stringfn_dep,
   c_string_buffer_dep,
@@ -15,7 +15,7 @@ emojis_deps = [
 ]
 
 
-emojis_lib = static_library('emojis', 
+emojis_lib = library('emojis', 
   emojis_srcs,
   install: false, 
   dependencies: emojis_deps,

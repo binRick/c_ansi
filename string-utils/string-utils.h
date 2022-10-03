@@ -21,4 +21,8 @@ CFArrayRef cfarray_of_cfnumbers(void *values, size_t size, int count, CFNumberTy
 char *CFDictionaryCopyCString(CFDictionaryRef dict, const void *key);
 int CFDictionaryGetInt(CFDictionaryRef dict, const void *key);
 char *vector_size_ts_to_csv(struct Vector *v, int max_width);
+size_t get_fp_size(FILE *fp);
+size_t string_size_to_size_t(char *SIZE_STRING);
+int read_16bytes_little_endian_image_buffer(unsigned char *buf);
+int read_32bytes_big_endian_image_buffer(unsigned char *buf);
 #endif

@@ -8,6 +8,17 @@
 #include "string-utils/string-utils.h"
 
 /////////////////////////////////////////////////////
+size_t get_fp_size(FILE *fp){
+  long int cur_pos;
+
+  fgetpos(fp, &cur_pos);
+  fseek(fp, 0, SEEK_END);
+  size_t fp_size = ftell(fp);
+
+  fseek(fp, cur_pos, SEEK_SET);
+  return(fp_size);
+}
+
 char *vector_size_ts_to_csv(struct Vector *v, int max_width){
   struct StringBuffer *sb            = stringbuffer_new();
   struct StringBuffer *cur_line      = stringbuffer_new();
@@ -234,4 +245,92 @@ char *strip_non_ascii(const char *s){
 
   stringbuffer_release(sb);
   return(stripped);
+}
+
+/**
+ * @brief         pad_string
+ *
+ * @param hex_num		Number to be printed
+ * @param check_num		check number to test for
+ * @param width			size of output buffer
+ * @param pad_char		padding character
+ * @param destination	output buffer
+ * @note				function to add an integer to a buffer. If the number is
+ *            equal to teh check number then if will instead pack the
+ *            pad character into the buffer
+ *            Done originally for printing '--------' if a number was
+ *            equal to Zero.
+ */
+void pad_string(uint32_t   hex_num,
+                uint32_t   check_num,
+                int        width,
+                const char pad_char,
+                char       *destination){
+  /*
+   * Example: 32-bit integer to be printed as hex
+   *                      1
+   * 0 1 2 3 4 5  6 7 8 9 0
+   * 0 x 8 0 0 0  0 0 0 0 \0
+   */
+  if (destination == NULL) {
+    return;
+  }
+
+  memset(destination, pad_char, width);
+  destination[width - 1] = '\0';
+
+  if (hex_num != check_num) {
+    sprintf(destination, "0x%08X", hex_num);
+  }
+}
+
+size_t string_size_to_size_t(char *SIZE_STRING){
+  char **ep;
+
+  return((size_t)strtoimax(SIZE_STRING, &ep, 10));
+}
+
+/**
+ * @brief pad_string_ret
+ *
+ * @param hex_num
+ * @param check_num
+ * @param pad_char
+ * @return
+ */
+char *pad_string_ret(uint32_t   hex_num,
+                     uint32_t   check_num,
+                     const char pad_char){
+  static char pad_string[11];
+
+  /*
+   *                      1
+   * 0 1 2 3 4 5  6 7 8 9 0
+   * 0 x 8 0 0 0  0 0 0 0 \0
+   */
+  memset(pad_string, pad_char, sizeof(pad_string));
+  pad_string[sizeof(pad_string) - 1] = '\0';
+
+  if (hex_num != check_num) {
+    sprintf(pad_string, "0x%08X", hex_num);
+  }
+
+  return((char *)(pad_string));
+}
+
+void safe_CFRelease(void *cfTypeRefPtr){
+  CFTypeRef *obj = (CFTypeRef *)cfTypeRefPtr;
+
+  if (obj && *obj) {
+    CFRelease(*obj);
+    *obj = NULL;
+  }
+}
+
+int read_32bytes_big_endian_image_buffer(unsigned char *buf) {
+  return(buf[0] << 24 | buf[1] << 16 | buf[2] << 8 | buf[3]);
+}
+
+int read_16bytes_little_endian_image_buffer(unsigned char *buf) {
+  return(buf[1] << 8 | buf[0]);
 }

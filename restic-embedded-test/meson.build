@@ -7,7 +7,7 @@ restic_embedded_test_include_dirs = [
   inc,
 ]
 restic_embedded_test_deps = [
-  c_greatest_dep,
+  c_greatest_dep,c_string_buffer_dep,
   c_vector_dep,
   incbin_dep,
   c_fsio_dep,

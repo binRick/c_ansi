@@ -9,7 +9,7 @@ tai64n_deps = [
 ]
 
 
-tai64n_lib = static_library('tai64n', 
+tai64n_lib = library('tai64n', 
   tai64n_srcs,
   install: false, 
   dependencies: tai64n_deps,

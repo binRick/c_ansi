@@ -10,7 +10,7 @@ term_utils_deps = [
   ansi_utils_dep,
 ]
 
-term_utils_lib = static_library('term-utils',
+term_utils_lib = library('term-utils',
   term_utils_srcs,
   install: false,
   dependencies: term_utils_deps,

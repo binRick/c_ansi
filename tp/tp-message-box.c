@@ -125,7 +125,7 @@ void cycle_cursor_style(){
   update_cursor_profile();
 }
 
-void clear_bottom_msg(bool SKIP_FLUSH, bool FORCE_FLUSH){
+void clear_bottom_msg(bool SKIP_FLUSH, __attribute__((unused)) bool FORCE_FLUSH){
   bool cursor_visible = cursor_profile->visible;
 
   if (cursor_visible) {

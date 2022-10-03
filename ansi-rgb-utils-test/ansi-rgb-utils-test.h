@@ -13,7 +13,7 @@
 #include "ansi-rgb-utils/ansi-rgb-utils.h"
 #include "c_dbg/c_dbg.h"
 #include "cargs/include/cargs.h"
-#include "log.h/log.h"
+#include "log/log.h"
 #include "rgba/src/rgba.h"
 
 int parse_args(int argc, char *argv[]);
