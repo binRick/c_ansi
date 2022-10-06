@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <termios.h>
 //////////////////////////////////////////////////
 #include "module/def.h"
 #include "module/module.h"
@@ -13,6 +14,7 @@
 int get_terminal_width(void);
 int get_terminal_height(void);
 void color_reset();
+struct winsize *get_terminal_size();
 
 #define color_set(r, g, b) \
   printf("\x1b[38;2;%d;%d;%dm", r, g, b)
@@ -265,6 +267,11 @@ char *AC_RGB(int R, int G, int B);
 #define AC_FG24(r, g, b)    "\x1b[38;2;"#r ";"#g ";"#b "m"
 #define AC_BG24(r, g, b)    "\x1b[48;2;"#r ";"#g ";"#b "m"
 
+#define AC_REPEAT_STRING(QTY, STRING) \
+                STRING "\x1b["#QTY "b"
+#define AC_REPEAT_STRINGIFIED(QTY, STRING) \
+                STRING##"\x1b["#QTY "b"
+
 #define AC_BOLD                     "\x1b[1m"
 #define AC_FAINT                    "\x1b[2m"
 #define AC_ITALIC                   "\x1b[3m"
@@ -272,7 +279,7 @@ char *AC_RGB(int R, int G, int B);
 #define AC_NO_UNDERLINE             "\x1b[4:0m"
 #define AC_DOUBLE_UNDERLINE         "\x1b[4:2m"
 #define AC_CURLY_UNDERLINE          "\x1b[4:3m"
-#define AC_FOTTED_UNDERLINE         "\x1b[4:4m"
+#define AC_DOTTED_UNDERLINE         "\x1b[4:4m"
 #define AC_DASHED_UNDERLINE         "\x1b[4:5m"
 #define AC_RESET_UNDERLINE_COLOR    "\x1b[59m"
 #define AC_UNDERLINE_COLOR_RED      "\x1b[58#569cd6m"
