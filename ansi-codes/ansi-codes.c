@@ -13,6 +13,7 @@
 
 struct winsize *get_terminal_size(){
   struct winsize *sz = calloc(1, sizeof(struct winsize));
+
   ioctl(STDOUT_FILENO, TIOCGWINSZ, sz);
   return(sz);
 }

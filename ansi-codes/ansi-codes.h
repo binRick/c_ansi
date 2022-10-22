@@ -268,9 +268,9 @@ char *AC_RGB(int R, int G, int B);
 #define AC_BG24(r, g, b)    "\x1b[48;2;"#r ";"#g ";"#b "m"
 
 #define AC_REPEAT_STRING(QTY, STRING) \
-                STRING "\x1b["#QTY "b"
+  STRING "\x1b["#QTY "b"
 #define AC_REPEAT_STRINGIFIED(QTY, STRING) \
-                STRING##"\x1b["#QTY "b"
+  STRING ## "\x1b["#QTY "b"
 
 #define AC_BOLD                     "\x1b[1m"
 #define AC_FAINT                    "\x1b[2m"
