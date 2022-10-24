@@ -6,17 +6,6 @@
 #include "chan-utils/chan-utils.h"
 #include "module/require.h"
 ////////////////////////////////////////////
-#include "ansi-codes/ansi-codes.h"
-#include "bytes/bytes.h"
-#include "c_fsio/include/fsio.h"
-#include "c_string_buffer/include/stringbuffer.h"
-#include "c_stringfn/include/stringfn.h"
-#include "c_vector/vector/vector.h"
-#include "log/log.h"
-#include "ms/ms.h"
-#include "timestamp/timestamp.h"
-
-////////////////////////////////////////////
 static bool CHAN_UTILS_DEBUG_MODE = false;
 ///////////////////////////////////////////////////////////////////////
 static void __attribute__((constructor)) __constructor__chan_utils(void){
@@ -25,7 +14,23 @@ static void __attribute__((constructor)) __constructor__chan_utils(void){
     CHAN_UTILS_DEBUG_MODE = true;
   }
 }
-static const cu_run_t cu_run = ^bool(CU_RUN_ARGS){
+struct chan_utils_req_t *cu_init_res(struct chan_utils_req_t *req){
+  struct chan_utils_res_t *res = calloc(1,sizeof(struct chan_utils_res_t));
+  res->req=req;
+  return(res);
+}
+cu_each_t cu_each = ^CU_EACH_RET(CU_EACH_ARGS){
+  CU_EACH_RET v = vector_new();
+  void *item = NULL, *item_result = NULL;
+  for(size_t i=0;i<vector_size(items);i++){
+    item = (void*)(vector_get(items, i));
+//    item_result = each_item(item);
+
+//    vector_push(v,(void*)(each_item((void*)(vector_get(v,i)))));
+  }
+  return(v);
+};
+cu_run_t cu_run = ^bool(CU_RUN_ARGS){
   char *msg;
   asprintf(&msg,"Running %lu items with concurrency %lu", vector_size(req->items),req->concurrency);
   fprintf(stdout, "%s\n",msg);

@@ -1,5 +1,6 @@
 chan_utils_srcs = [
   'chan-utils.c',
+  'module.c'
 ]
 
 inc = get_variable('inc', join_paths(meson.current_source_dir(),'..'))

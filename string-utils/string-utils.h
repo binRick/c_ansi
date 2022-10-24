@@ -10,6 +10,7 @@
 char *strip_non_ascii(const char *s);
 char *int_to_icon(const int b);
 char *int_to_string(const int b);
+char *size_to_string(const size_t b);
 char *string_copy(char *s);
 char *cfstring_copy(CFStringRef string);
 CFStringRef cfstring_from_cstring(char *cstring);

@@ -201,6 +201,15 @@ char *string_copy(char *s) {
   return(result);
 }
 
+char *size_to_string(const size_t b){
+  char *s = NULL;
+  struct StringBuffer *sb = stringbuffer_new_with_options(b%10, true);
+  stringbuffer_append_unsigned_long_long(sb,b);
+  s = stringbuffer_to_string(sb);
+  stringbuffer_release(sb);
+  return(s);
+}
+
 char *int_to_string(const int b){
   struct StringBuffer *sb = stringbuffer_new_with_options(8, true);
 

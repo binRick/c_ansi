@@ -2,6 +2,10 @@
 #ifndef CHAN_UTILS_STATIC_C
 #define CHAN_UTILS_STATIC_C
 #include "chan-utils/chan-utils.h"
+static const cu_new_t cu_new = ^bool(CU_NEW_ARGS){
+  struct chan_utils_req_t *req = calloc(1,sizeof(chan_utils_req_t));
+  return(req);
+}
 static const cu_run_t cu_run = ^bool(CU_RUN_ARGS){
   char *msg;
   asprintf(&msg,"Running %lu items with concurrency %lu", vector_size(req->items),req->concurrency);
