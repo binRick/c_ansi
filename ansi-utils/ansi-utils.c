@@ -26,7 +26,7 @@ size_t ansi_utils_tty_copy(const char *s){
   }
 
   printf("s: %s\n", s);
-  char *enc = b64_encode(s, strlen(s));
+  char *enc = b64_encode((const char*)s, strlen((const char*)s));
   printf("enc: %s\n", enc);
   char *copy_seq;
   asprintf(&copy_seq, "\x1b]52;c;%s\a", enc);
