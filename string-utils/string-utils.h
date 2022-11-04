@@ -1,6 +1,5 @@
-#pragma once
-#ifndef STRING_UTILS_H
-#define STRING_UTILS_H
+#ifndef ANSI_STRING_UTILS_H
+#define ANSI_STRING_UTILS_H
 #include "c_vector/vector/vector.h"
 #include <CoreServices/CoreServices.h>
 #include <stdbool.h>

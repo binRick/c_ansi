@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ANSI_STRING_UTILS_C
+#define ANSI_STRING_UTILS_C
 /////////////////////////////////////////////////////
 #include <stdlib.h>
 #include <string.h>
@@ -401,3 +402,5 @@ int read_32bytes_big_endian_image_buffer(unsigned char *buf) {
 int read_16bytes_little_endian_image_buffer(unsigned char *buf) {
   return(buf[1] << 8 | buf[0]);
 }
+
+#endif
