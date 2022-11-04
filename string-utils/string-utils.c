@@ -201,6 +201,25 @@ char *string_copy(char *s) {
   return(result);
 }
 
+char *uppercase_first_word_letters(char *S){
+  char *s=NULL, *t, *w;
+  if(!S)return(s);
+  struct StringFNStrings words = stringfn_split_words(S);
+  struct StringBuffer *sb = stringbuffer_new();
+  for(int i=0;i<words.count;i++){
+    w = words.strings[i];
+    asprintf(&t,"%s%s",
+        stringfn_to_uppercase(stringfn_substring(w,0,1)),
+        stringfn_substring(w,1,strlen(w)-1)
+        );
+    stringbuffer_append_string(sb,strdup(t));
+    if(t)free(t);
+  }
+  s = stringbuffer_to_string(sb);
+  stringbuffer_release(sb);
+  return(s);
+}
+
 char *size_to_string(const size_t b){
   char *s = NULL;
   struct StringBuffer *sb = stringbuffer_new_with_options(b%10, true);
@@ -236,6 +255,38 @@ char *int_to_icon(const int b){
 
   stringbuffer_release(sb);
   return(s);
+}
+
+bool string_contains_string(const char *s1, const char *s2){
+  if(strlen(s2)>strlen(s1))return false;
+  size_t len = strlen(s2);
+  char *ss;
+  for(size_t i=0;i<strlen(s1)-len+1;i++){
+    ss = stringfn_substring(s1,i,len);
+    printf("%d> ss:%s\n",i, ss);
+
+    if(strcmp(ss,s2)==0)
+      return true;
+  }
+  return false;
+}
+
+char *strip_non_alpha(const char *s){
+  struct StringBuffer *sb = stringbuffer_new_with_options(strlen(s), true);
+  for (size_t i = 0; i < strlen(s); i++) {
+    char *substring = stringfn_substring(s, i, 1);
+    if (substring) {
+      if (stringfn_is_ascii(substring) && isalpha(substring[0])) {
+        stringbuffer_append_string(sb, substring);
+      }
+      free(substring);
+    }
+  }
+  char *stripped = stringbuffer_to_string(sb);
+
+  stringbuffer_release(sb);
+  return(stripped);
+
 }
 
 char *strip_non_ascii(const char *s){
@@ -334,6 +385,13 @@ void safe_CFRelease(void *cfTypeRefPtr){
     CFRelease(*obj);
     *obj = NULL;
   }
+}
+
+char *pad_string_right(char *S, int len, char p){
+  char *s= strdup(S);
+  while(strlen(s)<len)
+    asprintf(&s,"%s%c",s,p);
+  return(s);
 }
 
 int read_32bytes_big_endian_image_buffer(unsigned char *buf) {

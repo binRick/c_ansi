@@ -16,8 +16,10 @@ module(cu) {
   CU_MAP_LIMIT_RET(^map_limit)(CU_MAP_ARGS);
 };
 int cu_init(module(cu) *exports);
-int cu_deinit(module(cu) *exports);
+void cu_deinit(module(cu) *exports);
 exports(cu) {
+    .init = cu_init,
+    .deinit = cu_deinit,
 //  .new = cu_new,
 //  .run = cu_run,
 };

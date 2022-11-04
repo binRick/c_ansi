@@ -8,6 +8,8 @@
 #define ASCII_ENCODING    kCFStringEncodingASCII
 #endif
 char *strip_non_ascii(const char *s);
+char *strip_non_alpha(const char *s);
+bool string_contains_string(const char *s1, const char *s2);
 char *int_to_icon(const int b);
 char *int_to_string(const int b);
 char *size_to_string(const size_t b);
@@ -26,4 +28,6 @@ size_t get_fp_size(FILE *fp);
 size_t string_size_to_size_t(char *SIZE_STRING);
 int read_16bytes_little_endian_image_buffer(unsigned char *buf);
 int read_32bytes_big_endian_image_buffer(unsigned char *buf);
+char *uppercase_first_word_letters(char *);
+char *pad_string_right(char * s, int len, char p);
 #endif

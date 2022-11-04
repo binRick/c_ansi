@@ -7,10 +7,11 @@
 #include <string.h>
 #include <termios.h>
 //////////////////////////////////////////////////
-#include "module/def.h"
+/*#include "module/def.h"
 #include "module/module.h"
 #include "module/require.h"
 #include "uuid4/src/uuid4.h"
+*/
 int get_terminal_width(void);
 int get_terminal_height(void);
 void color_reset();
@@ -74,6 +75,8 @@ char *AC_RGB(int R, int G, int B);
 #define ACRIS      "\ec"
 #define ACBCK      "\u007f"
 #define ACPAS      "\u001a"
+
+#define AC_CLEAR_EOL "\033[0K"
 
 #define AC_BUTTON(TEXT, COLOR)    COLOR "" AC_NONE COLOR AC_INVERSE " " TEXT " " AC_NONE COLOR ""
 
@@ -236,8 +239,8 @@ char *AC_RGB(int R, int G, int B);
 
 #define AC_SELECTION_BACKGROUND_RED    "\x1b]17;31\\"
 
-#define AC_CURSOR_SAVE                 "\x1b7"
-#define AC_CURSOR_RESTORE              "\x1b8"
+#define AC_CURSOR_SAVE                 "\0337"
+#define AC_CURSOR_RESTORE              "\0338"
 #define AC_CURSOR_BAR                  "\x1b[5 q"
 #define AC_CURSOR_BLOCK                "\x1b[1 q"
 #define AC_CURSOR_UNDER                "\x1b[3 q"
