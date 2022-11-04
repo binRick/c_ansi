@@ -10,7 +10,7 @@
 
 /////////////////////////////////////////////////////
 size_t get_fp_size(FILE *fp){
-  long int cur_pos;
+  long long cur_pos;
 
   fgetpos(fp, &cur_pos);
   fseek(fp, 0, SEEK_END);
