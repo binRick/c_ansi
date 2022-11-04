@@ -347,7 +347,7 @@ void pad_string(uint32_t   hex_num,
 size_t string_size_to_size_t(char *SIZE_STRING){
   char **ep = NULL;
 
-  return((size_t)strtoimax(SIZE_STRING, &ep, 10));
+  return((size_t)strtoimax(SIZE_STRING, ep, 10));
 }
 
 /**
