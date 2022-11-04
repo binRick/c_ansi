@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ANSI_UTILS_H
+#define ANSI_UTILS_H
 #include "ansi-codes/ansi-codes.h"
 //#include "vt100utils/vt100utils.h"
 #include <stdbool.h>
@@ -43,3 +44,5 @@ char * AC_cur_pos(int x, int y, char type);
 void bright_color_init(float alpha);
 void bright_color(int i, float color[4]);
 size_t ansi_utils_tty_copy(const char *s);
+
+#endif

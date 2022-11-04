@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ANSI_UTILS_C
+#define ANSI_UTILS_C
 #include "ansi-utils.h"
 #include "ansi-utils/ansi-utils.h"
 #include "b64.c/b64.h"
@@ -343,3 +344,5 @@ void bright_color_init(float alpha){
 void bright_color(int i, float color[4]){
   memcpy(color, colors[i % (8 * 8 * 8)], 4 * sizeof(float));
 }
+
+#endif
