@@ -264,7 +264,6 @@ bool string_contains_string(const char *s1, const char *s2){
   char *ss;
   for(size_t i=0;i<strlen(s1)-len+1;i++){
     ss = stringfn_substring(s1,i,len);
-    printf("%d> ss:%s\n",i, ss);
 
     if(strcmp(ss,s2)==0)
       return true;
