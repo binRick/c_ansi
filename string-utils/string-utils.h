@@ -6,6 +6,7 @@
 #ifndef ASCII_ENCODING
 #define ASCII_ENCODING    kCFStringEncodingASCII
 #endif
+char *su_limit_string_lines_width(char *str, size_t width);
 char *strip_non_ascii(const char *s);
 char *strip_non_alpha(const char *s);
 bool string_contains_string(const char *s1, const char *s2);
@@ -29,4 +30,7 @@ int read_16bytes_little_endian_image_buffer(unsigned char *buf);
 int read_32bytes_big_endian_image_buffer(unsigned char *buf);
 char *uppercase_first_word_letters(char *);
 char *pad_string_right(char * s, int len, char p);
+char *hash_buffer(void*s,size_t len);
+char *hash_path(char*path);
+char *hash_buffer(void*s,size_t len);
 #endif

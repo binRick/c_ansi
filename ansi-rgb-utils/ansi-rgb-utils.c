@@ -10,6 +10,137 @@
 #include "ansi-rgb-utils/ansi-rgb-utils.h"
 #include "c_string_buffer/include/stringbuffer.h"
 #include "c_stringfn/include/stringfn.h"
+#include "ansi-rgb-utils/ansi-rgb-utils-set.c"
+#include "ansi-codes/ansi-codes.h"
+#include "ansi-utils/ansi-utils.h"
+#include "rgba/src/rgba.h"
+#include "log/log.h"
+#define AU_DELTA_E_K_L             2
+#define AU_DELTA_E_K_1             0.048
+#define AU_DELTA_E_K_2             0.014
+static void au_rgb2lab(float r1, float g1, float b1, float *l2, float *a2, float *b2) {
+  float x, y, z;
+
+  r1 /= 255.0;
+  g1 /= 255.0;
+  b1 /= 255.0;
+
+  if (r1 > 0.04045) {
+    r1 = powf((r1 + 0.055) / 1.055, 2.4);
+  }else{
+    r1 /= 12.92;
+  }
+
+  if (g1 > 0.04045) {
+    g1 = powf((g1 + 0.055) / 1.055, 2.4);
+  }else{
+    g1 /= 12.92;
+  }
+
+  if (b1 > 0.04045) {
+    b1 = powf((b1 + 0.055) / 1.055, 2.4);
+  }else{
+    b1 /= 12.92;
+  }
+
+  r1 *= 100.0;
+  g1 *= 100.0;
+  b1 *= 100.0;
+
+  x = r1 * 0.4124 + g1 * 0.3576 + b1 * 0.1805;
+  y = r1 * 0.2126 + g1 * 0.7152 + b1 * 0.0722;
+  z = r1 * 0.0193 + g1 * 0.1192 + b1 * 0.9505;
+
+  x /= 95.047;
+  y /= 100.000;
+  z /= 108.883;
+
+  if (x > 0.008856) {
+    x = powf(x, 0.3333);
+  }else{
+    x = (7.787 * x) + 0.1379;
+  }
+
+  if (y > 0.008856) {
+    y = powf(y, 0.3333);
+  }else{
+    y = (7.787 * y) + 0.1379;
+  }
+
+  if (z > 0.008856) {
+    z = powf(z, 0.3333);
+  }else{
+    z = (7.787 * z) + 0.1379;
+  }
+
+  *l2 = (116.0 * y) - 16.0;
+  *a2 = 500.0 * (x - y);
+  *b2 = 200.0 * (y - z);
+}
+
+static float au_delta_e(float l1, float a1, float b1, float l2, float a2, float b2) {
+  float deltaL, c1, c2, deltaC, deltaA, deltaB, deltaHSquared, deltaH;
+  float q1, q2, q3, deltaE;
+
+  deltaL        = l1 - l2;
+  c1            = sqrtf(a1 * a1 + b1 * b1);
+  c2            = sqrtf(a2 * a2 + b2 * b2);
+  deltaC        = c1 - c2;
+  deltaA        = a1 - a2;
+  deltaB        = b1 - b2;
+  deltaHSquared = deltaA * deltaA + deltaB * deltaB - deltaC * deltaC;
+
+  if (deltaHSquared > 0) {
+    deltaH = sqrtf(deltaHSquared);
+  }else{
+    deltaH = 0;
+  }
+
+  q1     = deltaL / AU_DELTA_E_K_L;
+  q2     = deltaC / (1 + AU_DELTA_E_K_1 * c1);
+  q3     = deltaH / (1 + AU_DELTA_E_K_2 * c2);
+  deltaE = sqrtf(q1 * q1 + q2 * q2 + q3 * q3);
+
+  return(deltaE);
+}
+
+
+static int au_closest_ansi_code(const uint32_t trp) {
+  float l1, a1, b1;
+  float l2, a2, b2;
+  float delta, now, then = 255;
+  int   i, t = 0;
+
+  au_rgb2lab(trp >> 16 & 0xFF, trp >> 8 & 0xFF, trp & 0xFF, &l1, &a1, &b1);
+
+  for (i = 0; i < sizeof(au_set) / sizeof(*au_set); i++) {
+    au_rgb2lab(au_set[i] >> 16 & 0xFF,
+            au_set[i] >> 8 & 0xFF,
+            au_set[i] & 0xFF,
+            &l2, &a2, &b2);
+    now = au_delta_e(l1, a1, b1, l2, a2, b2);
+
+    if (now < then) {
+      then = now;
+      t    = i;
+    }
+  }
+  return(t + 16);
+}
+
+int au_hex_ansicode(char *HEX){
+  int code=0;
+  char gnd = '3';
+  char *colp, *ptr;
+  int  color;
+
+  colp = HEX;
+
+  if (*colp == '#') {
+    *colp++;
+  }
+  return(au_closest_ansi_code((const uint32_t)colp));
+}
 
 LabColor ansi_to_lab(int ansi_num) {
   return(ansi_to_lab_map[ansi_num - ANSI_MAP_OFFSET]);
@@ -71,6 +202,25 @@ char *get_color_boxes(void){
   return(ret);
 }
 
+void au_print_hex_cube(FILE *file,char *hex){
+  short ok;
+  uint32_t val = rgba_from_string(hex,&ok), width;
+  rgba_t _r;
+  _r= rgba_new(val);
+  width = get_terminal_width();
+
+ fprintf(stdout,
+     "\t%.2f/%.2f/%.2f/%.2f"
+     "\t%s%s%s"
+     "%s",
+     _r.r,_r.g,_r.b,_r.a,
+     strdup_escaped(au_set_fg_hex(hex)),
+     "  VAL  ",
+     strdup_escaped(RESET_CODE),
+     "\n"
+     );
+}
+
 void print_cube(FILE *file, int g) {
   for (int r = 0; r < 6; r++) {
     for (int b = 0; b < 6; b++) {
@@ -82,6 +232,27 @@ void print_cube(FILE *file, int g) {
     ansi_reset(file);
     fprintf(file, "\n");
   }
+}
+
+char *au_set_fg_hex(const char *hex){ return au_hex(HEX_SET_FG_CODE,hex); }
+char *au_set_bg_hex(const char *hex){ return au_hex(HEX_SET_BG_CODE,hex); }
+char *au_fg_hex(const char *hex){ return au_hex(HEX_FG_CODE,hex); }
+char *au_bg_hex(const char *hex){ return au_hex(HEX_BG_CODE,hex); }
+char *au_hex(const char *fmt, const char *hex){
+  char *s;
+  asprintf(&s, fmt, stringfn_trim(stringfn_replace(hex,'#',' ')));
+  return s;
+}
+
+char *au_bg_color(int color){
+  char *s;
+  asprintf(&s, C256_BG_CODE, color);
+  return s;
+}
+char *au_fg_color(int color){
+  char *s;
+  asprintf(&s, C256_FG_CODE, color);
+  return s;
 }
 
 ////////////////////////////////////////////////////////////////////////////

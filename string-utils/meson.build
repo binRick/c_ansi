@@ -9,10 +9,17 @@ string_utils_include_dirs = [
 string_utils_deps = [
   c_stringfn_dep,
   c_vector_dep,
-  c_string_buffer_dep,  
+  c_string_buffer_dep,sha256_c_dep,c_fsio_dep,c_string_buffer_dep,b64_dep,
 ]
 
-string_utils_lib = library('string-utils',
+string_utils_lib_static = static_library('string-utils',
+  string_utils_srcs,
+  install: false,
+  dependencies: string_utils_deps,
+  include_directories: string_utils_include_dirs,
+)
+
+string_utils_lib = shared_library('string-utils',
   string_utils_srcs,
   install: false,
   dependencies: string_utils_deps,

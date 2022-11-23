@@ -4,7 +4,7 @@
 #include "chan-utils/module.h"
 
 void cu_deinit(module(cu) *exports) {
-  return 0;
+  return;
 }
 
 int cu_init(module(cu) *exports) {

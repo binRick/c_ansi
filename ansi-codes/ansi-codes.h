@@ -12,6 +12,15 @@
 #include "module/require.h"
 #include "uuid4/src/uuid4.h"
 */
+void tc_echo_off();
+void tc_echo_on();
+void tc_canon_on();
+void tc_canon_off();
+void tc_get_cursor(int *x, int *y);
+bool tc_set_cursor(int x, int y);
+bool tc_save_cursor();
+bool tc_load_cursor();
+
 int get_terminal_width(void);
 int get_terminal_height(void);
 void color_reset();

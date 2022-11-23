@@ -7,8 +7,41 @@
 #include "c_string_buffer/include/stringbuffer.h"
 #include "c_stringfn/include/stringfn.h"
 #include "string-utils/string-utils.h"
-
+#include "sha256.c/sha256.h"
+#include "c_fsio/include/fsio.h"
+#include "b64.c/b64.h"
 /////////////////////////////////////////////////////
+char *hash_path(char*path){
+  unsigned char buf[32] = { 0 };
+  sha256_hash(buf,fsio_read_binary_file(path),fsio_file_size(path));
+  return(b64_encode(buf,32));
+}
+char *hash_buffer(void*s,size_t len){
+  unsigned char buf[32] = { 0 };
+  sha256_hash(buf,(unsigned char*)s,len);
+  return(b64_encode(buf,32));
+}
+char *hash_string(char*s,size_t len){
+  unsigned char buf[32] = { 0 };
+  sha256_hash(buf,s,len);
+  return(b64_encode(buf,32));
+}
+char *su_limit_string_lines_width(char *str, size_t width){
+  char *s;
+  struct StringBuffer *sb = stringbuffer_new();
+  struct StringFNStrings lines = stringfn_split_lines(str);
+  for(int i=0;i<lines.count;i++){
+    if(i>0)
+      stringbuffer_append_string(sb,"\n");
+    stringbuffer_append_string(sb,stringfn_substring(lines.strings[i],0,width));
+  }
+
+  stringfn_release_strings_struct(lines);
+  s = stringbuffer_to_string(sb);
+  stringbuffer_release(sb);
+  return(s);
+}
+
 size_t get_fp_size(FILE *fp){
   long long cur_pos;
 

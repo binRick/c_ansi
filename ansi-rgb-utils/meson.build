@@ -8,7 +8,8 @@ ansi_rgb_utils_deps = [
   ansi_codes_dep,
   hsluv_c_dep,
   rgba_dep,
-  c_string_buffer_dep,
+  ansi_utils_dep,
+  c_string_buffer_dep,log_dep,
   c_stringfn_dep,
 ]
 

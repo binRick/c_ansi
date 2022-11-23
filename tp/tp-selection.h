@@ -1,6 +1,7 @@
 #pragma once
 #ifndef TPSELH
 #define TPSELH
+#include "uuid4/src/uuid4.h"
 #include "tp-internal.h"
 //////////////////////////////////////////////////////////////////
 extern termpaint_attr *attr_bottom_msg;

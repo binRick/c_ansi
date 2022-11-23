@@ -1,6 +1,7 @@
 #pragma once
 #ifndef TPTABH
 #define TPTABH
+#include "uuid4/src/uuid4.h"
 #include "tp-internal.h"
 //////////////////////////////////////////////////////////////////
 enum change_tab_type_t {
