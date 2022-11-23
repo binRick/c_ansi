@@ -75,11 +75,10 @@ void render_tp_tabs(void){
 }
 
 void set_tab_index(size_t NEW_TAB_INDEX){
-  if (NEW_TAB_INDEX < 0) {
+  if (NEW_TAB_INDEX < 0)
     NEW_TAB_INDEX = TB->get_tabs_qty() - 1;
-  }else if (NEW_TAB_INDEX > TB->get_tabs_qty() - 1) {
+  else if (NEW_TAB_INDEX > TB->get_tabs_qty() - 1)
     NEW_TAB_INDEX = 0;
-  }
   struct tp_tab_t *NEW_TAB = (struct tp_tab_t *)vector_get(TB->tabs, NEW_TAB_INDEX);
   assert(NEW_TAB != NULL);
   for (size_t i = 0; i < TB->get_tabs_qty(); i++) {
@@ -132,9 +131,8 @@ int tp_get_max_tab_text_size(){
 
   for (size_t i = 0; i < TB->get_tabs_qty(); i++) {
     O = (struct tp_tab_t *)vector_get(TB->tabs, i);
-    if (strlen(O->text) > s) {
+    if (strlen(O->text) > s)
       s = strlen(O->text);
-    }
   }
   return(s);
 }
@@ -144,9 +142,8 @@ int get_selected_tab_index(){
 
   for (size_t i = 0; i < TB->get_tabs_qty(); i++) {
     O = (struct tp_tab_t *)vector_get(TB->tabs, i);
-    if (O->selected) {
+    if (O->selected)
       return(i);
-    }
   }
   return(-1);
 }

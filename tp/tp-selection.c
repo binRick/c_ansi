@@ -118,16 +118,14 @@ void render_tp_options(void){
 
       while (strlen(text) < option_width) {
         asprintf(&text, "%s%s", text, " ");
-        if (strlen(text) >= option_width) {
+        if (strlen(text) >= option_width)
           break;
-        }
       }
       {
         termpaint_surface_clear_rect_with_attr(surface, o_col - strlen(marker), o_row, strlen(marker) + max_option_text_size, 1, attr_ui);
         termpaint_surface_write_with_attr(surface, o_col, o_row, text, o->selected ? o_attr_selected : o_attr_unselected);
-        if (o->selected) {
+        if (o->selected)
           termpaint_surface_write_with_attr(surface, o_col - strlen(marker) - 0, o_row, marker, marker_attr);
-        }
         rendered_rows_qty++;
       }
     }
@@ -135,11 +133,10 @@ void render_tp_options(void){
 } /* render_tp_options */
 
 void set_selection_index(size_t NEW_SELECTION_INDEX){
-  if (NEW_SELECTION_INDEX < 0) {
+  if (NEW_SELECTION_INDEX < 0)
     NEW_SELECTION_INDEX = TP->get_options_qty() - 1;
-  }else if (NEW_SELECTION_INDEX > TP->get_options_qty() - 1) {
+  else if (NEW_SELECTION_INDEX > TP->get_options_qty() - 1)
     NEW_SELECTION_INDEX = 0;
-  }
   struct tp_confirm_option_t *NEW_SELECTION = (struct tp_confirm_option_t *)vector_get(TP->options, NEW_SELECTION_INDEX);
   assert(NEW_SELECTION != NULL);
   for (size_t i = 0; i < TP->get_options_qty(); i++) {
@@ -180,11 +177,10 @@ void change_selection_index(int CHANGE_SELECTION_TYPE) {
         NEW_SELECTION_INDEX = i + 1;
         break;
       case CHANGE_SELECTION_TYPE_PREV:
-        if (i == 0) {
+        if (i == 0)
           NEW_SELECTION_INDEX = TP->get_options_qty() - 1;
-        }else{
+        else
           NEW_SELECTION_INDEX = i - 1;
-        }
         break;
       }
       set_selection_index(NEW_SELECTION_INDEX);
@@ -227,9 +223,8 @@ int tp_get_max_option_text_size(){
 
   for (size_t i = 0; i < TP->get_options_qty(); i++) {
     O = (struct tp_confirm_option_t *)vector_get(TP->options, i);
-    if (strlen(O->text) > s) {
+    if (strlen(O->text) > s)
       s = strlen(O->text);
-    }
   }
   return(s);
 }
@@ -239,9 +234,8 @@ int get_selected_index(){
 
   for (size_t i = 0; i < TP->get_options_qty(); i++) {
     O = (struct tp_confirm_option_t *)vector_get(TP->options, i);
-    if (O->selected) {
+    if (O->selected)
       return(i);
-    }
   }
   return(-1);
 }

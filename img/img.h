@@ -37,8 +37,8 @@ module(img) {
   void                (*error)(char *);
 };
 
-int img_init(module(img) *exports);
-void img_deinit(module(img) *exports);
+int  img_init(module(img) * exports);
+void img_deinit(module(img) * exports);
 
 exports(img) {
   .log_mode = IMG_LOG_MODE_NONE,

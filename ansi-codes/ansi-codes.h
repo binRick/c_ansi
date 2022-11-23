@@ -8,10 +8,10 @@
 #include <termios.h>
 //////////////////////////////////////////////////
 /*#include "module/def.h"
-#include "module/module.h"
-#include "module/require.h"
-#include "uuid4/src/uuid4.h"
-*/
+ #include "module/module.h"
+ #include "module/require.h"
+ #include "uuid4/src/uuid4.h"
+ */
 void tc_echo_off();
 void tc_echo_on();
 void tc_canon_on();
@@ -75,17 +75,17 @@ char *AC_RGB(int R, int G, int B);
 #define ansistr(s)      s AC_RESETALL
 #define ansistrln(s)    s AC_RESETALL "\n"
 
-#define AC_NONE    "\x1b[0m"
-#define ACCSI      "\e["
-#define ACCSIP     "\e[?"
-#define ACOSC      "\e]"
-#define ACDCS      "\x1b(B"
-#define ACDEC      "\e(0"
-#define ACRIS      "\ec"
-#define ACBCK      "\u007f"
-#define ACPAS      "\u001a"
+#define AC_NONE         "\x1b[0m"
+#define ACCSI           "\e["
+#define ACCSIP          "\e[?"
+#define ACOSC           "\e]"
+#define ACDCS           "\x1b(B"
+#define ACDEC           "\e(0"
+#define ACRIS           "\ec"
+#define ACBCK           "\u007f"
+#define ACPAS           "\u001a"
 
-#define AC_CLEAR_EOL "\033[0K"
+#define AC_CLEAR_EOL    "\033[0K"
 
 #define AC_BUTTON(TEXT, COLOR)    COLOR "" AC_NONE COLOR AC_INVERSE " " TEXT " " AC_NONE COLOR ""
 

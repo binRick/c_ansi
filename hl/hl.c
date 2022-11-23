@@ -12,11 +12,11 @@
 #include "c_stringfn/include/stringfn.h"
 #include "c_vector/vector/vector.h"
 #include "log/log.h"
+#include "module/def.h"
+#include "module/module.h"
+#include "module/require.h"
 #include "ms/ms.h"
 #include "timestamp/timestamp.h"
-#include "module/module.h"
-#include "module/def.h"
-#include "module/require.h"
 
 ////////////////////////////////////////////
 static bool HL_DEBUG_MODE = false;

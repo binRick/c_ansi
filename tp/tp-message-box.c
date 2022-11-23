@@ -96,31 +96,28 @@ void update_cursor_profile(){
 }
 
 void cycle_cursor_blink(){
-  if (cursor_profile->blink) {
+  if (cursor_profile->blink)
     cursor_profile->blink = false;
-  }else{
+  else
     cursor_profile->blink = true;
-  }
   update_cursor_profile();
 }
 
 void cycle_cursor_visiblity(){
-  if (cursor_profile->visible) {
+  if (cursor_profile->visible)
     cursor_profile->visible = false;
-  }else{
+  else
     cursor_profile->visible = true;
-  }
   update_cursor_profile();
 }
 
 void cycle_cursor_style(){
-  if (cursor_profile->style == TERMPAINT_CURSOR_STYLE_BAR) {
+  if (cursor_profile->style == TERMPAINT_CURSOR_STYLE_BAR)
     cursor_profile->style = TERMPAINT_CURSOR_STYLE_BLOCK;
-  }else if (cursor_profile->style == TERMPAINT_CURSOR_STYLE_BLOCK) {
+  else if (cursor_profile->style == TERMPAINT_CURSOR_STYLE_BLOCK)
     cursor_profile->style = TERMPAINT_CURSOR_STYLE_UNDERLINE;
-  }else{
+  else
     cursor_profile->style = TERMPAINT_CURSOR_STYLE_BAR;
-  }
 
   update_cursor_profile();
 }
@@ -128,9 +125,8 @@ void cycle_cursor_style(){
 void clear_bottom_msg(bool SKIP_FLUSH, __attribute__((unused)) bool FORCE_FLUSH){
   bool cursor_visible = cursor_profile->visible;
 
-  if (cursor_visible) {
+  if (cursor_visible)
     cursor_profile->visible = false;
-  }
   termpaint_surface_clear_rect_with_attr(surface,
                                          0,
                                          termpaint_surface_height(surface) - BOTTOM_MSG_BOX_HEIGHT + 1,

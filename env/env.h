@@ -37,8 +37,8 @@ module(env) {
   void                (*error)(char *);
 };
 
-int env_init(module(env) *exports);
-void env_deinit(module(env) *exports);
+int  env_init(module(env) * exports);
+void env_deinit(module(env) * exports);
 
 exports(env) {
   .log_mode = ENV_LOG_MODE_NONE,

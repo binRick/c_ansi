@@ -20,10 +20,10 @@ TEST t_rgb_test1(){
   log_info("t1");
 //  print_cube(stdout,8);
 //  print_cube(stdout,1);
-  au_print_hex_cube(stdout,"#aabb11");
-  au_print_hex_cube(stdout,"#1e1e1e");
-  au_print_hex_cube(stdout,"#ffffff");
-  au_print_hex_cube(stdout,"#000000");
+  au_print_hex_cube(stdout, "#aabb11");
+  au_print_hex_cube(stdout, "#1e1e1e");
+  au_print_hex_cube(stdout, "#ffffff");
+  au_print_hex_cube(stdout, "#000000");
   PASS();
 }
 

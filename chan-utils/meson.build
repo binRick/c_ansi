@@ -15,6 +15,7 @@ chan_utils_deps = [
   c_vector_dep,
   c_fsio_dep,
   c_stringfn_dep,
+  hash_dep,
   c_string_buffer_dep,
   timestamp_dep,
   log_dep,

@@ -24,38 +24,38 @@ static inline int   time_GetPID();
 
 ////////////////////////////////////////////
 /*
-int time_init(module(time) *exports) {
-  clib_module_init(time, exports);
-  exports->pid      = getpid();
-  exports->log_mode = TIME_LOG_MODE_NONE;
-  exports->info     = time_info;
-  exports->error    = time_error;
-  exports->debug    = time_debug;
-  return(EXIT_SUCCESS);
-}
-void time_deinit(module(time) *exports) {
-  clib_module_deinit(time);
-}
+   int time_init(module(time) *exports) {
+   clib_module_init(time, exports);
+   exports->pid      = getpid();
+   exports->log_mode = TIME_LOG_MODE_NONE;
+   exports->info     = time_info;
+   exports->error    = time_error;
+   exports->debug    = time_debug;
+   return(EXIT_SUCCESS);
+   }
+   void time_deinit(module(time) *exports) {
+   clib_module_deinit(time);
+   }
 
-////////////////////////////////////////////
-static inline int time_GetPID(){
-  return(require(time)->pid);
-}
+   ////////////////////////////////////////////
+   static inline int time_GetPID(){
+   return(require(time)->pid);
+   }
 
-static inline void time_info(char *message) {
-  if (require(time)->log_mode >= TIME_LOG_MODE_INFO)
+   static inline void time_info(char *message) {
+   if (require(time)->log_mode >= TIME_LOG_MODE_INFO)
     fprintf(stdout, " info: %s\n", message);
-}
+   }
 
-static inline void time_error(char *message) {
-  if (require(time)->log_mode >= TIME_LOG_MODE_ERROR)
+   static inline void time_error(char *message) {
+   if (require(time)->log_mode >= TIME_LOG_MODE_ERROR)
     fprintf(stderr, "error: %s\n", message);
-}
+   }
 
-static inline void time_debug(char *message) {
-  if (require(time)->log_mode >= TIME_LOG_MODE_DEBUG)
+   static inline void time_debug(char *message) {
+   if (require(time)->log_mode >= TIME_LOG_MODE_DEBUG)
     fprintf(stderr, "debug: %s\n", message);
-}
-////////////////////////////////////////////
-*/
+   }
+   ////////////////////////////////////////////
+ */
 #endif

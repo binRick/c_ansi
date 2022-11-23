@@ -43,11 +43,9 @@ int main(__attribute__((unused)) int argc, __attribute__((unused)) char **argv) 
   SB = stringbuffer_new_with_options(1024, true);
 
   printf("Testing %lu Strings\n", len);
-  for (size_t i = 0; i < len; i++) {
-    if (TEST_ANSI_STRINGS[i] != NULL) {
+  for (size_t i = 0; i < len; i++)
+    if (TEST_ANSI_STRINGS[i] != NULL)
       stringbuffer_append_string(SB, TEST_ANSI_STRINGS[i]);
-    }
-  }
 
   stringbuffer_clear(SB);
   for (int i = 0; i < 3; i++) {

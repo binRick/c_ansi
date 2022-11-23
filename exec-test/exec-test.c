@@ -7,10 +7,10 @@
 #include "c_stringfn/include/stringfn.h"
 #include "c_vector/vector/vector.h"
 #include "exec-test/exec-test.h"
+#include "exec/exec.h"
 #include "log/log.h"
 #include "ms/ms.h"
 #include "timestamp/timestamp.h"
-#include "exec/exec.h"
 
 TEST t_exec_test2(){
   PASS();
@@ -18,6 +18,7 @@ TEST t_exec_test2(){
 
 TEST t_exec_test1(){
   char *out;
+
   out = require(exec)->sh("pwd");
   Ds(out);
   out = require(exec)->sh("ls /");

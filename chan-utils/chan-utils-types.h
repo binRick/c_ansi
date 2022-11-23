@@ -2,25 +2,26 @@
 #ifndef CHAN_UTILS_TYPES
 #define CHAN_UTILS_TYPES_H
 #include "c_vector/vector/vector.h"
+#include "c_workqueue/include/workqueue.h"
+#include "chan-utils/chan-utils-types.h"
+#include "chan-utils/chan-utils.h"
 #include "chan/src/chan.h"
 #include "chan/src/queue.h"
-#include "c_workqueue/include/workqueue.h"
-#include "chan-utils/chan-utils.h"
-#include "chan-utils/chan-utils-types.h"
+#include "hash/hash.h"
 struct chan_utils_req_t;
-#define CU_NEW_ARGS\
+#define CU_NEW_ARGS \
   struct Vector *items, size_t concurrency, cu_item_done_t item_done, cu_items_done_t items_done
-#define CU_RUN_ARGS\
+#define CU_RUN_ARGS \
   struct chan_utils_req_t *req
-#define CU_MAP_ARGS\
+#define CU_MAP_ARGS \
   struct Vector *items, cu_item_done_t map_item, cu_items_done_t items_done
-#define CU_MAP_LIMIT_ARGS\
+#define CU_MAP_LIMIT_ARGS \
   struct Vector *items, size_t concurrency, cu_item_done_t map_item, cu_items_done_t items_done
-#define CU_EACH_ARGS\
+#define CU_EACH_ARGS \
   struct Vector *items, cu_item_done_t each_item, cu_items_done_t items_done
-#define CU_EACH_RET struct Vector *
-#define CU_MAP_RET hash_t *
-#define CU_MAP_LIMIT_RET CU_MAP_RET
+#define CU_EACH_RET         struct Vector *
+#define CU_MAP_RET          hash_t *
+#define CU_MAP_LIMIT_RET    CU_MAP_RET
 typedef void (*chan_utils_fxn_t)(void);
 typedef void (^chan_utils_block_t)(void);
 typedef void (^cu_item_done_t)(void *item);
@@ -59,39 +60,38 @@ enum chan_utils_type_t {
 union chan_utils_cb_t {
   struct {
     chan_utils_fxn_t *fxn;
-  } fxn;
+  }             fxn;
   struct {
     chan_utils_block_t *block;
-  } block;
+  }             block;
   unsigned long init, started, start_dur, dur;
-  void *args;
+  void          *args;
 };
 
 struct chan_utils_receive_t {
-  chan_t *chans[CHAN_UTILS_CHAN_TYPES_QTY];
-  pthread_t *threads[CHAN_UTILS_THREAD_TYPES_QTY];
-  struct WorkQueue *queues[CHAN_UTILS_TYPES_QTY];
-  pthread_mutex_t *mutex;
+  chan_t                *chans[CHAN_UTILS_CHAN_TYPES_QTY];
+  pthread_t             *threads[CHAN_UTILS_THREAD_TYPES_QTY];
+  struct WorkQueue      *queues[CHAN_UTILS_TYPES_QTY];
+  pthread_mutex_t       *mutex;
   union chan_utils_cb_t *cb;
 };
-struct chan_utils_req_t { 
+struct chan_utils_req_t {
   struct chan_utils_receive_t recv;
-  chan_t *chans[CHAN_UTILS_CHAN_TYPES_QTY];
-  pthread_t threads[CHAN_UTILS_THREAD_TYPES_QTY];
-  struct WorkQueue *queues[CHAN_UTILS_TYPES_QTY];
-  pthread_mutex_t mutex;
-  void *args;
-  size_t concurrency;
-  struct Vector *items;
-  union chan_utils_cb_t cb;
-  cu_item_done_t item_done;
-  cu_items_done_t items_done;
+  chan_t                      *chans[CHAN_UTILS_CHAN_TYPES_QTY];
+  pthread_t                   threads[CHAN_UTILS_THREAD_TYPES_QTY];
+  struct WorkQueue            *queues[CHAN_UTILS_TYPES_QTY];
+  pthread_mutex_t             mutex;
+  void                        *args;
+  size_t                      concurrency;
+  struct Vector               *items;
+  union chan_utils_cb_t       cb;
+  cu_item_done_t              item_done;
+  cu_items_done_t             items_done;
 };
 struct chan_utils_res_t {
   struct chan_utils_req_t *req;
 };
 struct chan_utils_req_t *cu_init_res(struct chan_utils_req_t *req);
 cu_run_t cu_run;
-
 
 #endif

@@ -38,8 +38,8 @@ module(cache) {
   void                  (*test)(void);
 };
 
-int cache_init(module(cache) *exports);
-void cache_deinit(module(cache) *exports);
+int  cache_init(module(cache) * exports);
+void cache_deinit(module(cache) * exports);
 void __cache_test();
 
 exports(cache) {

@@ -37,16 +37,16 @@ module(time) {
   void                 (*error)(char *);
 };
 
-int time_init(module(time) *exports);
-void time_deinit(module(time) *exports);
+int  time_init(module(time) * exports);
+void time_deinit(module(time) * exports);
 /*
-exports(time) {
-  .log_mode = TIME_LOG_MODE_NONE,
-  .init     = time_init,
-  .deinit   = time_deinit,
-  .pid      = -1,
-};
+   exports(time) {
+   .log_mode = TIME_LOG_MODE_NONE,
+   .init     = time_init,
+   .deinit   = time_deinit,
+   .pid      = -1,
+   };
 
-#define time_m    module(time)
-*/
+ #define time_m    module(time)
+ */
 #endif

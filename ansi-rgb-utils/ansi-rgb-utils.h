@@ -147,15 +147,15 @@ void print_cube(FILE *file, int g);
 \033[48;5;14m  \033[0m\
 \033[48;5;15m  \033[0m\n"
 /***********************/// Control Code CONSTANTS
-#define AU_ANSI_ESC_CODE "\x1b"
-#define AU_CODES_SUFFIX                            AU_ANSI_ESC_CODE "\\"
+#define AU_ANSI_ESC_CODE          "\x1b"
+#define AU_CODES_SUFFIX           AU_ANSI_ESC_CODE "\\"
 
 #define C256_FG_CODE              "\x1b[38;5;%dm"
 #define C256_BG_CODE              "\x1b[48;5;%dm"
-#define HEX_SET_FG_CODE "\033]10;#%s\033\\"
-#define HEX_SET_BG_CODE "\033]11;#%s\033\\"
-#define HEX_FG_CODE "\033[48;5;10m;%d\033[0m"
-#define HEX_BG_CODE "\033[48;5;11m;%d\033[0m"
+#define HEX_SET_FG_CODE           "\033]10;#%s\033\\"
+#define HEX_SET_BG_CODE           "\033]11;#%s\033\\"
+#define HEX_FG_CODE               "\033[48;5;10m;%d\033[0m"
+#define HEX_BG_CODE               "\033[48;5;11m;%d\033[0m"
 //#define HEX_FG_CODE               AU_ANSI_ESC_CODE "]10;#%s" AU_CODES_SUFFIX
 //#define HEX_BG_CODE               AU_ANSI_ESC_CODE "]11;#%s" AU_CODES_SUFFIX
 #define TRUECOLOR_FG_CODE         "\x1b[38;2;%d;%d;%dm"
@@ -811,5 +811,5 @@ char *au_set_bg_hex(const char *hex);
 char *au_fg_hex(const char *hex);
 char *au_bg_hex(const char *hex);
 char *au_fg_color(int color);
-void au_print_hex_cube(FILE *file,char *hex);
+void au_print_hex_cube(FILE *file, char *hex);
 int au_hex_ansicode(char *HEX);

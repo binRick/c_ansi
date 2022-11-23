@@ -37,11 +37,10 @@ int main(int argc, char **argv) {
     B = require(tp_confirm);
     NEW_OPTION(99, false);
     for (int i = 1; i <= OPTIONS_QTY; i++) {
-      if (i == (int)(OPTIONS_QTY / 2)) {
+      if (i == (int)(OPTIONS_QTY / 2))
         NEW_OPTION(i, true);
-      }else{
+      else
         NEW_OPTION(i, false);
-      }
     }
     T = require(tp_tab);
     NEW_TAB(1, false);

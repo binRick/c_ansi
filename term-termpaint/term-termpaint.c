@@ -90,9 +90,8 @@ volatile char MSG[1024];
 static char *tp__basename(const char *path){
   const char *slash = strrchr(path, '/');
 
-  if (slash) {
+  if (slash)
     path = slash + 1;
-  }
   return((char *)path);
 }
 
@@ -108,12 +107,10 @@ void debug_log(termpaint_integration *integration, const char *data, int length)
     if (debug) {
       memcpy(debug + oldlen, data, length);
       debug[oldlen + length] = 0;
-    } else {
+    } else
       free(debug_old);
-    }
-  } else {
+  } else
     debug = strndup(data, length);
-  }
   debug_used = true;
 }
 
@@ -128,31 +125,28 @@ void update_cursor_profile(){
 }
 
 void cycle_cursor_blink(){
-  if (cursor_profile->blink) {
+  if (cursor_profile->blink)
     cursor_profile->blink = false;
-  }else{
+  else
     cursor_profile->blink = true;
-  }
   update_cursor_profile();
 }
 
 void cycle_cursor_visiblity(){
-  if (cursor_profile->visible) {
+  if (cursor_profile->visible)
     cursor_profile->visible = false;
-  }else{
+  else
     cursor_profile->visible = true;
-  }
   update_cursor_profile();
 }
 
 void cycle_cursor_style(){
-  if (cursor_profile->style == TERMPAINT_CURSOR_STYLE_BAR) {
+  if (cursor_profile->style == TERMPAINT_CURSOR_STYLE_BAR)
     cursor_profile->style = TERMPAINT_CURSOR_STYLE_BLOCK;
-  }else if (cursor_profile->style == TERMPAINT_CURSOR_STYLE_BLOCK) {
+  else if (cursor_profile->style == TERMPAINT_CURSOR_STYLE_BLOCK)
     cursor_profile->style = TERMPAINT_CURSOR_STYLE_UNDERLINE;
-  }else{
+  else
     cursor_profile->style = TERMPAINT_CURSOR_STYLE_BAR;
-  }
 
   update_cursor_profile();
 }
@@ -199,9 +193,8 @@ void event_callback(void *userdata, termpaint_event *tp_event) {
 
   if (my_event) {
     event *prev = event_current;
-    while (prev->next) {
+    while (prev->next)
       prev = prev->next;
-    }
     prev->next = my_event;
   }
 } /* event_callback */
@@ -254,12 +247,11 @@ void cleanup(void) {
 
 event * key_wait(void) {
   termpaint_terminal_flush(terminal, false);
-  while (!event_current->next) {
+  while (!event_current->next)
     if (!termpaint_full_integration_do_iteration(integration)) {
       cleanup();
       exit(1);
     }
-  }
 
   free((void *)event_current->string);
   event *next = event_current->next;
@@ -437,30 +429,26 @@ void named_color_menu(termpaint_attr *attr_ui, termpaint_attr *attr_to_change, i
 
     if (evt->type == TERMPAINT_EV_KEY && strcmp(evt->string, "ArrowUp") == 0) {
       color = color - 1;
-      if (color < 0) {
+      if (color < 0)
         color = 15;
-      }
     }
 
-    if (evt->type == TERMPAINT_EV_KEY && strcmp(evt->string, "ArrowDown") == 0) {
+    if (evt->type == TERMPAINT_EV_KEY && strcmp(evt->string, "ArrowDown") == 0)
       color = (color + 1) % 16;
-    }
 
     if (evt->type == TERMPAINT_EV_KEY && strcmp(evt->string, "Enter") == 0) {
       int tp_color = TERMPAINT_NAMED_COLOR + color;
-      if (which_color == 0) {
+      if (which_color == 0)
         termpaint_attr_set_fg(attr_to_change, tp_color);
-      } else if (which_color == 1) {
+      else if (which_color == 1)
         termpaint_attr_set_bg(attr_to_change, tp_color);
-      } else {
+      else
         termpaint_attr_set_deco(attr_to_change, tp_color);
-      }
       return;
     }
 
-    if (evt->type == TERMPAINT_EV_KEY && strcmp(evt->string, "Escape") == 0) {
+    if (evt->type == TERMPAINT_EV_KEY && strcmp(evt->string, "Escape") == 0)
       return;
-    }
   }
 } /* named_color_menu */
 
@@ -501,41 +489,35 @@ void indexed_color_menu(termpaint_attr *attr_ui, termpaint_attr *attr_to_change,
     update_current_key_display(attr_ui, evt);
 
     if (evt->type == TERMPAINT_EV_CHAR) {
-      if (strcmp(evt->string, "q") == 0) {
+      if (strcmp(evt->string, "q") == 0)
         quit = true;
-      }
     } else if (evt->type == TERMPAINT_EV_KEY) {
       if (evt->type == TERMPAINT_EV_KEY && strcmp(evt->string, "ArrowLeft") == 0) {
         color -= 1;
-        if (color < 0) {
+        if (color < 0)
           color = 255;
-        }
-      } else if (evt->type == TERMPAINT_EV_KEY && strcmp(evt->string, "ArrowRight") == 0) {
+      } else if (evt->type == TERMPAINT_EV_KEY && strcmp(evt->string, "ArrowRight") == 0)
         color = (color + 1) % 256;
-      } else if (evt->type == TERMPAINT_EV_KEY && strcmp(evt->string, "ArrowUp") == 0) {
+      else if (evt->type == TERMPAINT_EV_KEY && strcmp(evt->string, "ArrowUp") == 0) {
         color -= 16;
-        if (color < 0) {
+        if (color < 0)
           color += 256;
-        }
-      } else if (evt->type == TERMPAINT_EV_KEY && strcmp(evt->string, "ArrowDown") == 0) {
+      } else if (evt->type == TERMPAINT_EV_KEY && strcmp(evt->string, "ArrowDown") == 0)
         color = (color + 16) % 256;
-      }
 
       if (evt->type == TERMPAINT_EV_KEY && strcmp(evt->string, "Enter") == 0) {
         int tp_color = TERMPAINT_INDEXED_COLOR + color;
-        if (which_color == 0) {
+        if (which_color == 0)
           termpaint_attr_set_fg(attr_to_change, tp_color);
-        } else if (which_color == 1) {
+        else if (which_color == 1)
           termpaint_attr_set_bg(attr_to_change, tp_color);
-        } else {
+        else
           termpaint_attr_set_deco(attr_to_change, tp_color);
-        }
         return;
       }
 
-      if (strcmp(evt->string, "Escape") == 0) {
+      if (strcmp(evt->string, "Escape") == 0)
         return;
-      }
     }
   }
 } /* indexed_color_menu */
@@ -565,116 +547,101 @@ void rgb_color_menu(termpaint_attr *attr_ui, termpaint_attr *attr_to_change, int
       termpaint_attr_free(preview);
     }
 
-    if (selected == &red) {
+    if (selected == &red)
       termpaint_surface_write_with_attr(surface, 32, 8, "^^^", attr_ui);
-    } else if (selected == &green) {
+    else if (selected == &green)
       termpaint_surface_write_with_attr(surface, 39, 8, "^^^", attr_ui);
-    } else if (selected == &blue) {
+    else if (selected == &blue)
       termpaint_surface_write_with_attr(surface, 46, 8, "^^^", attr_ui);
-    }
 
     event *evt = key_wait();
     update_current_key_display(attr_ui, evt);
 
     if (evt->type == TERMPAINT_EV_CHAR) {
-      if (strcmp(evt->string, "q") == 0) {
+      if (strcmp(evt->string, "q") == 0)
         quit = true;
-      }else if (strcmp(evt->string, "q") == 0) {
+      else if (strcmp(evt->string, "q") == 0) {
         sprintf(MSG,
                 "cur cursor style:%d|",
                 cursor_profile->style
                 );
         M(MSG);
-        if (cursor_profile->style == TERMPAINT_CURSOR_STYLE_BAR) {
+        if (cursor_profile->style == TERMPAINT_CURSOR_STYLE_BAR)
           cursor_profile->style = TERMPAINT_CURSOR_STYLE_BLOCK;
-        }else if (cursor_profile->style == TERMPAINT_CURSOR_STYLE_BLOCK) {
+        else if (cursor_profile->style == TERMPAINT_CURSOR_STYLE_BLOCK)
           cursor_profile->style = TERMPAINT_CURSOR_STYLE_UNDERLINE;
-        }else{
+        else
           cursor_profile->style = TERMPAINT_CURSOR_STYLE_BAR;
-        }
         update_cursor_profile();
       }
     } else if (evt->type == TERMPAINT_EV_KEY) {
       if (evt->type == TERMPAINT_EV_KEY && strcmp(evt->string, "ArrowLeft") == 0) {
-        if (selected == &green) {
+        if (selected == &green)
           selected = &red;
-        } else if (selected == &blue) {
+        else if (selected == &blue)
           selected = &green;
-        }
-      } else if (evt->type == TERMPAINT_EV_KEY && strcmp(evt->string, "b") == 0) {
+      } else if (evt->type == TERMPAINT_EV_KEY && strcmp(evt->string, "b") == 0)
         cycle_cursor_blink();
-      } else if (evt->type == TERMPAINT_EV_KEY && strcmp(evt->string, "v") == 0) {
+      else if (evt->type == TERMPAINT_EV_KEY && strcmp(evt->string, "v") == 0)
         cycle_cursor_visiblity();
-      } else if (evt->type == TERMPAINT_EV_KEY && strcmp(evt->string, "c") == 0) {
+      else if (evt->type == TERMPAINT_EV_KEY && strcmp(evt->string, "c") == 0)
         cycle_cursor_style();
-      } else if (evt->type == TERMPAINT_EV_KEY && strcmp(evt->string, "ArrowRight") == 0) {
-        if (selected == &red) {
+      else if (evt->type == TERMPAINT_EV_KEY && strcmp(evt->string, "ArrowRight") == 0) {
+        if (selected == &red)
           selected = &green;
-        } else if (selected == &green) {
+        else if (selected == &green)
           selected = &blue;
-        }
-      } else if (evt->type == TERMPAINT_EV_KEY && strcmp(evt->string, "ArrowUp") == 0) {
+      } else if (evt->type == TERMPAINT_EV_KEY && strcmp(evt->string, "ArrowUp") == 0)
         *selected = (256 + *selected - 1) % 256;
-      } else if (evt->type == TERMPAINT_EV_KEY && strcmp(evt->string, "ArrowDown") == 0) {
+      else if (evt->type == TERMPAINT_EV_KEY && strcmp(evt->string, "ArrowDown") == 0)
         *selected = (*selected + 1) % 256;
-      } else if (evt->type == TERMPAINT_EV_KEY && strcmp(evt->string, "PageUp") == 0) {
+      else if (evt->type == TERMPAINT_EV_KEY && strcmp(evt->string, "PageUp") == 0)
         *selected = (256 + *selected - 16) % 256;
-      } else if (evt->type == TERMPAINT_EV_KEY && strcmp(evt->string, "PageDown") == 0) {
+      else if (evt->type == TERMPAINT_EV_KEY && strcmp(evt->string, "PageDown") == 0)
         *selected = (*selected + 16) % 256;
-      }
 
       if (evt->type == TERMPAINT_EV_KEY && strcmp(evt->string, "Enter") == 0) {
         int tp_color = TERMPAINT_RGB_COLOR(red, green, blue);
-        if (which_color == 0) {
+        if (which_color == 0)
           termpaint_attr_set_fg(attr_to_change, tp_color);
-        } else if (which_color == 1) {
+        else if (which_color == 1)
           termpaint_attr_set_bg(attr_to_change, tp_color);
-        } else {
+        else
           termpaint_attr_set_deco(attr_to_change, tp_color);
-        }
         return;
       }
 
-      if (strcmp(evt->string, "Escape") == 0) {
+      if (strcmp(evt->string, "Escape") == 0)
         return;
-      }
     }
   }
 } /* rgb_color_menu */
 
 void normalize_palette_type_selection(){
-  if (CUR_PALETTE_TYPE_ID < 0) {
+  if (CUR_PALETTE_TYPE_ID < 0)
     CUR_PALETTE_TYPE_ID = 2;
-  }
-  if (CUR_PALETTE_TYPE_ID > 2) {
+  if (CUR_PALETTE_TYPE_ID > 2)
     CUR_PALETTE_TYPE_ID = 0;
-  }
-  if (cur_palette_index < 1) {
+  if (cur_palette_index < 1)
     cur_palette_index = embedded_palettes_table_qty - 1;
-  }
-  if (cur_palette_index >= embedded_palettes_table_qty) {
+  if (cur_palette_index >= embedded_palettes_table_qty)
     cur_palette_index = 0;
-  }
   int MAX_CHANGES = 100, CHANGES = 0;
 
   while (CUR_PALETTE_TYPE_ID != 0 && CUR_PALETTE_TYPE_ID < 3 && (get_cur_palette().Type != (CUR_PALETTE_TYPE_ID - 1))) {
-    if (prev_cur_palette_index < cur_palette_index || (prev_cur_palette_index > embedded_palettes_table_qty - 1)) {
+    if (prev_cur_palette_index < cur_palette_index || (prev_cur_palette_index > embedded_palettes_table_qty - 1))
       cur_palette_index++;
-    }else if (prev_cur_palette_index > cur_palette_index || (prev_cur_palette_index < 0)) {
+    else if (prev_cur_palette_index > cur_palette_index || (prev_cur_palette_index < 0))
       cur_palette_index--;
-    }else{
+    else
       cur_palette_index++;
-    }
-    if (cur_palette_index < 0) {
+    if (cur_palette_index < 0)
       cur_palette_index = embedded_palettes_table_qty;
-    }
 
-    if (cur_palette_index >= embedded_palettes_table_qty) {
+    if (cur_palette_index >= embedded_palettes_table_qty)
       cur_palette_index = 0;
-    }
-    if (CHANGES > MAX_CHANGES) {
+    if (CHANGES > MAX_CHANGES)
       break;
-    }
     CHANGES++;
   }
   debug_cur_palette();
@@ -704,15 +671,15 @@ void menu(termpaint_attr *attr_ui, termpaint_attr *attr_sample) {
     event *evt = key_wait();
     update_current_key_display(attr_ui, evt);
 
-    if (evt->type == TERMPAINT_EV_CHAR && strcmp(evt->string, "q") == 0) {
+    if (evt->type == TERMPAINT_EV_CHAR && strcmp(evt->string, "q") == 0)
       quit = true;
-    } else if (evt->type == TERMPAINT_EV_CHAR && strcmp(evt->string, "b") == 0) {
+    else if (evt->type == TERMPAINT_EV_CHAR && strcmp(evt->string, "b") == 0)
       cycle_cursor_blink();
-    } else if (evt->type == TERMPAINT_EV_CHAR && strcmp(evt->string, "v") == 0) {
+    else if (evt->type == TERMPAINT_EV_CHAR && strcmp(evt->string, "v") == 0)
       cycle_cursor_visiblity();
-    } else if (evt->type == TERMPAINT_EV_CHAR && strcmp(evt->string, "c") == 0) {
+    else if (evt->type == TERMPAINT_EV_CHAR && strcmp(evt->string, "c") == 0)
       cycle_cursor_style();
-    }else if (evt->type == TERMPAINT_EV_KEY && strcmp(evt->string, "PageUp") == 0) {
+    else if (evt->type == TERMPAINT_EV_KEY && strcmp(evt->string, "PageUp") == 0) {
       prev_cur_palette_index = cur_palette_index;
       CUR_PALETTE_TYPE_ID++;
       normalize_palette_type_selection();
@@ -728,11 +695,11 @@ void menu(termpaint_attr *attr_ui, termpaint_attr *attr_sample) {
       prev_cur_palette_index = cur_palette_index;
       cur_palette_index--;
       normalize_palette_type_selection();
-    }else if (evt->type == TERMPAINT_EV_KEY && strcmp(evt->string, "ArrowLeft") == 0 && !sample) {
+    }else if (evt->type == TERMPAINT_EV_KEY && strcmp(evt->string, "ArrowLeft") == 0 && !sample)
       sample = true;
-    }else if (evt->type == TERMPAINT_EV_KEY && strcmp(evt->string, "ArrowRight") == 0 && sample) {
+    else if (evt->type == TERMPAINT_EV_KEY && strcmp(evt->string, "ArrowRight") == 0 && sample)
       sample = false;
-    }else if (evt->type == TERMPAINT_EV_KEY && strcmp(evt->string, "Enter") == 0) {
+    else if (evt->type == TERMPAINT_EV_KEY && strcmp(evt->string, "Enter") == 0) {
       int which_color = 0;
 
       termpaint_surface_write_with_attr(surface, 25, 4, "* Foreground", attr_ui);
@@ -743,9 +710,8 @@ void menu(termpaint_attr *attr_ui, termpaint_attr *attr_sample) {
         event *evt = key_wait();
         update_current_key_display(attr_ui, evt);
 
-        if (evt->type == TERMPAINT_EV_CHAR && strcmp(evt->string, "q") == 0) {
+        if (evt->type == TERMPAINT_EV_CHAR && strcmp(evt->string, "q") == 0)
           quit = true;
-        }
 
         if (evt->type == TERMPAINT_EV_KEY && strcmp(evt->string, "ArrowLeft") == 0 && which_color == 1) {
           termpaint_surface_write_with_attr(surface, 25, 4, "* Foreground", attr_ui);
@@ -783,9 +749,8 @@ void menu(termpaint_attr *attr_ui, termpaint_attr *attr_sample) {
             update_current_key_display(attr_ui, evt);
 
             if (evt->type == TERMPAINT_EV_CHAR) {
-              if (strcmp(evt->string, "q") == 0) {
+              if (strcmp(evt->string, "q") == 0)
                 quit = true;
-              }
             } else {
               if (strcmp(evt->string, "ArrowLeft") == 0 && type == 1) {
                 type = 0;
@@ -810,13 +775,12 @@ void menu(termpaint_attr *attr_ui, termpaint_attr *attr_sample) {
                 termpaint_surface_clear_rect_with_attr(surface, 29, 14, 25, 3, attr_ui);
 
                 termpaint_attr *to_change = sample ? attr_sample : attr_ui;
-                if (type == 0) {
+                if (type == 0)
                   named_color_menu(attr_ui, to_change, which_color);
-                } else if (type == 1) {
+                else if (type == 1)
                   indexed_color_menu(attr_ui, to_change, which_color);
-                } else {
+                else
                   rgb_color_menu(attr_ui, to_change, which_color);
-                }
                 reset = true;
               }
             }
@@ -844,9 +808,7 @@ char *get_cur_palette_name(){
 }
 
 void debug_cur_palette(){
-  if (!DEBUG_PALETTE_COLORS_TO_STDERR) {
-    return;
-  }
+  if (!DEBUG_PALETTE_COLORS_TO_STDERR)
 
   fprintf(stderr,
           "==============\n%s\n==============\n",
@@ -919,9 +881,9 @@ void debug_cur_palette(){
 
 int term_termpaint_main(int argc, char **argv) {
   (void)argc; (void)argv;
-  if (!init()) {
+  if (!init())
     return(1);
-  }
+
   debug_cur_palette();
 
   attr_ui     = termpaint_attr_new(TERMPAINT_DEFAULT_COLOR, TERMPAINT_DEFAULT_COLOR);

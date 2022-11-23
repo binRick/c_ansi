@@ -12,12 +12,12 @@
 #include "c_string_buffer/include/stringbuffer.h"
 #include "c_stringfn/include/stringfn.h"
 #include "c_vector/vector/vector.h"
+#include "fs/fs.h"
+#include "iowow/iowow.h"
+#include "iowow/iwkv.h"
 #include "log/log.h"
 #include "ms/ms.h"
 #include "timestamp/timestamp.h"
-#include "iowow/iowow.h"
-#include "iowow/iwkv.h"
-#include "fs/fs.h"
 
 ////////////////////////////////////////////
 static inline void  cache_info(char *message);
@@ -28,7 +28,8 @@ static inline int   cache_GetPID();
 ////////////////////////////////////////////
 void __cache_test(){
   char *p;
-  asprintf(&p,"%s%s",require(fs)->tmpdir(),"cache-iowow");
+
+  asprintf(&p, "%s%s", require(fs)->tmpdir(), "cache-iowow");
   Ds(p);
   IWKV_OPTS opts = {
     .path   = p,
@@ -37,7 +38,8 @@ void __cache_test(){
   IWKV      iwkv;
   IWDB      mydb;
   iwrc      rc = iwkv_open(&opts, &iwkv);
-    if (rc) {
+
+  if (rc) {
     iwlog_ecode_error3(rc);
     exit(1);
   }
@@ -48,6 +50,7 @@ void __cache_test(){
   }
 
   IWKV_val key, val;
+
   key.data = "foo";
   key.size = strlen(key.data);
   val.data = "bar";
@@ -57,7 +60,7 @@ void __cache_test(){
   if (rc) {
     iwlog_ecode_error3(rc);
     return(rc);
-  }  
+  }
 
   // Retrieve value associated with `foo` key
   val.data = 0;
@@ -73,8 +76,9 @@ void __cache_test(){
           (int)val.size, (char *)val.data);
 
   iwkv_val_dispose(&val);
-  iwkv_close(&iwkv);  
-}
+  iwkv_close(&iwkv);
+} /* __cache_test */
+
 int cache_init(module(cache) *exports) {
   clib_module_init(cache, exports);
   exports->pid      = getpid();

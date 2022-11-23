@@ -11,49 +11,49 @@
 #include <termios.h>
 #include <unistd.h>
 
-void tc_echo_off()
-{
-	struct termios term;
-	tcgetattr(1, &term);
-	term.c_lflag &= ~ECHO;
-	tcsetattr(1, TCSANOW, &term);
+void tc_echo_off(){
+  struct termios term;
+
+  tcgetattr(1, &term);
+  term.c_lflag &= ~ECHO;
+  tcsetattr(1, TCSANOW, &term);
 }
 
-void tc_echo_on()
-{
-	struct termios term;
-	tcgetattr(1, &term);
-	term.c_lflag |= ECHO;
-	tcsetattr(1, TCSANOW, &term);
+void tc_echo_on(){
+  struct termios term;
+
+  tcgetattr(1, &term);
+  term.c_lflag |= ECHO;
+  tcsetattr(1, TCSANOW, &term);
 }
 
-void tc_canon_on()
-{
-	struct termios term;
-	tcgetattr(1, &term);
-	term.c_lflag |= ICANON;
-	tcsetattr(1, TCSANOW, &term);
+void tc_canon_on(){
+  struct termios term;
+
+  tcgetattr(1, &term);
+  term.c_lflag |= ICANON;
+  tcsetattr(1, TCSANOW, &term);
 }
 
-void tc_canon_off()
-{
-	struct termios term;
-	tcgetattr(1, &term);
-	term.c_lflag &= ~ICANON;
-	tcsetattr(1, TCSANOW, &term);
+void tc_canon_off(){
+  struct termios term;
+
+  tcgetattr(1, &term);
+  term.c_lflag &= ~ICANON;
+  tcsetattr(1, TCSANOW, &term);
 }
 
 bool tc_set_cursor(int x, int y){
-  return(fprintf(stdout, "\x1B[%d;%dH", y, x)>0);
+  return(fprintf(stdout, "\x1B[%d;%dH", y, x) > 0);
 }
 bool tc_save_cursor();
 bool tc_load_cursor();
-void tc_get_cursor(int *x, int *y)
-{
-	tc_echo_off();
-	tc_canon_off();
-	printf("\033[6n");
-	scanf("\033[%d;%dR", x, y);
+
+void tc_get_cursor(int *x, int *y){
+  tc_echo_off();
+  tc_canon_off();
+  printf("\033[6n");
+  scanf("\033[%d;%dR", x, y);
 }
 
 struct winsize *get_terminal_size(){

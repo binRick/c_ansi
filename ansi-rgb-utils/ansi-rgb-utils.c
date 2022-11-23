@@ -7,17 +7,18 @@
 #include <string.h>
 #include <strings.h>
 /////////////////////////////////////////////////////////
+#include "ansi-codes/ansi-codes.h"
+#include "ansi-rgb-utils/ansi-rgb-utils-set.c"
 #include "ansi-rgb-utils/ansi-rgb-utils.h"
+#include "ansi-utils/ansi-utils.h"
 #include "c_string_buffer/include/stringbuffer.h"
 #include "c_stringfn/include/stringfn.h"
-#include "ansi-rgb-utils/ansi-rgb-utils-set.c"
-#include "ansi-codes/ansi-codes.h"
-#include "ansi-utils/ansi-utils.h"
-#include "rgba/src/rgba.h"
 #include "log/log.h"
-#define AU_DELTA_E_K_L             2
-#define AU_DELTA_E_K_1             0.048
-#define AU_DELTA_E_K_2             0.014
+#include "rgba/src/rgba.h"
+#define AU_DELTA_E_K_L    2
+#define AU_DELTA_E_K_1    0.048
+#define AU_DELTA_E_K_2    0.014
+
 static void au_rgb2lab(float r1, float g1, float b1, float *l2, float *a2, float *b2) {
   float x, y, z;
 
@@ -25,23 +26,20 @@ static void au_rgb2lab(float r1, float g1, float b1, float *l2, float *a2, float
   g1 /= 255.0;
   b1 /= 255.0;
 
-  if (r1 > 0.04045) {
+  if (r1 > 0.04045)
     r1 = powf((r1 + 0.055) / 1.055, 2.4);
-  }else{
+  else
     r1 /= 12.92;
-  }
 
-  if (g1 > 0.04045) {
+  if (g1 > 0.04045)
     g1 = powf((g1 + 0.055) / 1.055, 2.4);
-  }else{
+  else
     g1 /= 12.92;
-  }
 
-  if (b1 > 0.04045) {
+  if (b1 > 0.04045)
     b1 = powf((b1 + 0.055) / 1.055, 2.4);
-  }else{
+  else
     b1 /= 12.92;
-  }
 
   r1 *= 100.0;
   g1 *= 100.0;
@@ -55,28 +53,25 @@ static void au_rgb2lab(float r1, float g1, float b1, float *l2, float *a2, float
   y /= 100.000;
   z /= 108.883;
 
-  if (x > 0.008856) {
+  if (x > 0.008856)
     x = powf(x, 0.3333);
-  }else{
+  else
     x = (7.787 * x) + 0.1379;
-  }
 
-  if (y > 0.008856) {
+  if (y > 0.008856)
     y = powf(y, 0.3333);
-  }else{
+  else
     y = (7.787 * y) + 0.1379;
-  }
 
-  if (z > 0.008856) {
+  if (z > 0.008856)
     z = powf(z, 0.3333);
-  }else{
+  else
     z = (7.787 * z) + 0.1379;
-  }
 
   *l2 = (116.0 * y) - 16.0;
   *a2 = 500.0 * (x - y);
   *b2 = 200.0 * (y - z);
-}
+} /* au_rgb2lab */
 
 static float au_delta_e(float l1, float a1, float b1, float l2, float a2, float b2) {
   float deltaL, c1, c2, deltaC, deltaA, deltaB, deltaHSquared, deltaH;
@@ -90,11 +85,10 @@ static float au_delta_e(float l1, float a1, float b1, float l2, float a2, float 
   deltaB        = b1 - b2;
   deltaHSquared = deltaA * deltaA + deltaB * deltaB - deltaC * deltaC;
 
-  if (deltaHSquared > 0) {
+  if (deltaHSquared > 0)
     deltaH = sqrtf(deltaHSquared);
-  }else{
+  else
     deltaH = 0;
-  }
 
   q1     = deltaL / AU_DELTA_E_K_L;
   q2     = deltaC / (1 + AU_DELTA_E_K_1 * c1);
@@ -103,7 +97,6 @@ static float au_delta_e(float l1, float a1, float b1, float l2, float a2, float 
 
   return(deltaE);
 }
-
 
 static int au_closest_ansi_code(const uint32_t trp) {
   float l1, a1, b1;
@@ -115,9 +108,9 @@ static int au_closest_ansi_code(const uint32_t trp) {
 
   for (i = 0; i < sizeof(au_set) / sizeof(*au_set); i++) {
     au_rgb2lab(au_set[i] >> 16 & 0xFF,
-            au_set[i] >> 8 & 0xFF,
-            au_set[i] & 0xFF,
-            &l2, &a2, &b2);
+               au_set[i] >> 8 & 0xFF,
+               au_set[i] & 0xFF,
+               &l2, &a2, &b2);
     now = au_delta_e(l1, a1, b1, l2, a2, b2);
 
     if (now < then) {
@@ -129,16 +122,15 @@ static int au_closest_ansi_code(const uint32_t trp) {
 }
 
 int au_hex_ansicode(char *HEX){
-  int code=0;
+  int  code = 0;
   char gnd = '3';
   char *colp, *ptr;
   int  color;
 
   colp = HEX;
 
-  if (*colp == '#') {
+  if (*colp == '#')
     *colp++;
-  }
   return(au_closest_ansi_code((const uint32_t)colp));
 }
 
@@ -171,12 +163,11 @@ static char *pr(const char *r) {
   struct StringBuffer *sb = stringbuffer_new();
   char                *s;
 
-  for (int i = 0; i < 8; i++) {
+  for (int i = 0; i < 8; i++)
     if (__colors & (1 << i)) {
       asprintf(&s, r, i, i);
       stringbuffer_append_string(sb, s);
     }
-  }
   stringbuffer_append_string(sb, "\n");
   char *ret = stringbuffer_to_string(sb);
 
@@ -202,23 +193,24 @@ char *get_color_boxes(void){
   return(ret);
 }
 
-void au_print_hex_cube(FILE *file,char *hex){
-  short ok;
-  uint32_t val = rgba_from_string(hex,&ok), width;
-  rgba_t _r;
-  _r= rgba_new(val);
+void au_print_hex_cube(FILE *file, char *hex){
+  short    ok;
+  uint32_t val = rgba_from_string(hex, &ok), width;
+  rgba_t   _r;
+
+  _r    = rgba_new(val);
   width = get_terminal_width();
 
- fprintf(stdout,
-     "\t%.2f/%.2f/%.2f/%.2f"
-     "\t%s%s%s"
-     "%s",
-     _r.r,_r.g,_r.b,_r.a,
-     strdup_escaped(au_set_fg_hex(hex)),
-     "  VAL  ",
-     strdup_escaped(RESET_CODE),
-     "\n"
-     );
+  fprintf(stdout,
+          "\t%.2f/%.2f/%.2f/%.2f"
+          "\t%s%s%s"
+          "%s",
+          _r.r, _r.g, _r.b, _r.a,
+          strdup_escaped(au_set_fg_hex(hex)),
+          "  VAL  ",
+          strdup_escaped(RESET_CODE),
+          "\n"
+          );
 }
 
 void print_cube(FILE *file, int g) {
@@ -234,25 +226,41 @@ void print_cube(FILE *file, int g) {
   }
 }
 
-char *au_set_fg_hex(const char *hex){ return au_hex(HEX_SET_FG_CODE,hex); }
-char *au_set_bg_hex(const char *hex){ return au_hex(HEX_SET_BG_CODE,hex); }
-char *au_fg_hex(const char *hex){ return au_hex(HEX_FG_CODE,hex); }
-char *au_bg_hex(const char *hex){ return au_hex(HEX_BG_CODE,hex); }
+char *au_set_fg_hex(const char *hex){
+  return(au_hex(HEX_SET_FG_CODE, hex));
+}
+
+char *au_set_bg_hex(const char *hex){
+  return(au_hex(HEX_SET_BG_CODE, hex));
+}
+
+char *au_fg_hex(const char *hex){
+  return(au_hex(HEX_FG_CODE, hex));
+}
+
+char *au_bg_hex(const char *hex){
+  return(au_hex(HEX_BG_CODE, hex));
+}
+
 char *au_hex(const char *fmt, const char *hex){
   char *s;
-  asprintf(&s, fmt, stringfn_trim(stringfn_replace(hex,'#',' ')));
-  return s;
+
+  asprintf(&s, fmt, stringfn_trim(stringfn_replace(hex, '#', ' ')));
+  return(s);
 }
 
 char *au_bg_color(int color){
   char *s;
+
   asprintf(&s, C256_BG_CODE, color);
-  return s;
+  return(s);
 }
+
 char *au_fg_color(int color){
   char *s;
+
   asprintf(&s, C256_FG_CODE, color);
-  return s;
+  return(s);
 }
 
 ////////////////////////////////////////////////////////////////////////////
@@ -285,30 +293,28 @@ bool is_in_rgb_range(struct RGB rgb) {
     || rgb.green > 1
     || rgb.blue < 0
     || rgb.blue > 1
-    ) {
+    )
     return(false);
-  }
+
   return(true);
 }
 
 float get_rgb_min(struct RGB rgb) {
-  if (rgb.red <= rgb.green && rgb.red <= rgb.blue) {
+  if (rgb.red <= rgb.green && rgb.red <= rgb.blue)
     return(rgb.red);
-  } else if (rgb.green <= rgb.blue) {
+  else if (rgb.green <= rgb.blue)
     return(rgb.green);
-  } else {
+  else
     return(rgb.blue);
-  }
 }
 
 float get_rgb_max(struct RGB rgb) {
-  if (rgb.red >= rgb.green && rgb.red >= rgb.blue) {
+  if (rgb.red >= rgb.green && rgb.red >= rgb.blue)
     return(rgb.red);
-  } else if (rgb.green >= rgb.blue) {
+  else if (rgb.green >= rgb.blue)
     return(rgb.green);
-  } else {
+  else
     return(rgb.blue);
-  }
 }
 
 /* returns max - min */
@@ -327,11 +333,10 @@ float rgb_to_hsl_saturation(struct RGB rgb) {
   float max       = get_rgb_max(rgb);
   float luminance = rgb_to_hsl_luminance(rgb);
 
-  if (luminance <= 0.5) {
+  if (luminance <= 0.5)
     return((max - min) / (max + min));
-  } else {
+  else
     return((max - min) / (2.0 - max - min));
-  }
 }
 
 /* rgb -> hue */
@@ -340,22 +345,20 @@ float rgb_to_hue(struct RGB rgb) {
   float range = get_rgb_range(rgb);
   float hue;
 
-  if (range == 0) {
+  if (range == 0)
     return(NAN);
-  }
 
-  if (rgb.red == max) {
+
+  if (rgb.red == max)
     hue = fmodf((rgb.green - rgb.blue) / (range), 6);
-  } else if (rgb.green == max) {
+  else if (rgb.green == max)
     hue = ((rgb.blue - rgb.red) / (range)) + 2;
-  } else {
+  else
     hue = ((rgb.red - rgb.green) / (range)) + 4;
-  }
 
   hue *= 60;
-  if (hue < 0) {
+  if (hue < 0)
     hue += 360;
-  }
   return(hue);
 }
 
@@ -373,25 +376,24 @@ void print_ansi_color(int red, int green, int blue, int wl, char *word) {
 
 /* rgb -> hsv value */
 float rgb_to_hsv_value(struct RGB rgb) {
-  if (!is_in_rgb_range(rgb)) {
+  if (!is_in_rgb_range(rgb))
     return(-1);
-  }
+
 
   return(get_rgb_max(rgb));
 }
 
 float rgb_to_hsv_saturation(struct RGB rgb) {
-  if (!is_in_rgb_range(rgb)) {
+  if (!is_in_rgb_range(rgb))
     return(-1);
-  }
+
 
   float value = rgb_to_hsv_value(rgb);
 
-  if (value == 0) {
+  if (value == 0)
     return(-1);
-  } else {
+  else
     return((get_rgb_range(rgb)) / value);
-  }
 }
 
 void rgb_to_ints(struct RGBColor rgb, int *r, int *g, int *b) {

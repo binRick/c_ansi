@@ -10,9 +10,8 @@ int min(int a, int b) {
 char *tp__basename(const char *path){
   const char *slash = strrchr(path, '/');
 
-  if (slash) {
+  if (slash)
     path = slash + 1;
-  }
   return((char *)path);
 }
 
@@ -21,17 +20,16 @@ char *cell_at(board_t *board, int x, int y) {
 }
 
 char *str_repeat(char str[], unsigned int times){
-  if (times < 1) {
+  if (times < 1)
     return(NULL);
-  }
+
 
   char   *result;
   size_t str_len = strlen(str);
   result = malloc(sizeof(char) * str_len + 1);
 
-  while (times--) {
+  while (times--)
     strcat(result, str);
-  }
   return(result);
 }
 

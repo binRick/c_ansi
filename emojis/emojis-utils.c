@@ -51,9 +51,8 @@ struct parsed_emoji_t *get_parsed_emoji_t(char *EMOJI_STRING){
   E->string    = stringbuffer_to_string(sb);
   E->padding   = "";
 
-  for (size_t i = 0; i < E->len; i++) {
+  for (size_t i = 0; i < E->len; i++)
     stringbuffer_append_string(padding_sb, " ");
-  }
   E->padding = stringbuffer_to_string(padding_sb);
   return(E);
 }
@@ -73,12 +72,11 @@ size_t u8strwid(const void *beg, const void *end, size_t *width){
   const size_t  sz          = sizeof(__emojis) / sizeof(__emojis[0]);
   const size_t  raw_len     = (const char *)end - (const char *)beg;
 
-  for (size_t i = 0; i < sz; ++i) {
+  for (size_t i = 0; i < sz; ++i)
     if (memcmp(beg, __emojis[i], MIN(strlen(__emojis[i]), raw_len)) == 0) {
       *width = 2;
       return(0);
     }
-  }
   for (size_t i = 0; i < vector_size(__emojis_v); i++) {
     struct emojis_t       *e = vector_get(__emojis_v, i);
     struct parsed_emoji_t *E = get_parsed_emoji_t(e->emoji);

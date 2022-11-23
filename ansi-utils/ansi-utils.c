@@ -21,12 +21,12 @@ static char *read_csi();
 static bool query_dec_mode(int mode);
 
 size_t ansi_utils_tty_copy(const char *s){
-  if (!s) {
+  if (!s)
     return(0);
-  }
+
 
   printf("s: %s\n", s);
-  char *enc = b64_encode((const unsigned char*)s, strlen((const char*)s));
+  char *enc = b64_encode((const unsigned char *)s, strlen((const char *)s));
   printf("enc: %s\n", enc);
   char *copy_seq;
   asprintf(&copy_seq, "\x1b]52;c;%s\a", enc);
@@ -43,9 +43,8 @@ char *strdup_escaped(const char *tmp) {
     if (*tmp >= ' ' && *tmp <= 126 && *tmp != '\\') {
       *dst = *tmp;
       ++dst;
-    } else {
+    } else
       dst += sprintf(dst, "\\x%02hhx", (unsigned char)*tmp);
-    }
   }
   *dst = 0;
   return(ret);
@@ -91,9 +90,8 @@ char *au_draw_box(int BOX_SIZE){
 
   sprintf(out, "%s", BG);
   for (int y = 0; y < H; y++) {
-    for (int x = 0; x < W; x++) {
+    for (int x = 0; x < W; x++)
       strcat(out, " ");
-    }
     strcat(out, "\n");
   }
   return(out);
@@ -108,9 +106,9 @@ int au_term_size(int *w, int *h) {
           ws.ws_row, ws.ws_col, ws.ws_xpixel, ws.ws_ypixel
           );
 
-  if (ret < 0) {
+  if (ret < 0)
     return(ret);
-  }
+
   *w = ws.ws_col;
   *h = ws.ws_row;
   return(0);
@@ -121,17 +119,14 @@ static void await_c1(unsigned char c1){
   bool          in_esc = false;
 
   while ((c = getchar())) {
-    if (c == c1) {
+    if (c == c1)
       break;
-    }
-    if (in_esc && c == (char)(c1 - 0x40)) {
+    if (in_esc && c == (char)(c1 - 0x40))
       break;
-    }
-    if (!in_esc && c == 0x1b) {
+    if (!in_esc && c == 0x1b)
       in_esc = true;
-    }else{
+    else
       in_esc = false;
-    }
   }
 }
 
@@ -142,9 +137,8 @@ static char *read_csi(){
 
   for ( ; i < sizeof(csi) - 1; i++) {
     char c = csi[i] = getchar();
-    if (c >= 0x40 && c <= 0x7e) {
+    if (c >= 0x40 && c <= 0x7e)
       break;
-    }
   }
   csi[++i] = 0;
   return(strdup(csi));
@@ -155,31 +149,27 @@ __attribute__((unused))static bool query_dec_mode(int mode){
   char *s = NULL;
 
   do {
-    if (s) {
+    if (s)
       free(s);
-    }
     s = read_csi();
     int  reply_mode, reply_value;
     char reply_cmd;
-    if (sscanf(s, "?%d;%d$%c", &reply_mode, &reply_value, &reply_cmd) < 3) {
+    if (sscanf(s, "?%d;%d$%c", &reply_mode, &reply_value, &reply_cmd) < 3)
       continue;
-    }
-    if (reply_cmd != 'y') {
+    if (reply_cmd != 'y')
       continue;
-    }
 
-    if (reply_mode != mode) {
+    if (reply_mode != mode)
       continue;
-    }
 
     free(s);
 
-    if (reply_value == 1 || reply_value == 3) {
+    if (reply_value == 1 || reply_value == 3)
       return(true);
-    }
-    if (reply_value == 2 || reply_value == 4) {
+
+    if (reply_value == 2 || reply_value == 4)
       return(false);
-    }
+
 
     printf("Unrecognised reply to DECRQM: %d\n", reply_value);
     return(false);
@@ -192,16 +182,14 @@ bool seticanon(bool icanon, bool echo){
   tcgetattr(0, &termios);
   bool ret = (termios.c_lflag & ICANON);
 
-  if (icanon) {
+  if (icanon)
     termios.c_lflag |= ICANON;
-  }else{
+  else
     termios.c_lflag &= ~ICANON;
-  }
-  if (echo) {
+  if (echo)
     termios.c_lflag |= ECHO;
-  }else{
+  else
     termios.c_lflag &= ~ECHO;
-  }
   tcsetattr(0, TCSANOW, &termios);
   return(ret);
 }
@@ -322,8 +310,8 @@ void bright_color_init(float alpha){
   // a table of nice bright colors
   int num = 8;
 
-  for (  int i = 0; i < num; i++ ) {
-    for (  int j = 0; j < num; j++ ) {
+  for (  int i = 0; i < num; i++ )
+    for (  int j = 0; j < num; j++ )
       for (  int k = 0; k < num; k++ ) {
         h += 1.0 / BRIGHT_COLOR_GOLDEN_RATIO;
 
@@ -336,8 +324,6 @@ void bright_color_init(float alpha){
         colors[c][2] = col[2];
         colors[c][3] = alpha;
       }
-    }
-  }
 }
 
 /* Get a nice bright color from index @i in the color table. */

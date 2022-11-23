@@ -199,9 +199,9 @@ size_t get_index_by_uuid(char *UUID){
     if (tmp_->str) {
       struct ac_confirm_option_t *O = require(ac_confirm)->get_option_by_uuid((char *)(u.b.data[i]->data2));
       assert(O != NULL);
-      if (strcmp(UUID, O->uuid) == 0) {
+      if (strcmp(UUID, O->uuid) == 0)
         return(i);
-      }
+
       i++;
     }
     tmp_ = tmp_->next;
@@ -212,11 +212,10 @@ size_t get_index_by_uuid(char *UUID){
 }
 
 void set_selection_index(size_t NEW_SELECTION_INDEX){
-  if (NEW_SELECTION_INDEX < 0) {
+  if (NEW_SELECTION_INDEX < 0)
     NEW_SELECTION_INDEX = require(ac_confirm)->get_options_qty() - 1;
-  }else if (NEW_SELECTION_INDEX > require(ac_confirm)->get_options_qty() - 1) {
+  else if (NEW_SELECTION_INDEX > require(ac_confirm)->get_options_qty() - 1)
     NEW_SELECTION_INDEX = 0;
-  }
   struct ac_confirm_option_t *NEW_SELECTION = (struct ac_confirm_option_t *)vector_get(require(ac_confirm)->options, NEW_SELECTION_INDEX);
   assert(NEW_SELECTION != NULL);
   for (size_t i = 0; i < require(ac_confirm)->get_options_qty(); i++) {
@@ -242,9 +241,9 @@ struct vt100_node_t *get_node_by_uuid(char *UUID){
     if (tmp_->str) {
       struct ac_confirm_option_t *O = require(ac_confirm)->get_option_by_uuid((char *)(u.b.data[i]->data2));
       assert(O != NULL);
-      if (strcmp(UUID, O->uuid) == 0) {
+      if (strcmp(UUID, O->uuid) == 0)
         return(u.b.data[i]);
-      }
+
       i++;
     }
     tmp_ = tmp_->next;
@@ -265,11 +264,10 @@ void change_selection_index(int CHANGE_SELECTION_TYPE) {
         NEW_SELECTION_INDEX = i + 1;
         break;
       case CHANGE_SELECTION_TYPE_PREV:
-        if (i == 0) {
+        if (i == 0)
           NEW_SELECTION_INDEX = require(ac_confirm)->get_options_qty() - 1;
-        }else{
+        else
           NEW_SELECTION_INDEX = i - 1;
-        }
         break;
       }
       return(set_selection_index(NEW_SELECTION_INDEX));
@@ -313,7 +311,7 @@ void reload_options() {
           tmp_->fg.type  = P[0]->fg.type;
           tmp_->fg.value = P[0]->fg.value;
         }
-        if (false) {
+        if (false)
           fprintf(stderr,
                   "#%lu> Text: %s\n\t  Foreground: %i\n\t  Background: %i\n  Mode: %i|"
                   "data2:%s|id:%d|"
@@ -340,7 +338,6 @@ void reload_options() {
                   P[0]->fg.type, P[0]->fg.value, P[0]->bg.type, P[0]->bg.value,
                   P[1]->fg.type, P[1]->fg.value, P[1]->bg.type, P[1]->bg.value
                   );
-        }
         i++;
       }
       tmp_ = tmp_->next;
@@ -355,12 +352,11 @@ struct vt100_node_t *parse_seq(char *SEQ){
   struct vt100_node_t *_tmp  = _head;
 
   while (_tmp != NULL) {
-    if (false) {
+    if (false)
       fprintf(stderr, AC_RED "str:%s\n" AC_RESETALL, _tmp->str);
-    }
-    if (_tmp->str != NULL && (strcmp(_tmp->str, TEST_STR) == 0)) {
+    if (_tmp->str != NULL && (strcmp(_tmp->str, TEST_STR) == 0))
       return(_tmp);
-    }
+
     _tmp = _tmp->next;
   }
   fprintf(stderr, AC_RED "NOT FOUND\n"AC_RESETALL);
@@ -368,9 +364,8 @@ struct vt100_node_t *parse_seq(char *SEQ){
 }
 
 void hover(ui_box_t *b, int x, int y, __attribute__((unused)) int down) {
-  if (false) {
+  if (false)
     fprintf(stderr, "hover.uuid:%s.....%dx%d\n", (char *)b->data2, x, y);
-  }
 }
 
 void draw(ui_box_t *b, char *out) {
@@ -378,13 +373,12 @@ void draw(ui_box_t *b, char *out) {
   char                *sgr  = vt100_sgr(node, NULL);
 
   sprintf(out, "%s%s", sgr, node->str);
-  if (false) {
+  if (false)
     fprintf(stderr, "draw..uuid:%s....\n\t|sgr:%s\n\t|out:%s\n\t|fg:%d|bg:%d|[%s]|%d|\n",
             (char *)b->data2,
             strdup_escaped(sgr),
             strdup_escaped(out),
             node->fg.value, node->bg.value, (char *)node->str, node->len);
-  }
   free(sgr);
 
   {
@@ -401,9 +395,8 @@ void draw(ui_box_t *b, char *out) {
     {
       printf("\x1b[%i;%iH", 4, 4);
       printf("\x1b[35m┌");
-      for (int x = 1; x < 10; x++) {
+      for (int x = 1; x < 10; x++)
         printf("─");
-      }
       printf("┐");
     }
     {
@@ -417,9 +410,8 @@ void draw(ui_box_t *b, char *out) {
     {
       printf("\x1b[%i;%iH", (int)require(ac_confirm)->get_options_qty() + 5, 4);
       printf("\x1b[35m└");
-      for (int x = 1; x < 10; x++) {
+      for (int x = 1; x < 10; x++)
         printf("─");
-      }
       printf("┘");
       printf("\x1b[0m");
     }
@@ -429,11 +421,10 @@ void draw(ui_box_t *b, char *out) {
 void click(ui_box_t *b, int x, int y) {
   struct vt100_node_t *node = b->data1;
 
-  if (false) {
+  if (false)
     fprintf(stderr, AC_YELLOW "click....uuid:%s..%dx%d: fg:%d|bg:%d|[%s]|%d|\n" AC_RESETALL,
             (char *)b->data2, x, y, node->fg.value, node->bg.value, (char *)node->str, node->len
             );
-  }
   change_selection_by_uuid((char *)b->data2);
 }
 
@@ -497,13 +488,12 @@ void unhandled_input(void *BINDING_DATA){
     }
     tmp++;
   }
-  if (false == is_handled) {
+  if (false == is_handled)
     fprintf(stderr, "[BINDING_MODE_UNHANDLED_INPUT]      escaped:'%s' (%lu chars)"
             "\n",
             strdup_escaped((char *)BINDING_DATA),
             strlen((char *)BINDING_DATA)
             );
-  }
 
   return;
 } /* unhandled_input */
@@ -535,7 +525,7 @@ char *ac_confirm_render_ui(){
 
   while (tmp != NULL) {
     if (tmp->str != NULL) {
-      if (false) {
+      if (false)
         fprintf(stderr,
                 "#%lu> Text: %s\n x:%d|y:%d| Foreground: %i/%d\n  Background: %i/%d\n  Mode: %i\n\n",
                 index,
@@ -547,7 +537,6 @@ char *ac_confirm_render_ui(){
                 tmp->bg.type,
                 tmp->mode
                 );
-      }
       size_t added_id = ui_add(
         x, y,
         tmp->len, 1,
@@ -637,9 +626,8 @@ struct Vector *ac_confirm_render_option_buttons(){
 struct ac_confirm_option_t *ac_confirm_get_option_by_uuid(char *UUID){
   for (size_t i = 0; i < vector_size(require(ac_confirm)->options); i++) {
     struct ac_confirm_option_t *O = (struct ac_confirm_option_t *)vector_get(require(ac_confirm)->options, i);
-    if (strcmp(UUID, O->uuid) == 0) {
+    if (strcmp(UUID, O->uuid) == 0)
       return(O);
-    }
   }
 
   return(NULL);

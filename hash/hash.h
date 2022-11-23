@@ -37,8 +37,8 @@ module(hash) {
   void                 (*error)(char *);
 };
 
-int hash_init(module(hash) *exports);
-void hash_deinit(module(hash) *exports);
+int  hash_init(module(hash) * exports);
+void hash_deinit(module(hash) * exports);
 
 exports(hash) {
   .log_mode = HASH_LOG_MODE_NONE,

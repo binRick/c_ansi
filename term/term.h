@@ -37,8 +37,8 @@ module(term) {
   void                 (*error)(char *);
 };
 
-int term_init(module(term) *exports);
-void term_deinit(module(term) *exports);
+int  term_init(module(term) * exports);
+void term_deinit(module(term) * exports);
 
 exports(term) {
   .log_mode = TERM_LOG_MODE_NONE,

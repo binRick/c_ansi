@@ -4,36 +4,44 @@
 #include <stdlib.h>
 #include <string.h>
 /////////////////////////////////////////////////////
+#include "b64.c/b64.h"
+#include "c_fsio/include/fsio.h"
 #include "c_string_buffer/include/stringbuffer.h"
 #include "c_stringfn/include/stringfn.h"
-#include "string-utils/string-utils.h"
 #include "sha256.c/sha256.h"
-#include "c_fsio/include/fsio.h"
-#include "b64.c/b64.h"
+#include "string-utils/string-utils.h"
+
 /////////////////////////////////////////////////////
-char *hash_path(char*path){
+char *hash_path(char *path){
   unsigned char buf[32] = { 0 };
-  sha256_hash(buf,fsio_read_binary_file(path),fsio_file_size(path));
-  return(b64_encode(buf,32));
+
+  sha256_hash(buf, fsio_read_binary_file(path), fsio_file_size(path));
+  return(b64_encode(buf, 32));
 }
-char *hash_buffer(void*s,size_t len){
+
+char *hash_buffer(void *s, size_t len){
   unsigned char buf[32] = { 0 };
-  sha256_hash(buf,(unsigned char*)s,len);
-  return(b64_encode(buf,32));
+
+  sha256_hash(buf, (unsigned char *)s, len);
+  return(b64_encode(buf, 32));
 }
-char *hash_string(char*s,size_t len){
+
+char *hash_string(char *s, size_t len){
   unsigned char buf[32] = { 0 };
-  sha256_hash(buf,s,len);
-  return(b64_encode(buf,32));
+
+  sha256_hash(buf, s, len);
+  return(b64_encode(buf, 32));
 }
+
 char *su_limit_string_lines_width(char *str, size_t width){
-  char *s;
-  struct StringBuffer *sb = stringbuffer_new();
+  char                   *s;
+  struct StringBuffer    *sb   = stringbuffer_new();
   struct StringFNStrings lines = stringfn_split_lines(str);
-  for(int i=0;i<lines.count;i++){
-    if(i>0)
-      stringbuffer_append_string(sb,"\n");
-    stringbuffer_append_string(sb,stringfn_substring(lines.strings[i],0,width));
+
+  for (int i = 0; i < lines.count; i++) {
+    if (i > 0)
+      stringbuffer_append_string(sb, "\n");
+    stringbuffer_append_string(sb, stringfn_substring(lines.strings[i], 0, width));
   }
 
   stringfn_release_strings_struct(lines);
@@ -61,17 +69,15 @@ char *vector_size_ts_to_csv(struct Vector *v, int max_width){
 
   for (size_t i = 0; i < vector_size(v); i++) {
     if (strlen(stringbuffer_to_string(cur_line)) > (size_t)max_width) {
-      if (lines_qty > 0) {
+      if (lines_qty > 0)
         stringbuffer_append_string(sb, "\n");
-      }
       stringbuffer_append_string(sb, stringbuffer_to_string(cur_line));
       stringbuffer_clear(cur_line);
       cur_line_index = 0;
       lines_qty++;
     }else{
-      if (cur_line_index > 0 && i < vector_size(v) - 1) {
+      if (cur_line_index > 0 && i < vector_size(v) - 1)
         stringbuffer_append_string(cur_line, ", ");
-      }
       stringbuffer_append_unsigned_long_long(cur_line, (size_t)vector_get(v, i));
       cur_line_index++;
     }
@@ -97,9 +103,9 @@ char *CFDictionaryCopyCString(CFDictionaryRef dict, const void *key) {
   char       *value;
 
   dictValue = CFDictionaryGetValue(dict, key);
-  if (dictValue == NULL) {
+  if (dictValue == NULL)
     return(NULL);
-  }
+
   length  = CFStringGetLength(dictValue);
   maxSize = CFStringGetMaximumSizeForEncoding(length, kCFStringEncodingUTF8);
   if (length == 0 || maxSize == 0) {
@@ -117,32 +123,30 @@ char *CFDictionaryCopyCString(CFDictionaryRef dict, const void *key) {
 CFArrayRef cfarray_of_cfnumbers(void *values, size_t size, int count, CFNumberType type){
   CFNumberRef temp[count];
 
-  for (int i = 0; i < count; ++i) {
+  for (int i = 0; i < count; ++i)
     temp[i] = CFNumberCreate(NULL, type, ((char *)values) + (size * i));
-  }
 
   CFArrayRef result = CFArrayCreate(NULL, (const void **)temp, count, &kCFTypeArrayCallBacks);
 
-  for (int i = 0; i < count; ++i) {
+  for (int i = 0; i < count; ++i)
     CFRelease(temp[i]);
-  }
 
   return(result);
 }
 
 char * CFStringCopyUTF8String(CFStringRef aString){
-  if (aString == NULL) {
+  if (aString == NULL)
     return(NULL);
-  }
+
 
   CFIndex length  = CFStringGetLength(aString);
   CFIndex maxSize = CFStringGetMaximumSizeForEncoding(length, kCFStringEncodingUTF8);
 
   char    *buffer = (char *)malloc(maxSize);
 
-  if (CFStringGetCString(aString, buffer, maxSize, kCFStringEncodingUTF8)) {
+  if (CFStringGetCString(aString, buffer, maxSize, kCFStringEncodingUTF8))
     return(buffer);
-  }
+
 
   return(buffer);
 }
@@ -156,18 +160,16 @@ char * cstring_get_ascii_string(CFStringRef data) {
   if (bytes == NULL) {
     len   = (size_t)CFStringGetLength(data) + 1;
     chars = (char *)calloc(len, sizeof(char));
-    if (chars != NULL) {
+    if (chars != NULL)
       if (!CFStringGetCString(data, chars, (CFIndex)len, ASCII_ENCODING)) {
         free(chars);
         chars = NULL;
       }
-    }
   } else {
     len   = strlen(bytes) + 1;
     chars = (char *)calloc(len, sizeof(char));
-    if (chars != NULL) {
+    if (chars != NULL)
       strcpy(chars, bytes);
-    }
   }
   return(chars);
 }
@@ -210,9 +212,9 @@ char *cfstring_copy(CFStringRef string) {
   CFIndex num_bytes = CFStringGetMaximumSizeForEncoding(CFStringGetLength(string), kCFStringEncodingUTF8);
   char    *result   = malloc(num_bytes + 1);
 
-  if (!result) {
+  if (!result)
     return(NULL);
-  }
+
 
   if (!CFStringGetCString(string, result, num_bytes + 1, kCFStringEncodingUTF8)) {
     free(result);
@@ -226,9 +228,9 @@ char *string_copy(char *s) {
   int  length  = strlen(s);
   char *result = malloc(length + 1);
 
-  if (!result) {
+  if (!result)
     return(NULL);
-  }
+
 
   memcpy(result, s, length);
   result[length] = '\0';
@@ -236,18 +238,21 @@ char *string_copy(char *s) {
 }
 
 char *uppercase_first_word_letters(char *S){
-  char *s=NULL, *t, *w;
-  if(!S)return(s);
+  char *s = NULL, *t, *w;
+
+  if (!S) return(s);
+
   struct StringFNStrings words = stringfn_split_words(S);
-  struct StringBuffer *sb = stringbuffer_new();
-  for(int i=0;i<words.count;i++){
+  struct StringBuffer    *sb   = stringbuffer_new();
+
+  for (int i = 0; i < words.count; i++) {
     w = words.strings[i];
-    asprintf(&t,"%s%s",
-        stringfn_to_uppercase(stringfn_substring(w,0,1)),
-        stringfn_substring(w,1,strlen(w)-1)
-        );
-    stringbuffer_append_string(sb,strdup(t));
-    if(t)free(t);
+    asprintf(&t, "%s%s",
+             stringfn_to_uppercase(stringfn_substring(w, 0, 1)),
+             stringfn_substring(w, 1, strlen(w) - 1)
+             );
+    stringbuffer_append_string(sb, strdup(t));
+    if (t) free(t);
   }
   s = stringbuffer_to_string(sb);
   stringbuffer_release(sb);
@@ -255,9 +260,10 @@ char *uppercase_first_word_letters(char *S){
 }
 
 char *size_to_string(const size_t b){
-  char *s = NULL;
-  struct StringBuffer *sb = stringbuffer_new_with_options(b%10, true);
-  stringbuffer_append_unsigned_long_long(sb,b);
+  char                *s  = NULL;
+  struct StringBuffer *sb = stringbuffer_new_with_options(b % 10, true);
+
+  stringbuffer_append_unsigned_long_long(sb, b);
   s = stringbuffer_to_string(sb);
   stringbuffer_release(sb);
   return(s);
@@ -266,11 +272,10 @@ char *size_to_string(const size_t b){
 char *int_to_string(const int b){
   struct StringBuffer *sb = stringbuffer_new_with_options(8, true);
 
-  if (b == 1) {
+  if (b == 1)
     stringbuffer_append_string(sb, "Yes");
-  }else{
+  else
     stringbuffer_append_string(sb, "No");
-  }
   char *s = stringbuffer_to_string(sb);
 
   stringbuffer_release(sb);
@@ -280,11 +285,10 @@ char *int_to_string(const int b){
 char *int_to_icon(const int b){
   struct StringBuffer *sb = stringbuffer_new_with_options(8, true);
 
-  if (b == 1) {
+  if (b == 1)
     stringbuffer_append_string(sb, "✅");
-  }else{
+  else
     stringbuffer_append_string(sb, "❌");
-  }
   char *s = stringbuffer_to_string(sb);
 
   stringbuffer_release(sb);
@@ -292,26 +296,27 @@ char *int_to_icon(const int b){
 }
 
 bool string_contains_string(const char *s1, const char *s2){
-  if(strlen(s2)>strlen(s1))return false;
-  size_t len = strlen(s2);
-  char *ss;
-  for(size_t i=0;i<strlen(s1)-len+1;i++){
-    ss = stringfn_substring(s1,i,len);
+  if (strlen(s2) > strlen(s1)) return(false);
 
-    if(strcmp(ss,s2)==0)
-      return true;
+  size_t len = strlen(s2);
+  char   *ss;
+  for (size_t i = 0; i < strlen(s1) - len + 1; i++) {
+    ss = stringfn_substring(s1, i, len);
+
+    if (strcmp(ss, s2) == 0)
+      return(true);
   }
-  return false;
+  return(false);
 }
 
 char *strip_non_alpha(const char *s){
   struct StringBuffer *sb = stringbuffer_new_with_options(strlen(s), true);
+
   for (size_t i = 0; i < strlen(s); i++) {
     char *substring = stringfn_substring(s, i, 1);
     if (substring) {
-      if (stringfn_is_ascii(substring) && isalpha(substring[0])) {
+      if (stringfn_is_ascii(substring) && isalpha(substring[0]))
         stringbuffer_append_string(sb, substring);
-      }
       free(substring);
     }
   }
@@ -319,7 +324,6 @@ char *strip_non_alpha(const char *s){
 
   stringbuffer_release(sb);
   return(stripped);
-
 }
 
 char *strip_non_ascii(const char *s){
@@ -328,9 +332,8 @@ char *strip_non_ascii(const char *s){
   for (size_t i = 0; i < strlen(s); i++) {
     char *substring = stringfn_substring(s, i, 1);
     if (substring) {
-      if (stringfn_is_ascii(substring)) {
+      if (stringfn_is_ascii(substring))
         stringbuffer_append_string(sb, substring);
-      }
       free(substring);
     }
   }
@@ -365,16 +368,15 @@ void pad_string(uint32_t   hex_num,
    * 0 1 2 3 4 5  6 7 8 9 0
    * 0 x 8 0 0 0  0 0 0 0 \0
    */
-  if (destination == NULL) {
+  if (destination == NULL)
     return;
-  }
+
 
   memset(destination, pad_char, width);
   destination[width - 1] = '\0';
 
-  if (hex_num != check_num) {
+  if (hex_num != check_num)
     sprintf(destination, "0x%08X", hex_num);
-  }
 }
 
 size_t string_size_to_size_t(char *SIZE_STRING){
@@ -404,9 +406,8 @@ char *pad_string_ret(uint32_t   hex_num,
   memset(pad_string, pad_char, sizeof(pad_string));
   pad_string[sizeof(pad_string) - 1] = '\0';
 
-  if (hex_num != check_num) {
+  if (hex_num != check_num)
     sprintf(pad_string, "0x%08X", hex_num);
-  }
 
   return((char *)(pad_string));
 }
@@ -421,9 +422,10 @@ void safe_CFRelease(void *cfTypeRefPtr){
 }
 
 char *pad_string_right(char *S, int len, char p){
-  char *s= strdup(S);
-  while(strlen(s)<len)
-    asprintf(&s,"%s%c",s,p);
+  char *s = strdup(S);
+
+  while (strlen(s) < len)
+    asprintf(&s, "%s%c", s, p);
   return(s);
 }
 

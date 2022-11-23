@@ -146,8 +146,7 @@ int main(const int argc, const char **argv) {
   RUN_SUITE(s_restic_embedded_deploy);
   RUN_SUITE(s_restic_embedded_test_deploy);
   RUN_SUITE(s_restic_embedded_test_create_repo);
-  if (fsio_file_exists(restic_embedded_file_path) == true) {
+  if (fsio_file_exists(restic_embedded_file_path) == true)
     fsio_remove(restic_embedded_file_path);
-  }
   GREATEST_MAIN_END();
 }

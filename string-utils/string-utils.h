@@ -29,8 +29,8 @@ size_t string_size_to_size_t(char *SIZE_STRING);
 int read_16bytes_little_endian_image_buffer(unsigned char *buf);
 int read_32bytes_big_endian_image_buffer(unsigned char *buf);
 char *uppercase_first_word_letters(char *);
-char *pad_string_right(char * s, int len, char p);
-char *hash_buffer(void*s,size_t len);
-char *hash_path(char*path);
-char *hash_buffer(void*s,size_t len);
+char *pad_string_right(char *s, int len, char p);
+char *hash_buffer(void *s, size_t len);
+char *hash_path(char *path);
+char *hash_buffer(void *s, size_t len);
 #endif

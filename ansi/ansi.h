@@ -12,9 +12,9 @@
 #include <string.h>
 #include <unistd.h>
 //////////////////////////////////////
+#include "module/def.h"
 #include "module/module.h"
 #include "module/require.h"
-#include "module/def.h"
 
 // Module Type Interface
 module(ansi) {
@@ -25,14 +25,14 @@ module(ansi) {
 };
 
 int
-ansi_init(module(ansi) *exports);
+  ansi_init(module(ansi) * exports);
 
 void
-ansi_deinit(module(ansi) *exports);
+  ansi_deinit(module(ansi) * exports);
 
 // Default Module Exports
 exports(ansi) {
-  .init = ansi_init,
+  .init   = ansi_init,
   .deinit = ansi_deinit,
 };
 

@@ -1,8 +1,8 @@
 #pragma once
 #ifndef TPSELH
 #define TPSELH
-#include "uuid4/src/uuid4.h"
 #include "tp-internal.h"
+#include "uuid4/src/uuid4.h"
 //////////////////////////////////////////////////////////////////
 extern termpaint_attr *attr_bottom_msg;
 enum change_selection_type_t {
