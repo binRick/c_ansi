@@ -14,7 +14,13 @@ tp_include_dirs = [
 ]
 
 tp_deps = [
+  log_dep,
+  tempdir_dep,
   termpaint_dep,  
+  ms_dep,
+  bytes_dep,
+  str_dep,
+  termpaint_image_dep,
   c_stringfn_dep,  
   c_string_buffer_dep,  
   ansi_codes_dep,  

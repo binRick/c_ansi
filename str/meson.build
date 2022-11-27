@@ -21,6 +21,7 @@ str_static_libs = [
   #c_vector_lib_static,
   ]
 str_deps = [
+  emojis_dep,
   module_dep,
   ansi_codes_dep,
   c_vector_dep,

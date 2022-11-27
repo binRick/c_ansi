@@ -1,10 +1,18 @@
 #pragma once
 #ifndef TPC
 #define TPC
+#define DEBUG false
 #include <stdint.h>
 #include <stdlib.h>
 //////////////////////////////////////////////////////////////////
 #include "tp-internal.h"
+#include <termpaint_image.h>
+#include "log/log.h"
+#include "tempdir.c/tempdir.h"
+#include "timestamp/timestamp.h"
+#include "ms/ms.h"
+#include "bytes/bytes.h"
+#include "str/str.h"
 //////////////////////////////////////////////////////////////////
 #include "tp.h"
 //////////////////////////////////////////////////////////////////
@@ -110,11 +118,11 @@ volatile unsigned int
 
 ///////////////////////////////////////////////
 static void logging_func(__attribute__((unused)) termpaint_integration *integration, const char *data, int length){
-  fprintf(stderr, AC_RESETALL AC_GREEN "[logging_func] len:%d|data:'%s'\n" AC_RESETALL "\n", length, data);
+  if(DEBUG)
+   fprintf(stderr, AC_RESETALL AC_GREEN "[logging_func] len:%d|data:'%s'\n" AC_RESETALL "\n", length, data);
 }
 
 int term_tests_main(const int argc, const char **argv) {
-  printf("Main start\n");
   repaint_all(attr_ui, attr_sample);
   menu(attr_ui, attr_sample);
 
@@ -204,16 +212,21 @@ static void event_callback(void *userdata, termpaint_event *tp_event) {
     my_event->modifier = tp_event->c.modifier;
     my_event->string   = strndup(tp_event->c.string, tp_event->c.length);
     my_event->next     = NULL;
-    fprintf(stderr, AC_RESETALL AC_YELLOW AC_REVERSED "[TERMPAINT_EV_CHAR]   |%d|%s|" AC_RESETALL "\n", my_event->modifier, my_event->string);
+   // fprintf(stderr, AC_RESETALL AC_YELLOW AC_REVERSED "[TERMPAINT_EV_CHAR]   |%d|%s|" AC_RESETALL "\n", my_event->modifier, my_event->string);
   } else if (tp_event->type == TERMPAINT_EV_MISC) {
-    if (strcmp(tp_event->misc.atom, "FocusIn") == 0)
-      fprintf(stderr, AC_RESETALL AC_GREEN "Focus In" AC_RESETALL "\n");
-    else if (strcmp(tp_event->misc.atom, "FocusOut") == 0)
-      fprintf(stderr, AC_RESETALL AC_RED "Focus Out" AC_RESETALL "\n");
-    else
-      fprintf(stderr, "TERMPAINT_EV_MISC:%s\n", tp_event->misc.atom);
+    if (strcmp(tp_event->misc.atom, "FocusIn") == 0){
+      if(DEBUG)
+        fprintf(stderr, AC_RESETALL AC_GREEN "Focus In" AC_RESETALL "\n");
+    }else if (strcmp(tp_event->misc.atom, "FocusOut") == 0){
+        if(DEBUG)
+          fprintf(stderr, AC_RESETALL AC_RED "Focus Out" AC_RESETALL "\n");
+    }else{
+      if(DEBUG)
+        fprintf(stderr, "TERMPAINT_EV_MISC:%s\n", tp_event->misc.atom);
+    }
   } else if (tp_event->type == TERMPAINT_EV_KEY) {
-    fprintf(stderr, AC_RESETALL AC_YELLOW AC_REVERSED "tp_event->type:%d|%s" AC_RESETALL "\n", tp_event->type, (char *)tp_event->key.atom);
+    if(DEBUG)
+      fprintf(stderr, AC_RESETALL AC_YELLOW AC_REVERSED "tp_event->type:%d|%s" AC_RESETALL "\n", tp_event->type, (char *)tp_event->key.atom);
     my_event           = malloc(sizeof(event));
     my_event->type     = tp_event->type;
     my_event->modifier = tp_event->key.modifier;
@@ -300,7 +313,8 @@ int term_init(void) {
 
   if (termpaint_terminal_self_reported_name_and_version(terminal)) {
     char *self_reported_name_and_version = termpaint_terminal_self_reported_name_and_version(terminal);
-    fprintf(stderr, AC_RESETALL AC_GREEN "[self_reported_name_and_version] %s\n" AC_RESETALL "\n", self_reported_name_and_version);
+    if(DEBUG)
+      fprintf(stderr, AC_RESETALL AC_GREEN "[self_reported_name_and_version] %s\n" AC_RESETALL "\n", self_reported_name_and_version);
   }
 
 //  termpaint_terminal_set_log_mask(terminal, TERMPAINT_LOG_AUTO_DETECT_TRACE | TERMPAINT_LOG_TRACE_RAW_INPUT);
@@ -316,7 +330,7 @@ int term_init(void) {
     .sa_handler = tb_sig_handler,
     .sa_flags   = SA_NODEFER
   }, 0);
-  LOG("SIGWINCH LOADED");
+//  LOG("SIGWINCH LOADED");
 
   cursor_profile->visible = DEFAULT_CURSOR_VISIBLE;
   update_cursor_profile();
@@ -325,7 +339,6 @@ int term_init(void) {
   //termpaint_terminal_add_input_data(terminal, d, strlen(d));
 
   clear_bottom_msg(false, false);
-  //REDRAW_SURFACE_OBJECTS();
   return(EXIT_SUCCESS);
 } /* term_init */
 
@@ -396,8 +409,6 @@ static void repaint_all(termpaint_attr *attr_ui, termpaint_attr *attr_sample){
   termpaint_surface_clear_with_attr(surface, attr_ui);
   termpaint_surface_write_with_attr(surface, 1, 1, "Terminal UI", attr_ui);
   repaint_samples(attr_ui, attr_sample);
-
-  termpaint_surface_write_with_attr(surface, 25, 2, "Select Color", attr_ui);
 
   termpaint_surface_write_with_attr(surface, 2, 20, "q: Quit", attr_ui);
 } /* repaint_all */
@@ -681,21 +692,23 @@ static void menu(termpaint_attr *attr_ui, termpaint_attr *attr_sample) {
       reset = false;
     }
 
-    if (sample) {
-      termpaint_surface_write_with_attr(surface, 25, 3, "* Sample", attr_ui);
-      termpaint_surface_write_with_attr(surface, 40, 3, "  UI", attr_ui);
-    } else {
-      termpaint_surface_write_with_attr(surface, 25, 3, "  Sample", attr_ui);
-      termpaint_surface_write_with_attr(surface, 40, 3, "* UI", attr_ui);
-    }
-
     event *evt = key_wait();
     update_current_key_display(attr_ui, evt);
     if (evt->type == TERMPAINT_EV_CHAR && strcmp(evt->string, "q") == 0)
       quit = true;
     else if (evt->type == TERMPAINT_EV_CHAR && strcmp(evt->string, "b") == 0)
       cycle_cursor_blink();
-    else if (evt->type == TERMPAINT_EV_CHAR && strcmp(evt->string, "v") == 0)
+    else if (evt->type == TERMPAINT_EV_CHAR && strcmp(evt->string, "i") == 0){
+      char *s;
+      asprintf(&s,"%s%lld",gettempdir(),timestamp());
+      unsigned long st=timestamp(),dur=0;
+      if(!termpaint_image_save(surface,s)){
+        log_error("Failed to save image");
+        exit(EXIT_FAILURE);
+      }
+      dur=timestamp() -st;
+      log_info("Saved surface to %s in %s",s,milliseconds_to_string(dur));
+    } else if (evt->type == TERMPAINT_EV_CHAR && strcmp(evt->string, "v") == 0)
       cycle_cursor_visiblity();
     else if (evt->type == TERMPAINT_EV_KEY && strcmp(evt->string, "ArrowUp") == 0)
       select_prev();
@@ -717,7 +730,7 @@ static void menu(termpaint_attr *attr_ui, termpaint_attr *attr_sample) {
       title_updates_qty++;
 
       char *NEW_TITLE   = "xxxxxxxxX";
-      char *title_chars = "yyyyy";
+      char *title_chars = require(str)->emoji->digit(DIGIT_EMOJI_TYPE_CIRCLE, title_updates_qty);
       asprintf(&NEW_TITLE, "|\t%d\t|" "\t%s\t|", title_updates_qty, title_chars);
       sprintf(MSG, "%s", NEW_TITLE);
       termpaint_terminal_set_title(terminal, NEW_TITLE, TERMPAINT_TITLE_MODE_PREFER_RESTORE);
@@ -758,9 +771,6 @@ static void menu(termpaint_attr *attr_ui, termpaint_attr *attr_sample) {
       sample = false;
     else if (evt->type == TERMPAINT_EV_KEY && strcmp(evt->string, "Enter") == 0) {
       int which_color = 0;
-      termpaint_surface_write_with_attr(surface, 25, 4, "* Foreground", attr_ui);
-      termpaint_surface_write_with_attr(surface, 40, 4, "  Background", attr_ui);
-      termpaint_surface_write_with_attr(surface, 54, 4, "  Deco", attr_ui);
 
       while (!quit && !reset) {
         event *evt = key_wait();
@@ -769,25 +779,6 @@ static void menu(termpaint_attr *attr_ui, termpaint_attr *attr_sample) {
         if (evt->type == TERMPAINT_EV_CHAR && strcmp(evt->string, "q") == 0)
           quit = true;
 
-        if (evt->type == TERMPAINT_EV_KEY && strcmp(evt->string, "ArrowLeft") == 0 && which_color == 1) {
-          termpaint_surface_write_with_attr(surface, 25, 4, "* Foreground", attr_ui);
-          termpaint_surface_write_with_attr(surface, 40, 4, "  Background", attr_ui);
-          which_color = 0;
-        } else if (evt->type == TERMPAINT_EV_KEY && strcmp(evt->string, "ArrowLeft") == 0 && which_color == 2) {
-          termpaint_surface_write_with_attr(surface, 40, 4, "* Background", attr_ui);
-          termpaint_surface_write_with_attr(surface, 54, 4, "  Deco", attr_ui);
-          which_color = 1;
-        }
-
-        if (evt->type == TERMPAINT_EV_KEY && strcmp(evt->string, "ArrowRight") == 0 && which_color == 0) {
-          termpaint_surface_write_with_attr(surface, 25, 4, "  Foreground", attr_ui);
-          termpaint_surface_write_with_attr(surface, 40, 4, "* Background", attr_ui);
-          which_color = 1;
-        } else if (evt->type == TERMPAINT_EV_KEY && strcmp(evt->string, "ArrowRight") == 0 && which_color == 1) {
-          termpaint_surface_write_with_attr(surface, 40, 4, "  Background", attr_ui);
-          termpaint_surface_write_with_attr(surface, 54, 4, "* Deco", attr_ui);
-          which_color = 2;
-        }
 
         if (evt->type == TERMPAINT_EV_KEY && (strcmp(evt->string, "ArrowUp") == 0 || strcmp(evt->string, "Escape") == 0)) {
           termpaint_surface_clear_rect_with_attr(surface, 25, 4, 35, 1, attr_ui);
@@ -846,5 +837,5 @@ static void menu(termpaint_attr *attr_ui, termpaint_attr *attr_sample) {
     }
   }
 } /* menu */
-
+#undef DEBUG
 #endif

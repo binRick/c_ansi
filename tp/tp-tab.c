@@ -50,7 +50,7 @@ size_t tp_tab_get_qty(void){
 #define TERMINAL_TP_TABS_ROW_TOP_OFFSET    0
 
 void render_tp_tabs(void){
-  fprintf(stderr, "tabs rendering....\n");
+//  fprintf(stderr, "tabs rendering....\n");
   static struct tp_tab_t *o;
   char                   *text, *marker;
 

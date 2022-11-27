@@ -57,7 +57,6 @@ static struct surface_size_t surface_size = { .width = 0, .height = 0 };
 
 #define termpaint_terminal_flush_logged(TERMINAL, FORCE)                                                         \
   { do {                                                                                                         \
-      LOG("flush...........\n");                                                                                 \
       bool          _FORCE = FORCE;                                                                              \
       static size_t last_flush_ts;                                                                               \
       static char   termpaint_terminal_flush_msg[512];                                                           \
@@ -70,7 +69,7 @@ static struct surface_size_t surface_size = { .width = 0, .height = 0 };
                 (size_t)ts - last_flush_ts,                                                                      \
                 (_FORCE == true) ? "(forced)" : ""                                                               \
                 );                                                                                               \
-        LOG(termpaint_terminal_flush_msg);                                                                       \
+/*        LOG(termpaint_terminal_flush_msg);                                                                    */   \
       }                                                                                                          \
       last_flush_ts = ts;                                                                                        \
       termpaint_terminal_flush(TERMINAL, _FORCE);                                                                \

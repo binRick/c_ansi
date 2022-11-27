@@ -34,3 +34,4 @@ submodules/c_deps
 .meson.build*.log
 .meson-build*.log
 .DS_Store
+*.uncrustify

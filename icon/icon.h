@@ -1,6 +1,6 @@
 #pragma once
-#ifndef TIME_H
-#define TIME_H
+#ifndef ICON_H
+#define ICON_H
 //////////////////////////////////////
 #include <assert.h>
 #include <ctype.h>
@@ -17,18 +17,18 @@
 #include "module/module.h"
 #include "module/require.h"
 //////////////////////////////////////
-enum time_log_mode_t {
-  TIME_LOG_MODE_NONE = 1,
-  TIME_LOG_MODE_ERROR,
-  TIME_LOG_MODE_INFO,
-  TIME_LOG_MODE_DEBUG,
-  TIME_LOG_MODES_QTY,
+enum icon_log_mode_t {
+  ICON_LOG_MODE_NONE = 1,
+  ICON_LOG_MODE_ERROR,
+  ICON_LOG_MODE_INFO,
+  ICON_LOG_MODE_DEBUG,
+  ICON_LOG_MODES_QTY,
 };
 
-module(time) {
-  define(time, CLIB_MODULE);
+module(icon) {
+  define(icon, CLIB_MODULE);
 
-  enum time_log_mode_t log_mode;
+  enum icon_log_mode_t log_mode;
   int                  pid;
 
   int                  (*GetPID)();
@@ -37,16 +37,16 @@ module(time) {
   void                 (*error)(char *);
 };
 
-int time_init(module(time) *exports);
-void time_deinit(module(time) *exports);
+int icon_init(module(icon) *exports);
+void icon_deinit(module(icon) *exports);
 
-exports(time) {
-  .log_mode = TIME_LOG_MODE_NONE,
-  .init     = time_init,
-  .deinit   = time_deinit,
+exports(icon) {
+  .log_mode = ICON_LOG_MODE_NONE,
+  .init     = icon_init,
+  .deinit   = icon_deinit,
   .pid      = -1,
 };
 
-#define time_m    module(time)
+#define icon_m    module(icon)
 
 #endif

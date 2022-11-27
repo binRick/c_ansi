@@ -3,6 +3,9 @@
 #define TPSELC
 #include "tp-internal.h"
 #include "tp-selection.h"
+#include "log/log.h"
+static size_t __tp_get_max_option_rows();
+int get_selected_index();
 struct tp_confirm_option_t AC_CONFIRM_DEFAULT_OPTION = {
   .text           = "undefined",
   .selected       = false,
@@ -38,7 +41,9 @@ struct tp_confirm_option_t *tp_confirm_init_option(char *NEW_OPTION_TEXT){
 }
 
 bool tp_confirm_add_option(struct tp_confirm_option_t *NEW_OPTION){
-  vector_push(TP->options, (void *)NEW_OPTION);
+  if(vector_size(TP->options)<__tp_get_max_option_rows())
+    vector_push(TP->options, (void *)NEW_OPTION);
+  return(true);
 }
 
 size_t tp_confirm_get_options_qty(void){
@@ -46,45 +51,10 @@ size_t tp_confirm_get_options_qty(void){
 }
 
 ////////////////////////////////////////////////////////
-int get_selected_index();
-////////////////////////////////////////////////////////
-#define ICON0                                          ">"
-#define ICON1                                          "▶"
-#define ICON2                                          "➡"
-#define ICON3                                          ""
-#define ICON4                                          "➡"
-#define ICON5                                          "▶️"
-#define ICON6                                          "➡️"
-#define ICON7                                          "🔛"
-#define ICON8                                          "↪"
-#define ICON9                                          "👉"
-#define ICON10                                         "🚩"
-#define ICON11                                         "✅"
-#define ICON12                                         "⭐"
-#define ICON13                                         "✔️"
-#define ICON14                                         "☑️"
-#define ICON15                                         "✳️"
-////////////////////////////////////////////////////////
-#define SELECTED_LEFT_ICON                             ICON1
-#define SELECTED_RIGHT_ICON                            ICON3
-#define SELECTED_LEFT_ICON_SIZE                        1
-#define OPTION_RIGHT_EDGE_PADDING                      1
-#define SELECTED_STYLE                                 (TERMPAINT_STYLE_INVERSE | TERMPAINT_STYLE_BOLD)
-#define UNSELECTED_STYLE                               -1
-////////////////////////////////////////////////////////
-#define TERMINAL_TP_OPTIONS_ROW_TOP_OFFSET             2
-#define TERMINAL_TP_OPTIONS_ROW_BOTTOM_OFFSET          2
-#define TERMINAL_TP_OPTIONS_RIGHT_PERCENTAGE_OFFSET    .75
-#define TERMINAL_TP_OPTIONS_RIGHT_MAX_COLS_OFFSET      2
-#define TP_OPTIONS_SELECTED_LEFT_ICON_FG_COLOR         TERMPAINT_COLOR_BRIGHT_YELLOW
-#define TP_OPTIONS_SELECTED_LEFT_ICON_BG_COLOR         TERMPAINT_COLOR_BLACK
-#define TP_OPTIONS_UNSELECTED_FG_COLOR                 TERMPAINT_COLOR_WHITE
-#define TP_OPTIONS_SELECTED_FG_COLOR                   TERMPAINT_COLOR_GREEN
-#define TP_OPTIONS_UNSELECTED_BG_COLOR                 TERMPAINT_DEFAULT_COLOR
-#define TP_OPTIONS_SELECTED_BG_COLOR                   TERMPAINT_DEFAULT_COLOR
-#define SELECTED_LEFT_MARKER_PREFIX                    "  "
-#define SELECTED_LEFT_MARKER_SUFFIX                    "  "
-#define SELECTED_LEFT_MARKER                           SELECTED_LEFT_MARKER_PREFIX SELECTED_LEFT_ICON SELECTED_LEFT_MARKER_SUFFIX
+
+static size_t __tp_get_max_option_rows(){
+  return(termpaint_surface_height(surface) - TERMINAL_TP_OPTIONS_ROW_TOP_OFFSET - TERMINAL_TP_OPTIONS_ROW_BOTTOM_OFFSET - BOTTOM_MSG_BOX_HEIGHT - 5);
+}
 
 void render_tp_options(void){
   static struct tp_confirm_option_t *o;
@@ -100,14 +70,13 @@ void render_tp_options(void){
   int            max_option_text_size = tp_get_max_option_text_size();
   int            o_col                = (screen_width - max_option_text_size) - OPTION_RIGHT_EDGE_PADDING;
   size_t         option_width         = max_option_text_size + (OPTION_RIGHT_EDGE_PADDING * 2);
-  size_t         max_option_rows      = screen_height - TERMINAL_TP_OPTIONS_ROW_TOP_OFFSET - TERMINAL_TP_OPTIONS_ROW_BOTTOM_OFFSET - BOTTOM_MSG_BOX_HEIGHT;
   size_t         rendered_rows_qty    = 0;
   {
     char *msg;
-    asprintf(&msg, "screen_width=%d|max_option_rows=%lu|o_col=%d|ending on row #%lu|max_option_text_size=%d", screen_width, max_option_rows, o_col, max_option_rows, max_option_text_size);
-    LOG(msg);
+    asprintf(&msg, "screen_width=%d|max_option_rows=%lu|o_col=%d|ending on row #%lu|max_option_text_size=%d", screen_width, __tp_get_max_option_rows(), o_col, __tp_get_max_option_rows(), max_option_text_size);
+    log_info("%s",msg);
     assert(o_col < screen_width && o_col > 0);
-    for (size_t i = 0; (i < vector_size(TP->options)) && (i <= max_option_rows); i++) {
+    for (size_t i = 0; (i < vector_size(TP->options)) && (i <= __tp_get_max_option_rows()); i++) {
       o = vector_get(TP->options, i);
       assert(o != NULL && o->text != NULL && strlen(o->text) > 0);
       assert(o->uuid != NULL && strlen(o->uuid) > 10);
@@ -186,7 +155,7 @@ void change_selection_index(int CHANGE_SELECTION_TYPE) {
       set_selection_index(NEW_SELECTION_INDEX);
       int is = get_selected_index();
       asprintf(&msg, "selected index was %lu and is now %d :: selection type: %d", was, is, CHANGE_SELECTION_TYPE);
-      LOG(msg);
+ //     LOG(msg);
       return;
     }
   }

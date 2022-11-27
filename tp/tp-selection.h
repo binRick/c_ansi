@@ -62,7 +62,7 @@ int get_selected_index();
 #define ICON14                                         "☑️"
 #define ICON15                                         "✳️"
 ////////////////////////////////////////////////////////
-#define SELECTED_LEFT_ICON                             ICON1
+#define SELECTED_LEFT_ICON                             ICON4
 #define SELECTED_RIGHT_ICON                            ICON3
 #define SELECTED_LEFT_ICON_SIZE                        1
 #define OPTION_RIGHT_EDGE_PADDING                      1
