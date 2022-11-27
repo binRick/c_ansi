@@ -2,6 +2,7 @@ subdir('c_deps/meson/args')
 subdir('c_deps/meson/inc')
 subdir('c_deps/meson/osx')
 subdir('c_deps/meson/gd')
+subdir('c_deps/meson/incbin')
 #############################################
 subdir('c_deps/meson/deps/timestamp')
 subdir('c_deps/meson/deps/parson')

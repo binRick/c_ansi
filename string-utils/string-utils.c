@@ -15,21 +15,21 @@
 char *hash_path(char *path){
   unsigned char buf[32] = { 0 };
 
-  sha256_hash(buf, fsio_read_binary_file(path), fsio_file_size(path));
+  sha256_hash((const unsigned char *)buf, (const unsigned char *)fsio_read_binary_file(path), fsio_file_size(path));
   return(b64_encode(buf, 32));
 }
 
 char *hash_buffer(void *s, size_t len){
   unsigned char buf[32] = { 0 };
 
-  sha256_hash(buf, (unsigned char *)s, len);
+  sha256_hash((const unsigned char *)buf, (const unsigned char *)s, len);
   return(b64_encode(buf, 32));
 }
 
 char *hash_string(char *s, size_t len){
   unsigned char buf[32] = { 0 };
 
-  sha256_hash(buf, s, len);
+  sha256_hash((const unsigned char*)buf, (const unsigned char *)s, len);
   return(b64_encode(buf, 32));
 }
 

@@ -22,6 +22,7 @@
 static bool ASYNC_DEBUG_MODE = false;
 static void __attribute__((constructor)) __constructor__async(void);
 ////////////////////////////////////////////
+
 struct async_chan_work_t {
   async_worker_cb cb;
   void            *args;

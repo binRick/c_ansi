@@ -17,6 +17,9 @@
 #include "chan/src/chan.h"
 #include "chan/src/queue.h"
 #include "interface99/interface99.h"
+#include "module/def.h"
+#include "module/module.h"
+#include "module/require.h"
 #define async_each      async_chan_items
 #define async_each_v    async_chan_items_v
 

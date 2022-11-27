@@ -8,6 +8,7 @@ async_test_include_dirs = [
 ]
 async_test_deps = [
   async_dep,
+  module_dep,
   c_greatest_dep,
   ansi_codes_dep,
   c_vector_dep,
