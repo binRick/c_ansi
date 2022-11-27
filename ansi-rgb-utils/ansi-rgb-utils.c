@@ -348,7 +348,6 @@ float rgb_to_hue(struct RGB rgb) {
   if (range == 0)
     return(NAN);
 
-
   if (rgb.red == max)
     hue = fmodf((rgb.green - rgb.blue) / (range), 6);
   else if (rgb.green == max)
@@ -379,14 +378,12 @@ float rgb_to_hsv_value(struct RGB rgb) {
   if (!is_in_rgb_range(rgb))
     return(-1);
 
-
   return(get_rgb_max(rgb));
 }
 
 float rgb_to_hsv_saturation(struct RGB rgb) {
   if (!is_in_rgb_range(rgb))
     return(-1);
-
 
   float value = rgb_to_hsv_value(rgb);
 

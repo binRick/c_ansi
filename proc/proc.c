@@ -15,60 +15,55 @@
 #include "log/log.h"
 #include "ms/ms.h"
 #include "timestamp/timestamp.h"
-#include <libproc.h>
 #include <CoreFoundation/CoreFoundation.h>
 #include <dlfcn.h>
+#include <libproc.h>
+#include <mach/mach.h>
+#include <mach/mach_vm.h>
 #include <pthread.h>
+#include <sys/proc_info.h>
+#include <sys/proc_info.h>
 #include <sys/stat.h>
 #include <sys/sysctl.h>
 #include <sys/time.h>
-#include <sys/proc_info.h>
-#include <mach/mach.h>
-#include <mach/mach_vm.h>
 #include <sys/types.h>
-#include <sys/proc_info.h>
 
-#include <mach/mach.h>
-#include <mach/task.h>
-#include <mach/mach_init.h>
-#include <mach/host_info.h>
-#include <mach/mach_host.h>
-#include <mach/mach_traps.h>
-#include <CoreFoundation/CoreFoundation.h>
-#include <IOKit/IOKitLib.h>
-#include <IOKit/storage/IOBlockStorageDriver.h>
-#include <IOKit/storage/IOMedia.h>
-#include <Carbon/Carbon.h>
-#include <CoreFoundation/CFBase.h>
-#include <CoreFoundation/CFString.h>
-#include <CoreFoundation/CoreFoundation.h>
-#include <CoreServices/CoreServices.h>
-#include <sys/proc_info.h>
-#include <sys/sysctl.h>
-#include <sys/time.h>
-#include <sys/types.h>
-#include <IOKit/ps/IOPowerSources.h>
-#include <IOKit/ps/IOPSKeys.h>
-#include <libproc.h>
-#include <sys/resource.h>
-#include <Carbon/Carbon.h>
-#include <CoreFoundation/CFBase.h>
-#include <CoreFoundation/CFString.h>
-#include <CoreFoundation/CoreFoundation.h>
-#include <CoreServices/CoreServices.h>
-#include <IOKit/ps/IOPSKeys.h>
-#include <IOKit/ps/IOPowerSources.h>
 #include <assert.h>
 #include <ctype.h>
+#include <Carbon/Carbon.h>
+#include <Carbon/Carbon.h>
+#include <CoreFoundation/CFBase.h>
+#include <CoreFoundation/CFBase.h>
+#include <CoreFoundation/CFString.h>
+#include <CoreFoundation/CFString.h>
+#include <CoreFoundation/CoreFoundation.h>
+#include <CoreFoundation/CoreFoundation.h>
+#include <CoreFoundation/CoreFoundation.h>
+#include <CoreServices/CoreServices.h>
+#include <CoreServices/CoreServices.h>
 #include <dirent.h>
 #include <dlfcn.h>
 #include <errno.h>
 #include <fnmatch.h>
 #include <getopt.h>
 #include <inttypes.h>
+#include <IOKit/IOKitLib.h>
+#include <IOKit/ps/IOPowerSources.h>
+#include <IOKit/ps/IOPowerSources.h>
+#include <IOKit/ps/IOPSKeys.h>
+#include <IOKit/ps/IOPSKeys.h>
+#include <IOKit/storage/IOBlockStorageDriver.h>
+#include <IOKit/storage/IOMedia.h>
 #include <libgen.h>
 #include <libproc.h>
+#include <libproc.h>
+#include <mach/host_info.h>
+#include <mach/mach.h>
+#include <mach/mach_host.h>
+#include <mach/mach_init.h>
 #include <mach/mach_time.h>
+#include <mach/mach_traps.h>
+#include <mach/task.h>
 #include <pthread.h>
 #include <stdarg.h>
 #include <stdbool.h>
@@ -78,83 +73,88 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/proc_info.h>
+#include <sys/proc_info.h>
+#include <sys/resource.h>
 #include <sys/resource.h>
 #include <sys/stat.h>
 #include <sys/sysctl.h>
+#include <sys/sysctl.h>
 #include <sys/time.h>
+#include <sys/time.h>
+#include <sys/types.h>
 #include <sys/types.h>
 #include <termios.h>
 #include <time.h>
 #include <unistd.h>
 //#include <ApplicationServices/ApplicationServices.h>
 
-#include <stdio.h>
-#include <stdlib.h>
+#include <CoreFoundation/CoreFoundation.h>
+#include <device/device_types.h>
+#include <IOKit/IOKitLib.h>
+#include <IOKit/storage/IOBlockStorageDriver.h>
 #include <limits.h>
-#include <sys/types.h>
 #include <mach/bootstrap.h>
 #include <mach/host_priv.h>
 #include <mach/mach_error.h>
 #include <mach/mach_host.h>
-#include <device/device_types.h>
-#include <CoreFoundation/CoreFoundation.h>
-#include <IOKit/IOKitLib.h>
-#include <IOKit/storage/IOBlockStorageDriver.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/types.h>
 
 #include <libproc.h>
 
 #include <fcntl.h>
 #include <nlist.h>
+#include <pwd.h>
 #include <sys/param.h>
 #include <sys/sysctl.h>
-#include <pwd.h>
 
 #include <sys/resource.h>
 
-#include <sys/socket.h>
-#include <net/if.h>
-#include <net/route.h>
-#include <net/if_types.h>
-#include <ifaddrs.h>
-#include <mach/mach_port.h>
-#include <mach/mach_vm.h>
-#include <mach/mach_types.h>
-#include <mach/message.h>
-#include <mach/processor_set.h>
-#include <mach/task.h>
-#include <mach/thread_act.h>
-#include <mach/shared_region.h>
-#include <mach/vm_map.h>
-#include <sys/sysctl.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <assert.h>
-#include <errno.h>
-#include <stdbool.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <utmpx.h>
-#include <sys/sysctl.h>
-#include <sys/vmmeter.h>
-#include <libproc.h>
-#include <sys/proc_info.h>
-#include <netinet/tcp_fsm.h>
 #include <arpa/inet.h>
-#include <net/if_dl.h>
-#include <pwd.h>
-#include <mach/mach.h>
-#include <mach/task.h>
-#include <mach/mach_init.h>
-#include <mach/host_info.h>
-#include <mach/mach_host.h>
-#include <mach/mach_traps.h>
-#include <mach/mach_vm.h>
-#include <mach-o/loader.h>
+#include <assert.h>
 #include <CoreFoundation/CoreFoundation.h>
+#include <errno.h>
+#include <ifaddrs.h>
+#include <IOKit/IOBSD.h>
 #include <IOKit/IOKitLib.h>
 #include <IOKit/storage/IOBlockStorageDriver.h>
 #include <IOKit/storage/IOMedia.h>
-#include <IOKit/IOBSD.h>
+#include <libproc.h>
+#include <mach-o/loader.h>
+#include <mach/host_info.h>
+#include <mach/mach.h>
+#include <mach/mach_host.h>
+#include <mach/mach_init.h>
+#include <mach/mach_port.h>
+#include <mach/mach_traps.h>
+#include <mach/mach_types.h>
+#include <mach/mach_vm.h>
+#include <mach/mach_vm.h>
+#include <mach/message.h>
+#include <mach/processor_set.h>
+#include <mach/shared_region.h>
+#include <mach/task.h>
+#include <mach/task.h>
+#include <mach/thread_act.h>
+#include <mach/vm_map.h>
+#include <net/if.h>
+#include <net/if_dl.h>
+#include <net/if_types.h>
+#include <net/route.h>
+#include <netinet/tcp_fsm.h>
+#include <pwd.h>
+#include <stdbool.h>
+#include <stdio.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdlib.h>
+#include <sys/proc_info.h>
+#include <sys/socket.h>
+#include <sys/sysctl.h>
+#include <sys/sysctl.h>
+#include <sys/vmmeter.h>
+#include <utmpx.h>
 struct process_env_t {
   char *key;
   char *val;
@@ -164,7 +164,6 @@ static inline void  proc_info(char *message);
 static inline void  proc_error(char *message);
 static inline void  proc_debug(char *message);
 static inline int   proc_GetPID();
-
 
 static int __proc_argmax() {
   int    argmax, mib[] = { CTL_KERN, KERN_ARGMAX };
@@ -178,9 +177,9 @@ static int __proc_argmax() {
 
 char *__proc_pid_cmdline(pid_t pid){
   struct StringBuffer *sb = stringbuffer_new();
-  int           mib[3], nargs;
-  char          *procargs = NULL, *arg_ptr, *arg_end, *curr_arg;
-  size_t        len, argmax;
+  int                 mib[3], nargs;
+  char                *procargs = NULL, *arg_ptr, *arg_end, *curr_arg;
+  size_t              len, argmax;
 
   if (pid < 1)
     return(NULL);
@@ -218,85 +217,91 @@ char *__proc_pid_cmdline(pid_t pid){
   curr_arg = arg_ptr;
   while (arg_ptr < arg_end && nargs > 0)
     if (*arg_ptr++ == '\0') {
-      stringbuffer_append_string(sb," ");
-      stringbuffer_append_string(sb,curr_arg);
+      stringbuffer_append_string(sb, " ");
+      stringbuffer_append_string(sb, curr_arg);
       curr_arg = arg_ptr;
       nargs--;
     }
   if (procargs)
     free(procargs);
   char *s = stringbuffer_to_string(sb);
+
   stringbuffer_release(sb);
   return(s);
-}
+} /* __proc_pid_cmdline */
 
 struct kinfo_proc *__proc_pid_info(pid_t pid){
-  struct kinfo_proc *kp = calloc(1,sizeof(struct kinfo_proc));
-    int mib[4];
-    size_t len;
-    mib[0] = CTL_KERN;
-    mib[1] = KERN_PROC;
-    mib[2] = KERN_PROC_PID;
-    mib[3] = pid;
-    len = sizeof(struct kinfo_proc);
-    errno=0;
-    if (sysctl(mib, 4, kp, &len, NULL, 0) == -1) {
-      log_error("failed to fetch pid info");
-      return 0;
-    }
-    if (len == 0) {
-        errno = ESRCH;
-        return 0;
-    }
-    return kp;
+  struct kinfo_proc *kp = calloc(1, sizeof(struct kinfo_proc));
+  int               mib[4];
+  size_t            len;
+
+  mib[0] = CTL_KERN;
+  mib[1] = KERN_PROC;
+  mib[2] = KERN_PROC_PID;
+  mib[3] = pid;
+  len    = sizeof(struct kinfo_proc);
+  errno  = 0;
+  if (sysctl(mib, 4, kp, &len, NULL, 0) == -1) {
+    log_error("failed to fetch pid info");
+    return(0);
+  }
+  if (len == 0) {
+    errno = ESRCH;
+    return(0);
+  }
+  return(kp);
 }
 
-pid_t *__proc_pids_with_env_key_val(const char *key,const char *val,size_t *qty){
-  size_t q=0;
-  struct Vector *v=vector_new();
+pid_t *__proc_pids_with_env_key_val(const char *key, const char *val, size_t *qty){
+  size_t                q  = 0;
+  struct Vector         *v = vector_new();
   struct  process_env_t *e;
-  pid_t *pids=__proc_pids(&q);
-  for(size_t i=0;i<q;i++){
-    struct Vector *env=__proc_pid_env(pids[i]);
-    for(size_t ii=0;ii< vector_size(env);ii++){
-      e=(struct process_env_t*)vector_get(env,ii);
-      if(e && stringfn_equal(key,e->key) && stringfn_equal(val,e->val)){
-        vector_push(v,(void*)(size_t)pids[i]);
-      }
-      if(e)
+  pid_t                 *pids = __proc_pids(&q);
+
+  for (size_t i = 0; i < q; i++) {
+    struct Vector *env = __proc_pid_env(pids[i]);
+    for (size_t ii = 0; ii < vector_size(env); ii++) {
+      e = (struct process_env_t *)vector_get(env, ii);
+      if (e && stringfn_equal(key, e->key) && stringfn_equal(val, e->val))
+        vector_push(v, (void *)(size_t)pids[i]);
+      if (e)
         free(e);
     }
     vector_release(env);
   }
-  *qty=vector_size(v);
-  pids=(pid_t*)vector_to_array(v);
+  *qty = vector_size(v);
+  pids = (pid_t *)vector_to_array(v);
   vector_release(v);
   return(pids);
 }
-pid_t *__proc_pids_with_env_key(const char *key,size_t *qty){
-  size_t q=0;
-  struct Vector *v=vector_new();
+
+pid_t *__proc_pids_with_env_key(const char *key, size_t *qty){
+  size_t               q  = 0;
+  struct Vector        *v = vector_new();
   struct process_env_t *e;
-  struct Vector *env;
-  pid_t *pids=__proc_pids(&q);
-  for(size_t i=0;i<q;i++){
-    env =__proc_pid_env(pids[i]);
-    for(size_t ii=0;ii< vector_size(env);ii++){
-      if((e=(struct process_env_t*)vector_get(env,ii)) && stringfn_equal(key,e->key))
-        vector_push(v,(void*)(size_t)pids[i]);
-      if(e)
+  struct Vector        *env;
+  pid_t                *pids = __proc_pids(&q);
+
+  for (size_t i = 0; i < q; i++) {
+    env = __proc_pid_env(pids[i]);
+    for (size_t ii = 0; ii < vector_size(env); ii++) {
+      if ((e = (struct process_env_t *)vector_get(env, ii)) && stringfn_equal(key, e->key))
+        vector_push(v, (void *)(size_t)pids[i]);
+      if (e)
         free(e);
     }
     vector_release(env);
   }
-  *qty=vector_size(v);
-  pids=(pid_t*)vector_to_array(v);
+  *qty = vector_size(v);
+  pids = (pid_t *)vector_to_array(v);
   vector_release(v);
   return(pids);
 }
+
 size_t __proc_pids_qty(){
-  size_t qty=0;
-  pid_t *p=__proc_pids(&qty);
+  size_t qty = 0;
+  pid_t  *p  = __proc_pids(&qty);
+
   free(p);
   return(qty);
 }
@@ -312,12 +317,13 @@ pid_t *__proc_pids(size_t *qty){
     if ((long long)processes_buffer[i] > 0)
       vector_push(processes_v, (void *)(long long)processes_buffer[i]);
   free(processes_buffer);
-  *qty=vector_size(processes_v);
+  *qty = vector_size(processes_v);
 
-  pid_t *pids=calloc(*qty,sizeof(pid_t));
-  for(size_t i=0;i<*qty;i++)
-    pids[i]=(pid_t)(size_t)vector_get(processes_v,i);
-  
+  pid_t *pids = calloc(*qty, sizeof(pid_t));
+
+  for (size_t i = 0; i < *qty; i++)
+    pids[i] = (pid_t)(size_t)vector_get(processes_v, i);
+
   return(pids);
 }
 
@@ -386,94 +392,95 @@ struct Vector *__proc_pid_env(pid_t pid){
     vector_release(vector);
   }
   return(process_env_v);
-}
-
+} /* __proc_pid_env */
 
 static int GetBSDProcessList(struct kinfo_proc **procList, size_t *procCount){
-    int                 err;
-    struct kinfo_proc *        result;
-    bool                done;
-    static const int    name[] = { CTL_KERN, KERN_PROC, KERN_PROC_ALL, 0 };
-    size_t              length;
-    assert( procList != NULL);
-    assert(*procList == NULL);
-    assert(procCount != NULL);
+  int               err;
+  struct kinfo_proc *result;
+  bool              done;
+  static const int  name[] = { CTL_KERN, KERN_PROC, KERN_PROC_ALL, 0 };
+  size_t            length;
 
-    *procCount = 0;
+  assert(procList != NULL);
+  assert(*procList == NULL);
+  assert(procCount != NULL);
 
-    result = NULL;
-    done = false;
-    do {
-        assert(result == NULL);
+  *procCount = 0;
 
-        // Call sysctl with a NULL buffer.
+  result = NULL;
+  done   = false;
+  do {
+    assert(result == NULL);
 
-        length = 0;
-        err = sysctl( (int *) name, (sizeof(name) / sizeof(*name)) - 1,
-                      NULL, &length,
-                      NULL, 0);
-        if (err == -1) {
-            err = errno;
-        }
+    // Call sysctl with a NULL buffer.
 
-        // Allocate an appropriately sized buffer based on the results
-        // from the previous call.
+    length = 0;
+    err    = sysctl((int *)name, (sizeof(name) / sizeof(*name)) - 1,
+                    NULL, &length,
+                    NULL, 0);
+    if (err == -1)
+      err = errno;
 
-        if (err == 0) {
-            result = malloc(length);
-            if (result == NULL) {
-                err = ENOMEM;
-            }
-        }
+    // Allocate an appropriately sized buffer based on the results
+    // from the previous call.
 
-        // Call sysctl again with the new buffer.  If we get an ENOMEM
-        // error, toss away our buffer and start again.
+    if (err == 0) {
+      result = malloc(length);
+      if (result == NULL)
+        err = ENOMEM;
+    }
 
-        if (err == 0) {
-            err = sysctl( (int *) name, (sizeof(name) / sizeof(*name)) - 1,
-                          result, &length,
-                          NULL, 0);
-            if (err == -1) {
-                err = errno;
-            }
-            if (err == 0) {
-                done = true;
-            } else if (err == ENOMEM) {
-                assert(result != NULL);
-                free(result);
-                result = NULL;
-                err = 0;
-            }
-        }
-    } while (err == 0 && ! done);
+    // Call sysctl again with the new buffer.  If we get an ENOMEM
+    // error, toss away our buffer and start again.
 
-    // Clean up and establish post conditions.
-
-    if (err != 0 && result != NULL) {
+    if (err == 0) {
+      err = sysctl((int *)name, (sizeof(name) / sizeof(*name)) - 1,
+                   result, &length,
+                   NULL, 0);
+      if (err == -1)
+        err = errno;
+      if (err == 0)
+        done = true;
+      else if (err == ENOMEM) {
+        assert(result != NULL);
         free(result);
         result = NULL;
+        err    = 0;
+      }
     }
-    *procList = result;
-    if (err == 0) {
-        *procCount = length / sizeof(struct kinfo_proc);
-    }
+  } while (err == 0 && !done);
 
-    assert( (err == 0) == (*procList != NULL) );
+  // Clean up and establish post conditions.
 
-    return err;
-}
+  if (err != 0 && result != NULL) {
+    free(result);
+    result = NULL;
+  }
+  *procList = result;
+  if (err == 0)
+    *procCount = length / sizeof(struct kinfo_proc);
+
+  assert((err == 0) == (*procList != NULL));
+
+  return(err);
+} /* GetBSDProcessList */
+
 pid_t __proc_pid_ppid(pid_t pid){
   struct kinfo_proc kp;
+
   return((int)(long)kp.kp_eproc.e_ppid);
 }
+
 char *__proc_pid_cwd(pid_t pid){
   char                      *cwd = NULL;
   struct proc_vnodepathinfo vpi;
+
   proc_pidinfo(pid, PROC_PIDVNODEPATHINFO, 0, &vpi, sizeof(vpi));
   if (strlen(vpi.pvi_cdir.vip_path) > 0)
     cwd = strdup(vpi.pvi_cdir.vip_path);
   return(cwd);
 }
+
 ////////////////////////////////////////////
 int proc_init(module(proc) *exports) {
   clib_module_init(proc, exports);

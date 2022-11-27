@@ -9,19 +9,20 @@
 #include "log/log.h"
 #include "ms/ms.h"
 #include "str-test/str-test.h"
-#include "timestamp/timestamp.h"
 #include "str/str.h"
-module(str) *str;
+#include "timestamp/timestamp.h"
+module(str) * str;
 
 TEST t_str_test1(){
-  char *s = "  AbCdEfg\t  sS";
+  char *s  = "  AbCdEfg\t  sS";
   char *lc = str->lowercase(s);
-  log_info("%s->%s->%s->%s"
-      ,s
-      ,str->lowercase(s)
-      ,str->uppercase(str->lowercase(s))
-      ,str->trim(s)
-      );
+
+  log_info("%s->%s->%s->%s",
+           s,
+           str->lowercase(s),
+           str->uppercase(str->lowercase(s)),
+           str->trim(s)
+           );
   PASS();
 }
 

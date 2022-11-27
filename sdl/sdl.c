@@ -43,7 +43,7 @@ int sdl_init(module(sdl) *exports) {
   return(0);
 }
 
-void sdl_deinit(module(sdl) *exports)      {
+void sdl_deinit(module(sdl) *exports) {
   clib_module_deinit(sdl);
 }
 ///////////////////////////////////////////////////////////////////////

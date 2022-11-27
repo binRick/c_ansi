@@ -24,7 +24,6 @@ size_t ansi_utils_tty_copy(const char *s){
   if (!s)
     return(0);
 
-
   printf("s: %s\n", s);
   char *enc = b64_encode((const unsigned char *)s, strlen((const char *)s));
   printf("enc: %s\n", enc);
@@ -169,7 +168,6 @@ __attribute__((unused))static bool query_dec_mode(int mode){
 
     if (reply_value == 2 || reply_value == 4)
       return(false);
-
 
     printf("Unrecognised reply to DECRQM: %d\n", reply_value);
     return(false);

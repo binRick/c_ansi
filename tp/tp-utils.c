@@ -23,7 +23,6 @@ char *str_repeat(char str[], unsigned int times){
   if (times < 1)
     return(NULL);
 
-
   char   *result;
   size_t str_len = strlen(str);
   result = malloc(sizeof(char) * str_len + 1);

@@ -26,12 +26,12 @@ static void __attribute__((constructor)) __constructor__ansi(void){
 }
 
 ////////////////////////////////////////////
-int ansi_init(module(ansi) *exports)     {
+int ansi_init(module(ansi) *exports) {
   clib_module_init(ansi, exports);
   return(0);
 }
 
-void ansi_deinit(module(ansi) *exports)      {
+void ansi_deinit(module(ansi) *exports) {
   clib_module_deinit(ansi);
 }
 #undef LOCAL_DEBUG_MODE

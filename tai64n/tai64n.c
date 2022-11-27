@@ -20,7 +20,6 @@ struct tai64n *tai64(){
   if (gettimeofday(&now, NULL) == -1)
     return(NULL);
 
-
   out->sec  = TAI0 + now.tv_sec;
   out->nano = 1000 * now.tv_usec + 500;
 

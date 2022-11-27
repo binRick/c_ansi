@@ -23,7 +23,7 @@ unsigned int          BORDER_STYLE = 0,
 #define INCREASE_BOTTOM_MSG_FG_GREEN()    { do { BORDER_FG_COLOR_GREEN = BORDER_FG_COLOR_GREEN >= MAX_RGB ? 0 : BORDER_FG_COLOR_GREEN + 1; redraw_bottom_msg(); } while (0); }
 #define INCREASE_BOTTOM_MSG_FG_BLUE()     { do { BORDER_FG_COLOR_BLUE = BORDER_FG_COLOR_BLUE >= MAX_RGB ? 0 : BORDER_FG_COLOR_BLUE + 1; redraw_bottom_msg(); } while (0); }
 #define INCREASE_BOTTOM_MSG_BG_RED()      { do { BORDER_BG_COLOR_RED = BORDER_BG_COLOR_RED >= MAX_RGB ? 0 : BORDER_BG_COLOR_RED + 1; redraw_bottom_msg(); } while (0); }
-#define INCREASE_BOTTOM_MSG_BG_GREEN()    { do { BORDER_BG_COLOR_GREEN = BORDER_BG_COLOR_GREEN >= MAX_RGB ? 0 : BORDER_BG_COLOR_GREEN + 1; redraw_bottom_msg(); } while (0); }
+#define INCREASE_BOTTOM_MSG_BG_GREEN(){BORDER_BG_COLOR_GREEN = BORDER_BG_COLOR_GREEN >= MAX_RGB ? 0 : BORDER_BG_COLOR_GREEN + 1; redraw_bottom_msg();}
 #define INCREASE_BOTTOM_MSG_BG_BLUE()     { do { BORDER_BG_COLOR_BLUE = BORDER_BG_COLOR_BLUE >= MAX_RGB ? 0 : BORDER_BG_COLOR_BLUE + 1; redraw_bottom_msg(); } while (0); }
 #define BOTTOM_MSG_ROW_O
 #define TERMINAL_KEY_MENU_ROW_OFFSET    26
@@ -726,17 +726,17 @@ static void menu(termpaint_attr *attr_ui, termpaint_attr *attr_sample) {
       free(NEW_TITLE);
     } else if (evt->type == TERMPAINT_EV_CHAR && strcmp(evt->string, "5") == 0){
       INCREASE_BOTTOM_MSG_BG_RED();
-    }else if (evt->type == TERMPAINT_EV_CHAR && strcmp(evt->string, "6") == 0){
+  }else if (evt->type == TERMPAINT_EV_CHAR && strcmp(evt->string, "6") == 0){
       INCREASE_BOTTOM_MSG_BG_GREEN();
-    }else if (evt->type == TERMPAINT_EV_CHAR && strcmp(evt->string, "7") == 0){
+  }   else if (evt->type == TERMPAINT_EV_CHAR && strcmp(evt->string, "7") == 0){
       INCREASE_BOTTOM_MSG_BG_BLUE();
-    }else if (evt->type == TERMPAINT_EV_CHAR && strcmp(evt->string, "8") == 0){
+  }   else if (evt->type == TERMPAINT_EV_CHAR && strcmp(evt->string, "8") == 0){
       INCREASE_BOTTOM_MSG_FG_RED();
-    }else if (evt->type == TERMPAINT_EV_CHAR && strcmp(evt->string, "9") == 0){
+  }   else if (evt->type == TERMPAINT_EV_CHAR && strcmp(evt->string, "9") == 0){
       INCREASE_BOTTOM_MSG_FG_GREEN();
-    }else if (evt->type == TERMPAINT_EV_CHAR && strcmp(evt->string, "0") == 0){
+  }   else if (evt->type == TERMPAINT_EV_CHAR && strcmp(evt->string, "0") == 0){
       INCREASE_BOTTOM_MSG_FG_BLUE();
-    }else if (evt->type == TERMPAINT_EV_CHAR && strcmp(evt->string, "C") == 0) {
+  }   else if (evt->type == TERMPAINT_EV_CHAR && strcmp(evt->string, "C") == 0) {
       sprintf(MSG, "");
       write_bottom_msg(MSG);
     } else if (evt->type == TERMPAINT_EV_CHAR && strcmp(evt->string, "r") == 0) {

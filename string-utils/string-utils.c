@@ -29,7 +29,7 @@ char *hash_buffer(void *s, size_t len){
 char *hash_string(char *s, size_t len){
   unsigned char buf[32] = { 0 };
 
-  sha256_hash((const unsigned char*)buf, (const unsigned char *)s, len);
+  sha256_hash((const unsigned char *)buf, (const unsigned char *)s, len);
   return(b64_encode(buf, 32));
 }
 
@@ -138,7 +138,6 @@ char * CFStringCopyUTF8String(CFStringRef aString){
   if (aString == NULL)
     return(NULL);
 
-
   CFIndex length  = CFStringGetLength(aString);
   CFIndex maxSize = CFStringGetMaximumSizeForEncoding(length, kCFStringEncodingUTF8);
 
@@ -146,7 +145,6 @@ char * CFStringCopyUTF8String(CFStringRef aString){
 
   if (CFStringGetCString(aString, buffer, maxSize, kCFStringEncodingUTF8))
     return(buffer);
-
 
   return(buffer);
 }
@@ -215,7 +213,6 @@ char *cfstring_copy(CFStringRef string) {
   if (!result)
     return(NULL);
 
-
   if (!CFStringGetCString(string, result, num_bytes + 1, kCFStringEncodingUTF8)) {
     free(result);
     result = NULL;
@@ -230,7 +227,6 @@ char *string_copy(char *s) {
 
   if (!result)
     return(NULL);
-
 
   memcpy(result, s, length);
   result[length] = '\0';
@@ -370,7 +366,6 @@ void pad_string(uint32_t   hex_num,
    */
   if (destination == NULL)
     return;
-
 
   memset(destination, pad_char, width);
   destination[width - 1] = '\0';

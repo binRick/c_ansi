@@ -810,10 +810,10 @@ char *get_cur_palette_name(){
 void debug_cur_palette(){
   if (!DEBUG_PALETTE_COLORS_TO_STDERR)
 
-  fprintf(stderr,
-          "==============\n%s\n==============\n",
-          get_cur_palette_data()
-          );
+    fprintf(stderr,
+            "==============\n%s\n==============\n",
+            get_cur_palette_data()
+            );
   fprintf(stderr,
           "Palette #%d: %s (%s) -> %lu bytes\n",
           cur_palette_index,

@@ -1,6 +1,7 @@
 
 #include "ansi-codes/ansi-codes.h"
 #include "async-test/async-test.h"
+#include "async/async.h"
 #include "bytes/bytes.h"
 #include "c_fsio/include/fsio.h"
 #include "c_greatest/greatest/greatest.h"
@@ -8,17 +9,17 @@
 #include "c_stringfn/include/stringfn.h"
 #include "c_vector/vector/vector.h"
 #include "log/log.h"
-#include "ms/ms.h"
-#include "timestamp/timestamp.h"
 #include "module/def.h"
 #include "module/module.h"
 #include "module/require.h"
-#include "async/async.h"
+#include "ms/ms.h"
+#include "timestamp/timestamp.h"
 
 TEST t_async_module1(){
- // module(async) *a= require(async);
+  // module(async) *a= require(async);
   PASS();
 }
+
 TEST t_async_each_a(){
   unsigned long started = timestamp();
   size_t        out_qty = 0; void **res;
@@ -216,7 +217,6 @@ SUITE(s_async_v) {
 }
 SUITE(s_async_module) {
   RUN_TEST(t_async_module1);
-
 }
 SUITE(s_async_test) {
   RUN_TEST(t_async_test1);
