@@ -1,7 +1,7 @@
 
 #include "ansi-codes/ansi-codes.h"
 #include "async-test/async-test.h"
-#include "async/async.h"
+#include "../async/async.h"
 #include "bytes/bytes.h"
 #include "c_fsio/include/fsio.h"
 #include "c_greatest/greatest/greatest.h"
@@ -14,12 +14,8 @@
 #include "module/require.h"
 #include "ms/ms.h"
 #include "timestamp/timestamp.h"
-
-TEST t_async_module1(){
-  // module(async) *a= require(async);
-  PASS();
-}
-
+static size_t items[] = { 1, 5, 25, 2, 4, 1, 22, 11 };
+/*
 TEST t_async_each_a(){
   unsigned long started = timestamp();
   size_t        out_qty = 0; void **res;
@@ -116,14 +112,40 @@ SUITE(s_async_module) {
 }
 SUITE(s_async_test) {
 }
+*/
+
+TEST t_async_each_vec(void){
+  int           concurrency = getenv("CONCURRENCY") ? atoi(getenv("CONCURRENCY")) : 5, qty = getenv("QTY") ? atoi(getenv("QTY")) : 5;
+  struct Vector *results_v, *items_v = vector_new();
+  for (size_t i = 0; i < sizeof(items) / sizeof(items[0]); i++)
+    vector_push(items_v, (void *)items[i]);
+  Dbg(vector_size(items_v), %lu);
+  async_worker_cb cb = ^ void *(void *VOID){
+    size_t item = (size_t)VOID;
+    Dn(item);
+    return((void *)(item * 2));
+  };
+  results_v = require(async)->each->vec(concurrency,items_v,cb);
+  Dbg(vector_size(results_v), %lu);
+  for (size_t i = 0; i < vector_size(results_v); i++)
+    Dbg((size_t)vector_get(results_v, i), %lu);
+  PASS();
+}
+
+SUITE(s_async_each) {
+  RUN_TEST(t_async_each_vec);
+}
 
 GREATEST_MAIN_DEFS();
 
 int main(int argc, char **argv) {
   GREATEST_MAIN_BEGIN();
+  RUN_SUITE(s_async_each);
+  /*
   RUN_SUITE(s_async_v);
   RUN_SUITE(s_async_chan_v);
   RUN_SUITE(s_async_chan_a);
   RUN_SUITE(s_async_module);
+  */
   GREATEST_MAIN_END();
 }

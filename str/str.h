@@ -14,15 +14,26 @@
 #include <unistd.h>
 //////////////////////////////////////
 #include "c_stringfn/include/stringfn.h"
+#include "str-truncate.c/src/str-truncate.h"
+#include "occurences.c/occurrences.h"
+#include "str-flatten.c/src/str-flatten.h"
 #include "module/def.h"
 #include "module/module.h"
 #include "module/require.h"
+#include "smaz/smaz.h"
+#include "is_number.c/is_number.h"
+#include "slug.c/src/slug.h"
+#include "genpassword.c/src/genpassword.h"
 //////////////////////////////////////
 enum digit_emoji_type_t {
   DIGIT_EMOJI_TYPE_SMALL,
   DIGIT_EMOJI_TYPE_CIRCLE,
   DIGIT_EMOJI_TYPES_QTY,
 };
+typedef bool (*str_filter_fxn_t)(char *LINE);
+typedef bool (^str_filter_block_t)(char *LINE);
+typedef void (*str_each_fxn_t)(char *LINE);
+typedef void (^str_each_block_t)(char *LINE);
 
 module(str) {
   define(str, CLIB_MODULE);
@@ -37,30 +48,79 @@ module(str) {
     char **(*arr)(int *qty);
     size_t (*qty)(void);
   } *emojis;
-
-  /*
-  module(str_lines) {
-    module(str_lines_fn) {
-      define(str_lines_fn, CLIB_MODULE);
-      struct StringFNStrings (*split)(const char *);
-    } *fn;
-    module(str_lines_vec) {
-      define(str_lines_vec, CLIB_MODULE);
-        struct Vector *(*split)(const char *);
-    } *vec;
-    module(str_lines_arr) {
-      define(str_lines_arr, CLIB_MODULE);
-        char **(*split)(const char *, int *qty);
-    } *arr;
-  } *lines;
-  */
-
+  module(str_is) {
+    bool (*number)(const char *num, int len);
+  } *is;
+  int *(*compress)(char *in,int inlen,char *out,int outlen);
+  int *(*decompress)(char *in,int inlen,char *out,int outlen);
   char *(*lowercase)(const char *);
   char *(*uppercase)(const char *);
   char *(*replace)(char *, char, char);
+  char *(*password)(int len);
+  char *(*slug)(char *);
   bool (*equal)(const char *, const char *);
   char *(*trim)(const char *);
-
+  char *(*truncate)(const char *, int len);
+  module(__str_split) {
+    define(__str_split, CLIB_MODULE);
+    struct StringFNStrings (*lines)(const char *);
+    struct Vector *(*vec)(const char *);
+    char **(*arr)(const char *, int *qty);
+  } *split;
+  module(__str_filter) {
+    define(__str_filter, CLIB_MODULE);
+    module(__str_filter_arr) {
+      define(__str_filter_arr, CLIB_MODULE);
+      struct Vector *(^block)(struct Vector *v, str_filter_block_t *block);
+      struct Vector *(*fxn)(struct Vector *v, str_filter_fxn_t *fxn);
+    } *arr;
+    module(__str_filter_lines) {
+      define(__str_filter_lines, CLIB_MODULE);
+      struct Vector *(^block)(struct Vector *v, str_filter_block_t *block);
+      struct Vector *(*fxn)(struct Vector *v, str_filter_fxn_t *fxn);
+    } *lines;
+    module(__str_filter_vec) {
+      define(__str_filter_vec, CLIB_MODULE);
+      struct Vector *(^block)(struct Vector *v, str_each_block_t *block);
+      struct Vector *(*fxn)(struct Vector *v, str_each_fxn_t *fxn);
+    } *vec;
+  } *filter;
+  module(__str_each) {
+    define(__str_each, CLIB_MODULE);
+    module(__str_each_arr) {
+      define(__str_each_arr, CLIB_MODULE);
+      void (*block)(struct Vector *v, str_each_block_t *block);
+      void (*fxn)(struct Vector *v, str_each_fxn_t *fxn);
+    } *arr;
+    module(__str_each_vec) {
+      define(__str_each_vec, CLIB_MODULE);
+      void (*block)(struct Vector *v, str_each_block_t *block);
+      void (*fxn)(struct Vector *v, str_each_fxn_t *fxn);
+    } *vec;
+    struct StringFNStrings (*lines)(struct StringFNStrings *lines);
+    char *(*ch)(char *, char, char);
+    char *(*str)(char *, char*, char*);
+  } *each;
+  module(__str_repl) {
+    define(__str_repl, CLIB_MODULE);
+    struct Vector *(*vec)(struct Vector *v);
+    char **(*arr)(const char **arr, int qty, int *new_qty);
+    struct StringFNStrings (*lines)(struct StringFNStrings *lines);
+    char *(*ch)(char *, char, char);
+    char *(*str)(char *, char*, char*);
+  } *repl;
+  module(__str_match) {
+    define(__str_split, CLIB_MODULE);
+    char *(*vec)(struct Vector *v);
+    char *(*arr)(const char **arr, int qty);
+    char *(*lines)(struct StringFNStrings *lines);
+  } *match;
+  module(__str_join) {
+    define(__str_split, CLIB_MODULE);
+    char *(*vec)(struct Vector *v);
+    char *(*arr)(const char **arr, int qty);
+    char *(*lines)(struct StringFNStrings *lines);
+  } *join;
   struct StringFNStrings (*split_lines)(const char *);
 };
 
@@ -73,23 +133,8 @@ struct Vector *__str_get_emojis(void);
 char **__str_get_emojis_arr(int *qty);
 size_t __str_get_emojis_qty(void);
 struct StringFNStrings __str_split_lines_fn(const char *str);
-/*
-exports(str_lines_vec) {
-  .init        = 0,
-  .deinit      = 0,
-  .split      = stringfn_split_lines_and_trim,
-};
-exports(str_lines_arr) {
-  .init        = 0,
-  .deinit      = 0,
-  .split      = stringfn_split_lines_and_trim,
-};
-exports(str_lines_fn) {
-  .init        = 0,
-  .deinit      = 0,
-  .split      = stringfn_split_lines_and_trim,
-};
-*/
+struct Vector *__str_each_block(struct Vector *v, str_each_block_t *block);
+bool __str_filter_block(struct Vector *v, str_filter_block_t block);
 exports(str_emojis) {
   .init        = 0,
   .deinit      = 0,
@@ -104,10 +149,10 @@ exports(str_emoji) {
   .digit=__str_get_digit_type,
 };
 exports(str) {
- // .lines=0,
-  .emoji=0,
-  .emojis=0,
- // .fn=0,
+  .slug   = slug,
+  .password   = generate_password,
+  .compress   = smaz_compress,
+  .decompress   = smaz_decompress,
   .lowercase   = stringfn_to_lowercase,
   .uppercase   = stringfn_to_uppercase,
   .replace     = stringfn_replace,

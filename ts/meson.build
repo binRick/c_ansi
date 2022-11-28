@@ -25,6 +25,9 @@ ts_deps = [
 ts_c_args = [
 ]
 
+ts_link_whole = [
+  uptime_lib_static,
+]
 ts_link_args = [
 ]
 
@@ -33,7 +36,9 @@ ts_lib = static_library('ts',
   install: false,
   dependencies: ts_deps,
   c_args: ts_c_args,
-  include_directories: ts_include_dirs
+  include_directories: ts_include_dirs,
+  link_whole: ts_link_whole,
+
 )
 
 ts_dep = declare_dependency(

@@ -16,6 +16,7 @@
 #include "module/def.h"
 #include "module/module.h"
 #include "module/require.h"
+#include "uptime/include/uptime/uptime.h"
 //////////////////////////////////////
 enum ts_log_mode_t {
   TS_LOG_MODE_NONE = 1,
@@ -37,6 +38,7 @@ module(ts) {
   void               (*error)(char *);
   unsigned long (*ts)(void);
   unsigned long (*ms)(void);
+  unsigned long (*uptime)(void);
 };
 
 int ts_init(module(ts) *exports);
@@ -50,6 +52,7 @@ exports(ts) {
   .deinit   = ts_deinit,
   .ts=__ts_ts,
   .ms=__ts_ms,
+  .uptime=getUptime,
   .pid      = -1,
 };
 

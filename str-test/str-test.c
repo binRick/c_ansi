@@ -14,6 +14,27 @@
 module(str) * str;
 
 
+TEST t_str_filter_arr(){
+  char *arr[]={"a","b","c","AAA","a"};
+  Dn(sizeof(arr));
+  PASS();
+}
+TEST t_str_filter_lines(){
+//  struct StringFNStrings lines= require(str)->split->lines("a\tb\nc d");
+ // Di(lines.count);
+  PASS();
+}
+TEST t_str_filter_vec(){
+  struct Vector *v=vector_new();
+  vector_push(v,(void*)timestamp());
+  usleep(1000*100);
+  vector_push(v,(void*)timestamp());
+  usleep(1000*100);
+  vector_push(v,(void*)timestamp());
+  usleep(1000*100);
+  Dn(vector_size(v));
+  PASS();
+}
 TEST t_str_test_emojis_qty(){
   size_t qty=0;
   qty= require(str)->emojis->qty();
@@ -74,6 +95,7 @@ TEST t_str_test1(){
 }
 
 SUITE(s_str_test) {
+  /*
   RUN_TEST(t_str_test1);
   RUN_TEST(t_str_test_digits);
   RUN_TEST(t_str_test_digit);
@@ -81,12 +103,16 @@ SUITE(s_str_test) {
   RUN_TEST(t_str_test_emojis_vec);
   RUN_TEST(t_str_test_emojis_arr);
   RUN_TEST(t_str_test_emojis_qty);
+  RUN_TEST(t_str_filter_arr);
+  RUN_TEST(t_str_filter_lines);
+  RUN_TEST(t_str_filter_vec);
+  */
 }
 
 GREATEST_MAIN_DEFS();
 
 int main(int argc, char **argv) {
-  str = require(str);
+  //str = require(str);
   GREATEST_MAIN_BEGIN();
   RUN_SUITE(s_str_test);
   GREATEST_MAIN_END();

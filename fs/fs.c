@@ -22,8 +22,8 @@
 #include "string-utils/string-utils.h"
 #include "timestamp/timestamp.h"
 #include "tinydir/tinydir.h"
-#include "which/src/which.h"
 #include "wildcardcmp/wildcardcmp.h"
+#include "microtar/src/microtar.h"
 
 ////////////////////////////////////////////
 char *__fs_tmpdir_extension(const char *extension) {

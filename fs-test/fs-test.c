@@ -13,6 +13,14 @@
 #include "str/str.h"
 #include "timestamp/timestamp.h"
 
+TEST t_fs_test_normalize(){
+  char *s;
+  log_info("%s",(require(fs)->normalize("/tmp//xx")));
+  log_info("%s",(require(fs)->normalize("/tmp//xx/123//")));
+  log_info("%s",(require(fs)->normalize("/tmp//")));
+  PASS();
+}
+
 TEST t_fs_test2(){
   PASS();
 }
@@ -44,8 +52,7 @@ TEST t_fs_test1(){
 
 SUITE(s_fs_test) {
   RUN_TEST(t_fs_test1);
-  if (isatty(STDOUT_FILENO))
-    RUN_TEST(t_fs_test2);
+  RUN_TEST(t_fs_test_normalize);
 }
 
 GREATEST_MAIN_DEFS();

@@ -18,7 +18,8 @@
 #include "ms/ms.h"
 #include "timestamp/timestamp.h"
 #include "vips/vips.h"
-#include <SDL2/SDL.h>
+#include "win/win.h"
+#include "lodepng/lodepng.h"
 ////////////////////////////////////////////
 static bool SDL_DEBUG_MODE = false;
 
@@ -40,6 +41,7 @@ void __sdl_screenshot(module(sdl) *exports, SDL_Renderer *renderer, const char *
 
 int sdl_init(module(sdl) *exports) {
   clib_module_init(sdl, exports);
+  exports->utils->win=require(win);
   return(0);
 }
 

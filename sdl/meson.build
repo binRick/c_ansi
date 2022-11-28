@@ -13,6 +13,8 @@ sdl_deps = [
   ansi_codes_dep,
   c_vector_dep,
   glib_dep,vips_dep,msf_gif_dep,
+  lodepng_dep,
+  win_dep,
   c_fsio_dep,
   sdl2_dep,
   parson_dep,

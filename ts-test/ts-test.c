@@ -12,6 +12,12 @@
 #include "ts/ts.h"
 #include "ts-test/ts-test.h"
 
+TEST t_ts_test_uptime(){
+  unsigned long uptime=require(ts)->uptime();
+  char *s;
+  asprintf(&s,"Uptime: %ld",uptime);
+  PASSm(s);
+}
 TEST t_ts_test_ms(){
   unsigned long ms=require(ts)->ms();
   char *s;
@@ -28,6 +34,7 @@ TEST t_ts_test_ts(){
 SUITE(s_ts_test) {
   RUN_TEST(t_ts_test_ts);
   RUN_TEST(t_ts_test_ms);
+  RUN_TEST(t_ts_test_uptime);
 }
 
 GREATEST_MAIN_DEFS();

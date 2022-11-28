@@ -22,6 +22,17 @@ str_static_libs = [
   ]
 str_deps = [
   emojis_dep,
+  str_flatten_c_dep,
+  str_replace_dep,
+  str_truncate_dep,
+  occurrences_dep,
+  cansid_dep,
+  smaz_dep,
+  slug_dep,
+  chfreq_c_dep,
+  uuid4_dep,
+  is_number_dep,
+  genpassword_c_dep,
   module_dep,
   ansi_codes_dep,
   c_vector_dep,

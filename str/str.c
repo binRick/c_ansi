@@ -15,10 +15,46 @@
 #include "ms/ms.h"
 #include "timestamp/timestamp.h"
 #include "emojis/emojis.h"
+#include "cansid/cansid.h"
+#include "uuid4/src/uuid4.h"
 static const char *digit_emojis[][32];
 
+bool __str_filter_fxn(struct Vector *v, str_filter_fxn_t fxn){
+  bool res;
+  for(size_t i= 0;i<vector_size(v);i++)
+    if(!fxn((char*)vector_get(v,i)))
+      vector_remove(v,i);
+  return(true);
+}
+bool __str_filter_block(struct Vector *v, str_filter_block_t block){
+  bool res;
+  for(size_t i= 0;i<vector_size(v);i++)
+    if(!block((char*)vector_get(v,i)))
+      vector_remove(v,i);
+  return(true);
+}
+struct Vector *__str_each_fxn(struct Vector *v, str_each_fxn_t *fxn){
+  struct Vector *v1=vector_new();
 
+}
+inline struct StringFNStrings __str_parse_ansi_lines(struct StringFNStrings *lines){
+  struct Vector *v=vector_new();
+  vector_release(v);
+  for(size_t i = 0; i <lines->count;i++)
+    vector_push(v,(void*)lines->strings[i]);
 
+//  struct StringFNStrings lines = stringfn_split_lines_and_trim(
+}
+inline char **__str_parse_ansi_arr(int *qty){
+  struct Vector *v=vector_new();
+  char **s=vector_to_array(v);
+  *qty=vector_size(v);
+  return s;
+}
+inline struct Vector *__str_parse_ansi_vec(){
+  struct Vector *v=vector_new();
+  return v;
+}
 inline size_t __str_get_emojis_qty(){
   size_t qty=0;
   struct Vector *v=get_emojis_t_v();
@@ -100,13 +136,10 @@ static inline int   str_GetPID();
 ////////////////////////////////////////////
 int str_init(module(str) *exports) {
   clib_module_init(str, exports);
+  uuid4_init();
   exports->emoji=require(str_emoji);
   exports->emojis=require(str_emojis);
-  /*
-  exports->lines->fn=require(str_lines_fn);
-  exports->lines->arr=require(str_lines_arr);
-  exports->lines->vec=require(str_lines_vec);
-  */
+  exports->is->number=is_number;
   return(EXIT_SUCCESS);
 }
 

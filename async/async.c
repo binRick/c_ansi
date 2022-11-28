@@ -1,29 +1,29 @@
 #pragma once
 #ifndef ASYNC_C
 #define ASYNC_C
-#define LOCAL_DEBUG_MODE    ASYNC_DEBUG_MODE
 ////////////////////////////////////////////
-#include "async/async.h"
+#include "../async/async.h"
 ////////////////////////////////////////////
 #include "ansi-codes/ansi-codes.h"
 #include "bytes/bytes.h"
+#include "c_eventemitter/include/eventemitter.h"
+#include "c_workqueue/include/workqueue.h"
 #include "c_fsio/include/fsio.h"
+#include "clamp/clamp.h"
 #include "c_string_buffer/include/stringbuffer.h"
 #include "c_stringfn/include/stringfn.h"
 #include "c_vector/vector/vector.h"
-#include "c_workqueue/include/workqueue.h"
 #include "chan/src/chan.h"
 #include "chan/src/queue.h"
-#include "clamp/clamp.h"
+#include "incbin/incbin.h"
 #include "log/log.h"
+#include "module/def.h"
+#include "module/module.h"
+#include "module/require.h"
 #include "ms/ms.h"
+#include "tempdir.c/tempdir.h"
 #include "timestamp/timestamp.h"
-#include "fancy-progress/src/fancy-progress.h"
-////////////////////////////////////////////
-static bool ASYNC_DEBUG_MODE = false;
-static void __attribute__((constructor)) __constructor__async(void);
-////////////////////////////////////////////
-
+#include "which/src/which.h"
 struct async_chan_work_t {
   async_worker_cb cb;
   void            *args;
@@ -92,7 +92,6 @@ void **async_chan_bufs(size_t concurrency, void **items, size_t item_len, int in
     chan_send_buf(chans[ii % concurrency]->work, (void *)(items[ii]), item_len);
   }
 }
-
 void **async_chan_items(size_t concurrency, void **items, int in_qty, int *out_qty, async_worker_cb cb){
   size_t        qty = 0;
   struct Vector *v = vector_new(), *r;
@@ -142,7 +141,11 @@ struct Vector *async_chan_items_v(size_t concurrency, struct Vector *items, asyn
 
   return(results_v);
 }
-struct Vector *async_items_v(size_t concurrency, struct Vector *items, async_worker_cb cb){
+void ** __async_each_arr(size_t concurrency, void **items,size_t qty, async_worker_cb cb){
+
+  return(NULL);
+}
+struct Vector *__async_each_vec(size_t concurrency, struct Vector *items, async_worker_cb cb){
   struct Vector    *results_v = vector_new();
   struct WorkQueue *queues[concurrency];
 
@@ -163,5 +166,18 @@ struct Vector *async_items_v(size_t concurrency, struct Vector *items, async_wor
 
   return(results_v);
 }
-#undef LOCAL_DEBUG_MODE
+////////////////////////////////////////////
+int async_init(module(async) *exports) {
+  clib_module_init(async, exports);
+  exports->each = calloc(1,sizeof(module(async_each)));
+  exports->each->vec=__async_each_vec;
+  exports->each->arr=__async_each_arr;
+  return(EXIT_SUCCESS);
+}
+
+void async_deinit(module(async) *exports) {
+  free(exports->each);
+  clib_module_deinit(async);
+}
+////////////////////////////////////////////
 #endif
