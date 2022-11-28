@@ -1,12 +1,15 @@
 #pragma once
 #ifndef CHESS_C
 #define CHESS_C
+#define DEBUG_MODE false
 ////////////////////////////////////////////
 
 ////////////////////////////////////////////
 #include "chess/chess.h"
 ////////////////////////////////////////////
 #include "ansi-codes/ansi-codes.h"
+#include "glib.h"
+#include "vips/vips.h"
 #include "subprocess.h/subprocess.h"
 #include "bytes/bytes.h"
 #include "c_fsio/include/fsio.h"
@@ -20,15 +23,67 @@
 #include "log/log.h"
 #include "ms/ms.h"
 #include "timestamp/timestamp.h"
-#include "FEN2SVG/unsortedlinkedlist.h"
-#include "FEN2SVG/fen2svg.h"
+#include "fen2svg/unsortedlinkedlist.h"
+#include "fen2svg/fen2svg.h"
+#include "incbin/incbin.h"
 #include "which/src/which.h"
 #include "str/str.h"
 #include "reproc/reproc/include/reproc/drain.h"
 #include "reproc/reproc/include/reproc/export.h"
 #include "reproc/reproc/include/reproc/reproc.h"
-
+#include "tempdir.c/tempdir.h"
+INCTXT(svg_template,"assets/template.svg");
+#define SVG_FILE "dia00001.svg"
 ////////////////////////////////////////////
+unsigned char *__chess_fen_image(char *fen, char *fmt, size_t *len){
+  *len=0;
+  VipsImage *image_svg;
+  int argc=6;
+  char *fen_file,*template,*dir,*j,*tempdir,*svg,*_fmt;
+  unsigned char *png;
+  asprintf(&tempdir,"%s%lld",gettempdir(),timestamp());
+  fsio_mkdirs(tempdir,0777);
+  asprintf(&fen_file,"%s%lld.fen",tempdir,timestamp());
+  char *argv[] = {"./fen2svg","-b","-c","-m","-f",fen_file,NULL};
+  asprintf(&template,"%s/template.svg",tempdir);
+  fsio_write_text_file(fen_file,fen);
+  fsio_write_text_file(template,require(chess)->svg_template);
+  j= stringfn_join(argv," ",0,argc);
+  dir=getwd(0);
+  chdir(tempdir);
+  if(fsio_file_exists(SVG_FILE))
+    fsio_remove(SVG_FILE);
+  if(fen2svg_main(argc,argv)!=0){
+    log_error("Failed to generate svg from fen");
+    return(NULL);
+  }
+  if(!fsio_file_exists(SVG_FILE)){
+    log_error("Failed to find svg file %s",SVG_FILE);
+    return(NULL);
+  }
+  svg=fsio_read_text_file(SVG_FILE);
+  fsio_remove(SVG_FILE);
+  fsio_remove(fen_file);
+  fsio_remove(template);
+  chdir(dir);
+  if(!(image_svg=vips_image_new_from_buffer((const void*)svg,strlen(svg),"",NULL))){
+    log_error("Failed to decode svg");
+    return 0;
+  }
+  if(DEBUG_MODE)
+    log_info("%dx%d",
+      vips_image_get_width(image_svg),
+      vips_image_get_height(image_svg)
+      );
+
+  asprintf(&_fmt,".%s",fmt);
+  if(vips_image_write_to_buffer(image_svg,_fmt,&png,len,NULL)){
+    log_error("Failed to write %s buffer",fmt);
+    return(NULL);
+  }
+  free(_fmt);
+  return(png);
+}
 
 void __chessterm(char *fen){
   char *f=calloc(FEN_SIZE,sizeof(char));
@@ -98,6 +153,7 @@ char *__chess_exec_stockfish_fen(const char *fen){
   vector_push(v,(void*)strdup(s[0]));
   return(__chess_exec_stockfish((char**)vector_to_array(v),vector_size(v)));
 }
+
 char *__chess_exec_stockfish(const char **cmds, size_t qty){
   struct Vector *out_lines=vector_new();
   size_t buf_len=1024;
@@ -126,8 +182,6 @@ char *__chess_exec_stockfish(const char **cmds, size_t qty){
   } while (bytes_read != 0);
   subprocess_join(&proc, &ret);
   subprocess_destroy(&proc);
-
-
   return(require(str)->trim(data));
 }
 bool __chess_fen_valid(const char *fen){
@@ -136,11 +190,14 @@ bool __chess_fen_valid(const char *fen){
 ////////////////////////////////////////////
 int __chess_init(module(chess) *exports) {
   clib_module_init(chess, exports);
+  exports->svg_template=stringfn_trim(gsvg_templateData);
   {
     exports->stockfish=calloc(1,sizeof(module(chess_stockfish)));
     exports->fen=calloc(1,sizeof(module(chess_fen)));
+    exports->fen->image=calloc(1,sizeof(module(chess_fen_image)));
   }
   {
+    exports->fen->image->buffer=__chess_fen_image;
     exports->stockfish->exec=__chess_exec_stockfish;
     exports->stockfish->fen=__chess_exec_stockfish_fen;
   }
@@ -150,6 +207,7 @@ int __chess_init(module(chess) *exports) {
 void __chess_deinit(module(chess) *exports) {
   free(exports->stockfish);
   free(exports->fen);
+  free(exports->fen->image);
   clib_module_deinit(chess);
 }
 

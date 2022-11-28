@@ -26,7 +26,12 @@ chess_deps = [
   log_dep,
   ms_dep,
   bytes_dep,
-  FEN2SVG_dep,
+  fen2svg_dep,
+  b64_dep,
+  incbin_dep,
+  vips_dep,
+  glib_dep,
+  tempdir_dep,
 ]
 
 chess_c_args = [
