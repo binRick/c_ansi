@@ -4,6 +4,7 @@
 #define DEBUG_MODE false
 ////////////////////////////////////////////
 
+
 ////////////////////////////////////////////
 #include "chess/chess.h"
 ////////////////////////////////////////////
@@ -34,24 +35,48 @@
 #include "tempdir.c/tempdir.h"
 INCTXT(svg_template,"assets/template.svg");
 #define SVG_FILE "dia00001.svg"
+static char *__chess_print_piece(uint8_t piece);
+char *__chess_fen_ansi(char *fen);
 ////////////////////////////////////////////
+int __chess_fen_black_score(char *fen){
+  Board board;
+  load_fen(&board, fen);
+  int scores[2];
+  get_material_scores(&board,&scores[0],&scores[1]);
+  return(scores[1]);
+}
+
+int __chess_fen_white_score(char *fen){
+  Board board;
+  load_fen(&board, fen);
+  int scores[2];
+  get_material_scores(&board,&scores[0],&scores[1]);
+  return(scores[0]);
+}
+bool __chess_fen_print(char *fen){
+  Board board;
+  load_fen(&board, fen);
+  print_fancy(&board);
+  return(true);
+}
 unsigned char *__chess_fen_image(char *fen, char *fmt, size_t *len){
   *len=0;
   VipsImage *image_svg;
   int argc=6;
-  char *fen_file,*template,*dir,*j,*tempdir,*svg,*_fmt;
+  char *fen_file,*template,*dir,*j,*tempdir,*svg,*_fmt,*svg_file;
   unsigned char *png;
   asprintf(&tempdir,"%s%lld",gettempdir(),timestamp());
   fsio_mkdirs(tempdir,0777);
-  asprintf(&fen_file,"%s%lld.fen",tempdir,timestamp());
-  char *argv[] = {"./fen2svg","-b","-c","-m","-f",fen_file,NULL};
+  asprintf(&fen_file,"%s/%lld.fen",tempdir,timestamp());
+  asprintf(&svg_file,"%s/%s",tempdir,SVG_FILE);
   asprintf(&template,"%s/template.svg",tempdir);
-  fsio_write_text_file(fen_file,fen);
-  fsio_write_text_file(template,require(chess)->svg_template);
+  char *argv[] = {"./fen2svg","-b","-c","-m","-f",fen_file,NULL};
   j= stringfn_join(argv," ",0,argc);
   dir=getwd(0);
   chdir(tempdir);
-  if(fsio_file_exists(SVG_FILE))
+  fsio_write_text_file(fen_file,fen);
+  fsio_write_text_file(template,require(chess)->svg_template);
+  if(fsio_file_exists(svg_file))
     fsio_remove(SVG_FILE);
   if(fen2svg_main(argc,argv)!=0){
     log_error("Failed to generate svg from fen");
@@ -66,6 +91,7 @@ unsigned char *__chess_fen_image(char *fen, char *fmt, size_t *len){
   fsio_remove(fen_file);
   fsio_remove(template);
   chdir(dir);
+  fsio_remove(tempdir);
   if(!(image_svg=vips_image_new_from_buffer((const void*)svg,strlen(svg),"",NULL))){
     log_error("Failed to decode svg");
     return 0;
@@ -185,19 +211,245 @@ char *__chess_exec_stockfish(const char **cmds, size_t qty){
   return(require(str)->trim(data));
 }
 bool __chess_fen_valid(const char *fen){
-  return(false);
+  Board board;
+  load_fen(&board, fen);
+  int s[2]={0,0};
+  get_material_scores(&board, &(s[0]), &(s[1]));
+  bool valid=(s[0]>0&&s[1]>0);
+  return(valid);
 }
 ////////////////////////////////////////////
+bool __chess_fen_is_white_move(const char *fen){
+  Board *board=calloc(1,sizeof(Board));
+  load_fen(board, fen);
+  bool move;
+  move = (board->to_move==1);
+  free(board);
+  return(move);
+}
+bool __chess_fen_is_black_move(const char *fen){
+  Board *board=calloc(1,sizeof(Board));
+  load_fen(board, fen);
+  bool move;
+  move = (board->to_move==0);
+  free(board);
+  return(move);
+}
+char *__chess_fen_stats(char *fen){
+    char *s;
+    struct StringBuffer *sb=stringbuffer_new();
+    int LIGHT= 179;
+    int DARK=  58;
+    Board *board=calloc(1,sizeof(Board));
+    load_fen(board, fen);
+    if (board->to_move == 1)
+        stringbuffer_append_string(sb,"Black");
+    else if (board->to_move == 0)
+        stringbuffer_append_string(sb,"White");
+    stringbuffer_append_string(sb," to move.\nCastling: ");
+    if (board->castling & 0x08)
+        stringbuffer_append_string(sb,"K");
+    if (board->castling & 0x04)
+        stringbuffer_append_string(sb,"Q");
+    if (board->castling & 0x02)
+        stringbuffer_append_string(sb,"k");
+    if (board->castling & 0x01)
+        stringbuffer_append_string(sb,"q");
+    stringbuffer_append_string(sb,"\nEn pessant: ");
+    if (board->en_p == -1)
+      stringbuffer_append_string(sb,"None\n");
+    else{
+      asprintf(&s,"%c%d\n", (board->en_p % 8) + 'a', 8 - (board->en_p / 8));
+      stringbuffer_append_string(sb,s);
+    }
+    asprintf(&s,"Halfmoves: %d\nFullmoves: %d\n", board->halfmoves, board->moves);
+    stringbuffer_append_string(sb,s);
+    asprintf(&s,"Whiteking_pos: %c%d\n", (board->wking_pos % 8) + 'a',
+            8 - (board->wking_pos / 8));
+    stringbuffer_append_string(sb,s);
+    asprintf(&s,"Blackking_pos: %c%d\n", (board->bking_pos % 8) + 'a',
+            8 - (board->bking_pos / 8));
+    stringbuffer_append_string(sb,s);
+    free(board);
+    s =stringbuffer_to_string(sb);
+    stringbuffer_release(sb);
+    stringfn_mut_trim(s);
+    return(s);
+}
+char *__chess_fen_ansi(char *fen){   
+    struct StringBuffer *sb=stringbuffer_new();
+    int LIGHT= 179;
+    int DARK=  58;
+    Board *board=calloc(1,sizeof(Board));
+    load_fen(board, fen);
+    int i;
+    stringbuffer_append_string(sb,"   \u2554");
+    for (i = 0; i < 56; ++i)
+      stringbuffer_append_string(sb,"\u2550");
+    stringbuffer_append_string(sb,"\u2557");
+    int white_score[6];
+    int black_score[6];
+    const char* piece_chars = "pbnrq";
+    get_material_scores(board, white_score, black_score);
+    char *s;
+    asprintf(&s," %s: ", strlen(board->black_name) ? board->black_name : "Black");
+    stringbuffer_append_string(sb,s);
+    if (white_score[0] - black_score[0] < 0){
+        asprintf(&s,"%+d ", black_score[0]-white_score[0]);
+        stringbuffer_append_string(sb,s);
+    }
+    int j;
+    for (i = 1; i < 6; ++i)
+        for (j = 0; j < white_score[6 - i]; ++j)
+          stringbuffer_append(sb,piece_chars[5-i]-32);
+    stringbuffer_append_string(sb,"\n");
+    
+    for (i = 0; i < 24; ++i)
+    {
+        if (i % 3 == 1){
+          asprintf(&s,"%+d \u2551",8-(i/3));
+        }else{
+          asprintf(&s,"   \u2551");
+        }
+        stringbuffer_append_string(sb,s);
+        int j;
+        for (j = 0; j < 8; ++j)
+          stringbuffer_append_string(sb,"       ");
+        stringbuffer_append_string(sb,"\u2551\n");
+    }
+    stringbuffer_append_string(sb,"   \u255a");
+    for (i = 0; i < 56; ++i)
+        stringbuffer_append_string(sb,"\u2550");
+    asprintf(&s," %s: ", board->white_name);
+    stringbuffer_append_string(sb,s);
+    if (white_score[0] - black_score[0] > 0){
+      asprintf(&s,"%+d ", white_score[0] - black_score[0]);
+      stringbuffer_append_string(sb,s);
+    }
+    for (i = 1; i < 6; ++i)
+        for (j = 0; j < black_score[6 - i]; ++j)
+          stringbuffer_append(sb,piece_chars[5 - i]);
+    stringbuffer_append_string(sb,"\n       ");
+    for (i = 0; i < 8; ++i){
+      asprintf(&s,"%c      ", 'a' + i);
+      stringbuffer_append_string(sb,s);
+    }
+    stringbuffer_append_string(sb,"\n");
+    stringbuffer_append_string(sb,"\e[26F\e[4C");
+
+    Move prev_move;
+    if (board->history_count > 0)
+        prev_move = board->history[board->history_count - 1];
+    else 
+        prev_move = board->history[board->history_count];
+    int8_t prev_src = prev_move.src_rank * 8 + prev_move.src_file;
+    int8_t prev_dest = prev_move.dest;
+
+    for (i = 0; i < 64; ++i)
+    {
+        /* Bullshit that colors them checkered-like 
+         * - Courtesy of Zach Gorman
+         */
+        uint8_t square = board->position[i];
+        if (prev_dest != -1 && (i == prev_src || i == prev_dest))
+        {
+            if (i == prev_src)
+                stringbuffer_append_string(sb,"\e[48;5;6m");
+            if (i == prev_dest)
+                stringbuffer_append_string(sb,"\e[48;5;12m");
+        }
+        else
+        {
+            if (!(!(i & 1) ^ !(i & 8))) {
+              asprintf(&s,"\e[48;5;%dm", LIGHT);
+            }else{
+              asprintf(&s,"\e[48;5;%dm", DARK);
+            }
+            stringbuffer_append_string(sb,s);
+        }
+
+        stringbuffer_append_string(sb,"\e[1m");
+        (square & BLACK) ? stringbuffer_append_string(sb,"\e[38;5;232m") : stringbuffer_append_string(sb,"\e[37m");
+        stringbuffer_append_string(sb,__chess_print_piece(square));
+        stringbuffer_append_string(sb,"\e[0m");
+
+        if (i % 8 == 7)
+           stringbuffer_append_string(sb,"\u2551\e[3E\e[4C");
+    }
+    stringbuffer_append_string(sb,"\e[8E\n");
+    free(board);
+    s=stringbuffer_to_string(sb);
+    stringbuffer_release(sb);
+    stringfn_mut_trim(s);
+    return(s);
+}
+static char *__chess_print_piece(uint8_t piece){
+    struct StringBuffer *sb=stringbuffer_new();
+    if (piece & PAWN)
+    {
+        stringbuffer_append_string(sb,"   O   \e[B\e[7D"
+               "  ( )  \e[B\e[7D"
+               "  ===  \e[2A");
+    }
+    else if (piece & BISHOP)
+    {
+        stringbuffer_append_string(sb,"  (/)  \e[B\e[7D"
+               "  / \\  \e[B\e[7D"
+               "  ===  \e[2A");
+    }
+    else if (piece & KNIGHT)
+    {
+        stringbuffer_append_string(sb,"  <*^  \e[B\e[7D"
+               "  / |  \e[B\e[7D"
+               "  ===  \e[2A");
+    }
+    else if (piece & ROOK)
+    {
+        stringbuffer_append_string(sb,"  ooo  \e[B\e[7D"
+               "  | |  \e[B\e[7D"
+               "  ===  \e[2A");
+    }
+    else if (piece & KING)
+    {
+        stringbuffer_append_string(sb,"  ^+^  \e[B\e[7D"
+               "  )|(  \e[B\e[7D"
+               "  ===  \e[2A");
+    }
+    else if (piece & QUEEN)
+    {
+        stringbuffer_append_string(sb,"  oOo  \e[B\e[7D"
+               "  )|(  \e[B\e[7D"
+               "  ===  \e[2A");
+    }
+    else
+        stringbuffer_append_string(sb,"       \e[B\e[7D"
+               "       \e[B\e[7D"
+               "       \e[2A");
+    char *s=stringbuffer_to_string(sb);
+    stringbuffer_release(sb);
+    return(s);
+}
 int __chess_init(module(chess) *exports) {
   clib_module_init(chess, exports);
   exports->svg_template=stringfn_trim(gsvg_templateData);
   {
     exports->stockfish=calloc(1,sizeof(module(chess_stockfish)));
     exports->fen=calloc(1,sizeof(module(chess_fen)));
+    exports->fen->score=calloc(1,sizeof(module(chess_stockfish)));
+    exports->fen->is=calloc(1,sizeof(module(chess_fen_is)));
+    exports->fen->is->move=calloc(1,sizeof(module(chess_fen_is_move)));
     exports->fen->image=calloc(1,sizeof(module(chess_fen_image)));
   }
   {
+    exports->fen->print=__chess_fen_print;
     exports->fen->image->buffer=__chess_fen_image;
+    exports->fen->is->valid=__chess_fen_valid;
+    exports->fen->is->move->black=__chess_fen_is_black_move;
+    exports->fen->is->move->white=__chess_fen_is_white_move;
+    exports->fen->score->black=__chess_fen_black_score;
+    exports->fen->score->white=__chess_fen_white_score;
+    exports->fen->stats=__chess_fen_stats;
+    exports->fen->image->ansi=__chess_fen_ansi;
     exports->stockfish->exec=__chess_exec_stockfish;
     exports->stockfish->fen=__chess_exec_stockfish_fen;
   }
@@ -207,9 +459,12 @@ int __chess_init(module(chess) *exports) {
 void __chess_deinit(module(chess) *exports) {
   free(exports->stockfish);
   free(exports->fen);
+  free(exports->fen->is->move);
+  free(exports->fen->is);
   free(exports->fen->image);
   clib_module_deinit(chess);
 }
+
 
 ////////////////////////////////////////////
 #endif
