@@ -17,13 +17,6 @@
 #include "module/module.h"
 #include "module/require.h"
 //////////////////////////////////////
-enum chess_log_mode_t {
-  CHESS_LOG_MODE_NONE = 1,
-  CHESS_LOG_MODE_ERROR,
-  CHESS_LOG_MODE_INFO,
-  CHESS_LOG_MODE_DEBUG,
-  CHESS_LOG_MODES_QTY,
-};
 enum chess_player_move_t {
   CHESS_PLAYER_MOVE_WHITE,
   CHESS_PLAYER_MOVE_BLACK,
@@ -31,13 +24,12 @@ enum chess_player_move_t {
 
 module(chess) {
   define(chess, CLIB_MODULE);
-  enum chess_log_mode_t log_mode;
   bool (*valid_fen)(const char *fen);
   module(chess_stockfish){
     define(chess_stockfish, CLIB_MODULE);
     char *(*exec)(const char **cmd,size_t qty);
     char *(*fen)(const char *fen);
-  } stockfish;
+  } *stockfish;
   module(chess_fen){
     define(chess_fen, CLIB_MODULE);
     char *(*move)(const char *fen);
@@ -45,19 +37,21 @@ module(chess) {
     unsigned char *(*svg)(const char *fen, size_t *len);
     unsigned char *(*png)(const char *fen, size_t *len);
   } *fen;
+  void (*chessterm)(char *fen);
 };
 
-int chess_init(module(chess) *exports);
-void chess_deinit(module(chess) *exports);
+int __chess_init(module(chess) *exports);
+void __chess_deinit(module(chess) *exports);
 bool __chess_fen_valid(const char *fen);
 char *__chess_exec_stockfish(const char **cmds, size_t qty);
 char *__chess_exec_stockfish_fen(const char *fen);
+void __chessterm(char *fen);
 
 exports(chess) {
-  .log_mode = CHESS_LOG_MODE_NONE,
   .valid_fen=__chess_fen_valid,
-  .init     = chess_init,
-  .deinit   = chess_deinit,
+  .init     = __chess_init,
+  .deinit   = __chess_deinit,
+  .chessterm   = __chessterm,
 };
 
 #define chess_m    module(chess)

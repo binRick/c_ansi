@@ -2,8 +2,6 @@
 #ifndef ICON_C
 #define ICON_C
 ////////////////////////////////////////////
-
-////////////////////////////////////////////
 #include "icon/icon.h"
 ////////////////////////////////////////////
 #include "ansi-codes/ansi-codes.h"
@@ -17,13 +15,7 @@
 #include "timestamp/timestamp.h"
 #include "string-utils/string-utils.h"
 #include <CoreVideo/CVPixelBuffer.h>
-
 ////////////////////////////////////////////
-static inline void  icon_info(char *message);
-static inline void  icon_error(char *message);
-static inline void  icon_debug(char *message);
-static inline int   icon_GetPID();
-
 CFDataRef copyIconDataForURL(CFURLRef URL){
   CFDataRef data = NULL;
   if (URL) {
@@ -71,36 +63,10 @@ static CFDataRef __icon_from_path(char *path) {
 ////////////////////////////////////////////
 int icon_init(module(icon) *exports) {
   clib_module_init(icon, exports);
-  exports->pid      = getpid();
-  exports->log_mode = ICON_LOG_MODE_NONE;
-  exports->info     = icon_info;
-  exports->error    = icon_error;
-  exports->debug    = icon_debug;
   return(EXIT_SUCCESS);
 }
-
 void icon_deinit(module(icon) *exports) {
   clib_module_deinit(icon);
-}
-
-////////////////////////////////////////////
-static inline int icon_GetPID(){
-  return(require(icon)->pid);
-}
-
-static inline void icon_info(char *message) {
-  if (require(icon)->log_mode >= ICON_LOG_MODE_INFO)
-    fprintf(stdout, " info: %s\n", message);
-}
-
-static inline void icon_error(char *message) {
-  if (require(icon)->log_mode >= ICON_LOG_MODE_ERROR)
-    fprintf(stderr, "error: %s\n", message);
-}
-
-static inline void icon_debug(char *message) {
-  if (require(icon)->log_mode >= ICON_LOG_MODE_DEBUG)
-    fprintf(stderr, "debug: %s\n", message);
 }
 ////////////////////////////////////////////
 #endif

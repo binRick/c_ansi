@@ -10,6 +10,10 @@
 #include "subprocess.h/subprocess.h"
 #include "bytes/bytes.h"
 #include "c_fsio/include/fsio.h"
+#include "chessterm/include/chessterm.h"
+#include "chessterm/include/board.h"
+#include "chessterm/include/uci.h"
+#include "chessterm/include/engine.h"
 #include "c_string_buffer/include/stringbuffer.h"
 #include "c_stringfn/include/stringfn.h"
 #include "c_vector/vector/vector.h"
@@ -26,6 +30,67 @@
 
 ////////////////////////////////////////////
 
+void __chessterm(char *fen){
+  char *f=calloc(FEN_SIZE,sizeof(char));
+  int scores[2];
+  Board board;
+  memcpy(board.black_name, "My Engine\0", 10);
+  memcpy(board.white_name, "My Engine\0", 10);
+  default_board(&board);
+  Engine white_engine;
+  white_engine.pid = 0;
+  Engine black_engine;
+  black_engine.pid = 0;  
+  load_fen(&board, fen);
+  get_material_scores(&board,&scores[0],&scores[1]);
+
+  Di(scores[0]);
+  Di(scores[1]);
+  Ds(fen);
+  Di(is_gameover(&board));
+  Di(board.to_move);
+  Di(black_engine.pid);
+  Di(white_engine.pid);
+  Di(board.to_move);
+  Di(board.history_count);
+  Di(board.pos_count);
+  print_fancy(&board);
+  board_stats(&board);
+  export_fen(&board,f);
+  Ds(f);
+
+
+  send_ucinewgame(white_engine.write);
+  send_isready(white_engine.write);
+  send_position(white_engine.write,"fen",fen);
+  /*
+  char *msg;
+  asprintf(msg, "depth %d", white_engine.depth);
+  send_go(white_engine.write, msg);
+  char* message = get_message(white_engine.read);
+  while (!strstr(message, "bestmove")){
+    Ds(message);
+    free(message);
+    message = get_message(white_engine.read);
+    Ds(message);
+  }
+  */
+
+  Move engine_move;
+  engine_move = Erandom_move(&board);
+
+  Di(engine_move.src_piece);
+  Di(engine_move.dest);
+  Di(board.to_move);
+  Di(move_piece(&board, &engine_move));
+  Di(board.to_move);
+  export_fen(&board,f);
+  board_stats(&board);
+  Di(is_gameover(&board));
+  Ds("ok");
+
+//  stop_engine(&white_engine);
+}
 char *__chess_exec_stockfish_fen(const char *fen){
   char *s[2];
   asprintf(&s[0],"position fen %s\n",fen);
@@ -69,15 +134,22 @@ bool __chess_fen_valid(const char *fen){
   return(false);
 }
 ////////////////////////////////////////////
-int chess_init(module(chess) *exports) {
+int __chess_init(module(chess) *exports) {
   clib_module_init(chess, exports);
-  exports->log_mode = CHESS_LOG_MODE_NONE;
-  exports->stockfish.exec=__chess_exec_stockfish;
-  exports->stockfish.fen=__chess_exec_stockfish_fen;
+  {
+    exports->stockfish=calloc(1,sizeof(module(chess_stockfish)));
+    exports->fen=calloc(1,sizeof(module(chess_fen)));
+  }
+  {
+    exports->stockfish->exec=__chess_exec_stockfish;
+    exports->stockfish->fen=__chess_exec_stockfish_fen;
+  }
   return(EXIT_SUCCESS);
 }
 
-void chess_deinit(module(chess) *exports) {
+void __chess_deinit(module(chess) *exports) {
+  free(exports->stockfish);
+  free(exports->fen);
   clib_module_deinit(chess);
 }
 

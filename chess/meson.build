@@ -17,6 +17,7 @@ chess_deps = [
   str_dep,
   exec_dep,
   subprocess_dep,
+  chessterm_dep,
   c_vector_dep,
   c_fsio_dep,
   c_stringfn_dep,
