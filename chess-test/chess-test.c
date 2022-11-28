@@ -43,6 +43,25 @@ TEST t_chess_test_fens(){
   PASSm(s);
 }
 
+TEST t_chess_test_fen_players(){
+  for(size_t i=0;i<QTY;i++){
+    char *fen=lines.strings[i];
+    char *player=require(chess)->fen->get->player(fen);
+    log_info(FEN_STYLE"%s"AC_RESETALL "- %s",fen,player);
+  }
+  PASS();
+}
+
+TEST t_chess_test_fen_moves(){
+  for(size_t i=0;i<QTY;i++){
+    char *fen=lines.strings[i];
+    char *move=require(chess)->fen->get->move(fen);
+    char *player=require(chess)->fen->get->player(fen);
+    log_info(FEN_STYLE"%s"AC_RESETALL "- %s %s",fen,player, move);
+  }
+  PASS();
+}
+
 TEST t_chess_test_fen_ansi(){
   for(size_t i=0;i<QTY;i++){
     char *fen = lines.strings[i];
@@ -112,6 +131,20 @@ TEST t_chess_test_svg(){
 
 }
 
+TEST t_chess_test_fen_is_over(){
+  char *over;
+  for(size_t i=0;i<QTY;i++){
+    char *fen = lines.strings[i];
+    if(require(chess)->fen->is->over(fen)){
+      asprintf(&over,"over");
+    }else{
+      asprintf(&over,"not over");
+    }
+    log_info(FEN_STYLE"%s"AC_RESETALL "- %s",fen,over);
+  }
+  PASS();
+}
+
 TEST t_chess_test_fen_is_move(){
   char *player;
   for(size_t i=0;i<QTY;i++){
@@ -137,8 +170,11 @@ SUITE(s_chess_test) {
   RUN_TEST(t_chess_test_fen_valid);
   RUN_TEST(t_chess_test_fen_stats);
   RUN_TEST(t_chess_test_fen_is_move);
+  RUN_TEST(t_chess_test_fen_is_over);
   RUN_TEST(t_chess_test_fen_print);
   RUN_TEST(t_chess_test_fen_ansi);
+  RUN_TEST(t_chess_test_fen_moves);
+  RUN_TEST(t_chess_test_fen_players);
   RUN_TEST(t_chess_test_fen_scores);
   RUN_TEST(t_chess_test_chessterm);
 }

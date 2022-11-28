@@ -2,9 +2,7 @@
 #ifndef CHESS_C
 #define CHESS_C
 #define DEBUG_MODE false
-////////////////////////////////////////////
-
-
+#define CHESS_DEFAULT_DEPTH 10
 ////////////////////////////////////////////
 #include "chess/chess.h"
 ////////////////////////////////////////////
@@ -29,15 +27,21 @@
 #include "incbin/incbin.h"
 #include "which/src/which.h"
 #include "str/str.h"
-#include "reproc/reproc/include/reproc/drain.h"
-#include "reproc/reproc/include/reproc/export.h"
-#include "reproc/reproc/include/reproc/reproc.h"
 #include "tempdir.c/tempdir.h"
+#define STOCKFISH_EVALUATE_FEN_FMT "printf \"position fen %s\\ngo depth %d\" | %s"
 INCTXT(svg_template,"assets/template.svg");
 #define SVG_FILE "dia00001.svg"
 static char *__chess_print_piece(uint8_t piece);
+static char *__chess_render_fen_cmd(char *fen, int depth);
 char *__chess_fen_ansi(char *fen);
 ////////////////////////////////////////////
+
+static char *__chess_render_fen_cmd(char *fen, int depth){
+  char *s;
+  asprintf(&s,STOCKFISH_EVALUATE_FEN_FMT,fen,depth,which("stockfish"));
+  return(s);
+}
+
 int __chess_fen_black_score(char *fen){
   Board board;
   load_fen(&board, fen);
@@ -53,19 +57,22 @@ int __chess_fen_white_score(char *fen){
   get_material_scores(&board,&scores[0],&scores[1]);
   return(scores[0]);
 }
+
 bool __chess_fen_print(char *fen){
   Board board;
   load_fen(&board, fen);
   print_fancy(&board);
   return(true);
 }
+
 unsigned char *__chess_fen_image(char *fen, char *fmt, size_t *len){
   *len=0;
   VipsImage *image_svg;
-  int argc=6;
+  int argc=6,r=rand()%1000;
   char *fen_file,*template,*dir,*j,*tempdir,*svg,*_fmt,*svg_file;
   unsigned char *png;
-  asprintf(&tempdir,"%s%lld",gettempdir(),timestamp());
+
+  asprintf(&tempdir,"%s%lld-%d",gettempdir(),timestamp(),r);
   fsio_mkdirs(tempdir,0777);
   asprintf(&fen_file,"%s/%lld.fen",tempdir,timestamp());
   asprintf(&svg_file,"%s/%s",tempdir,SVG_FILE);
@@ -108,6 +115,7 @@ unsigned char *__chess_fen_image(char *fen, char *fmt, size_t *len){
     return(NULL);
   }
   free(_fmt);
+  g_object_unref(image_svg);
   return(png);
 }
 
@@ -144,18 +152,6 @@ void __chessterm(char *fen){
   send_ucinewgame(white_engine.write);
   send_isready(white_engine.write);
   send_position(white_engine.write,"fen",fen);
-  /*
-  char *msg;
-  asprintf(msg, "depth %d", white_engine.depth);
-  send_go(white_engine.write, msg);
-  char* message = get_message(white_engine.read);
-  while (!strstr(message, "bestmove")){
-    Ds(message);
-    free(message);
-    message = get_message(white_engine.read);
-    Ds(message);
-  }
-  */
 
   Move engine_move;
   engine_move = Erandom_move(&board);
@@ -169,21 +165,24 @@ void __chessterm(char *fen){
   board_stats(&board);
   Di(is_gameover(&board));
   Ds("ok");
+  free(f);
 
 //  stop_engine(&white_engine);
 }
-char *__chess_exec_stockfish_fen(const char *fen){
-  char *s[2];
-  asprintf(&s[0],"position fen %s\n",fen);
-  struct Vector *v=vector_new();
-  vector_push(v,(void*)strdup(s[0]));
-  return(__chess_exec_stockfish((char**)vector_to_array(v),vector_size(v)));
+
+char *__chess_fen_get_move(const char *fen){
+  char *move;
+  char *res=require(chess)->stockfish->exec(require(chess)->fen->cmd(fen,CHESS_DEFAULT_DEPTH));
+  if(stringfn_starts_with(res,"bestmove")){
+    struct StringFNStrings words= stringfn_split_words(res);
+    move=strdup(words.strings[words.count-1]);
+  }
+  return(move);
 }
 
-char *__chess_exec_stockfish(const char **cmds, size_t qty){
-  struct Vector *out_lines=vector_new();
+char *__chess_exec_stockfish(const char *cmd){
   size_t buf_len=1024;
-  const char  *command_line[] = { which("sh"),"-c",which("Stockfish"), NULL };
+  const char  *command_line[] = { which("sh"),"-c", cmd, NULL};
   struct subprocess_s proc;
   int result,ret;
   unsigned index = 0;
@@ -193,31 +192,47 @@ char *__chess_exec_stockfish(const char **cmds, size_t qty){
     log_error("subprocess error");
     return(NULL);
   }
-  Ds(cmds[0]);
-  fputs(cmds[0], subprocess_stdin(&proc));
-  fflush(subprocess_stdin(&proc));
-  fclose(subprocess_stdin(&proc));
   do {
     bytes_read = subprocess_read_stdout(&proc, data + index,sizeof(data) - 1 - index);
-    Di(bytes_read);
-    Di(index);
-    if (index == 0) {
-    }
-
     index += bytes_read;
   } while (bytes_read != 0);
   subprocess_join(&proc, &ret);
   subprocess_destroy(&proc);
-  return(require(str)->trim(data));
+  char *s;
+  if(strlen(data)>0){
+    stringfn_mut_trim((char*)data);
+    struct StringFNStrings lines=stringfn_split_lines_and_trim((char*)data);
+    if(lines.count>0)
+      s = strdup(lines.strings[lines.count-1]);
+    stringfn_release_strings_struct(lines);
+  }
+  return(s);
 }
+
+bool __chess_fen_over(const char *fen){
+  Board board;
+  load_fen(&board, fen);
+  int s[2]={0,0};
+  get_material_scores(&board, &(s[0]), &(s[1]));
+  return(is_gameover(&board));
+}
+
 bool __chess_fen_valid(const char *fen){
   Board board;
   load_fen(&board, fen);
   int s[2]={0,0};
   get_material_scores(&board, &(s[0]), &(s[1]));
-  bool valid=(s[0]>0&&s[1]>0);
-  return(valid);
+  return(s[0]>0&&s[1]>0);
 }
+
+char *__chess_fen_get_player_to_move(char *fen){
+  if(require(chess)->fen->is->move->white(fen))
+    return "white";
+  else if(require(chess)->fen->is->move->black(fen))
+    return "black";
+  return "UNKNOWN";
+}
+
 ////////////////////////////////////////////
 bool __chess_fen_is_white_move(const char *fen){
   Board *board=calloc(1,sizeof(Board));
@@ -227,6 +242,7 @@ bool __chess_fen_is_white_move(const char *fen){
   free(board);
   return(move);
 }
+
 bool __chess_fen_is_black_move(const char *fen){
   Board *board=calloc(1,sizeof(Board));
   load_fen(board, fen);
@@ -235,6 +251,7 @@ bool __chess_fen_is_black_move(const char *fen){
   free(board);
   return(move);
 }
+
 char *__chess_fen_stats(char *fen){
     char *s;
     struct StringBuffer *sb=stringbuffer_new();
@@ -278,11 +295,9 @@ char *__chess_fen_stats(char *fen){
 }
 char *__chess_fen_ansi(char *fen){   
     struct StringBuffer *sb=stringbuffer_new();
-    int LIGHT= 179;
-    int DARK=  58;
+    int LIGHT= 179, DARK=  58,i;
     Board *board=calloc(1,sizeof(Board));
     load_fen(board, fen);
-    int i;
     stringbuffer_append_string(sb,"   \u2554");
     for (i = 0; i < 56; ++i)
       stringbuffer_append_string(sb,"\u2550");
@@ -439,19 +454,23 @@ int __chess_init(module(chess) *exports) {
     exports->fen->is=calloc(1,sizeof(module(chess_fen_is)));
     exports->fen->is->move=calloc(1,sizeof(module(chess_fen_is_move)));
     exports->fen->image=calloc(1,sizeof(module(chess_fen_image)));
+    exports->fen->get=calloc(1,sizeof(module(chess_fen_get)));
   }
   {
     exports->fen->print=__chess_fen_print;
     exports->fen->image->buffer=__chess_fen_image;
     exports->fen->is->valid=__chess_fen_valid;
+    exports->fen->is->over=__chess_fen_over;
     exports->fen->is->move->black=__chess_fen_is_black_move;
     exports->fen->is->move->white=__chess_fen_is_white_move;
     exports->fen->score->black=__chess_fen_black_score;
     exports->fen->score->white=__chess_fen_white_score;
     exports->fen->stats=__chess_fen_stats;
+    exports->fen->cmd=__chess_render_fen_cmd;
+    exports->fen->get->move=__chess_fen_get_move;
+    exports->fen->get->player=__chess_fen_get_player_to_move;
     exports->fen->image->ansi=__chess_fen_ansi;
     exports->stockfish->exec=__chess_exec_stockfish;
-    exports->stockfish->fen=__chess_exec_stockfish_fen;
   }
   return(EXIT_SUCCESS);
 }
@@ -462,6 +481,7 @@ void __chess_deinit(module(chess) *exports) {
   free(exports->fen->is->move);
   free(exports->fen->is);
   free(exports->fen->image);
+  free(exports->fen->get);
   clib_module_deinit(chess);
 }
 
