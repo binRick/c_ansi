@@ -52,7 +52,8 @@ TEST t_chess_test_fen_players(){
 TEST t_chess_test_fen_bulk_moves(){
   unsigned long st[10],dur[10];
   struct Vector *v=vector_new();
-  int lim=15;
+  int lim=999;
+
   for(int i=0;i<lim&&i<lines.count;i++)
     vector_push(v,(void*)lines.strings[i]);
 
@@ -69,6 +70,7 @@ TEST t_chess_test_fen_bulk_moves(){
 //  Ds(moves[0]);
 
   st[0]=timestamp();
+  PASS();
 }
 TEST t_chess_test_fen_moves(){
   unsigned long st[10],dur[10];
@@ -92,6 +94,8 @@ TEST t_chess_test_fen_moves(){
     st[6]=timestamp();
     bool is_over =require(chess)->fen->is->over(lines.strings[i]);
     dur[6]=timestamp()-st[6];
+  PASS();
+
     log_info(FEN_STYLE"%s"AC_RESETALL "\n\t"AC_RESETALL AC_CYAN "%s"AC_RESETALL "'s Move %s:%s, "
         "|player:%s:%s"
         "|valid:%s:%s"
@@ -155,7 +159,7 @@ TEST t_chess_test_fen_scores(){
   for(size_t i=0;i<QTY;i++){
     int black=require(chess)->fen->score->black(lines.strings[i]);
     int white=require(chess)->fen->score->white(lines.strings[i]);
-    log_info(FEN_STYLE"%s"AC_RESETALL "\nwhite:"AC_WHITE"%d"AC_RESETALL "|"AC_WHITE_BLACK "black"AC_RESETALL ":%d",lines.strings[i],white,black);
+    log_info("%lu/%d> " FEN_STYLE"%s"AC_RESETALL "\nwhite:"AC_WHITE"%d"AC_RESETALL "|"AC_WHITE_BLACK "black"AC_RESETALL ":%d",i+1,QTY,lines.strings[i],white,black);
   }
   PASS();
 }

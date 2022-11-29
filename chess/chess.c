@@ -6,10 +6,12 @@
 ////////////////////////////////////////////
 #include "chess/chess.h"
 ////////////////////////////////////////////
-#include "ansi-codes/ansi-codes.h"
 #include "glib.h"
-#include "async/async.h"
 #include "vips/vips.h"
+#include "ansi-codes/ansi-codes.h"
+#include "async/async.h"
+#include "chan/src/chan.h"
+#include "chan/src/queue.h"
 #include "subprocess.h/subprocess.h"
 #include "bytes/bytes.h"
 #include "c_fsio/include/fsio.h"
@@ -197,7 +199,7 @@ char **__chess_fen_get_moves(const char **fens,size_t qty,size_t *moves_qty){
     if(stringfn_starts_with(lines.strings[i],"bestmove ")){
       struct StringFNStrings words=stringfn_split_words(lines.strings[i]);
       if(words.count<2)continue;
-      asprintf(&(fen_move[fen_moves_qty]),"%s:%s",fens[fen_moves_qty],words.strings[1]);
+      asprintf(&(fen_move[fen_moves_qty]),"%s",words.strings[1]);
       vector_push(v,(void*)fen_move[fen_moves_qty]);
       fen_moves_qty++;
     }
@@ -206,6 +208,7 @@ char **__chess_fen_get_moves(const char **fens,size_t qty,size_t *moves_qty){
   *moves_qty=vector_size(v);
   return(vector_to_array(v));
 }
+
 char *__chess_fen_get_move(const char *fen){
   char *move;
   int depth=CHESS_DEFAULT_DEPTH;
@@ -218,6 +221,50 @@ char *__chess_fen_get_move(const char *fen){
   return(move);
 }
 
+/*
+
+        Candidate cans[MOVES_PER_POSITION];
+        get_all_moves(&temp_board, cans);
+
+        */
+
+static struct subprocess_s *proc_async;
+void __chess_exec_stockfish_async_init(void){
+  size_t buf_len=1024;
+  char *tf,*of,*cmd_file;
+  setenv("TMPDIR","/tmp/",1);
+  asprintf(&of,"%s%d%lld.out",gettempdir(),rand()%1000,timestamp());
+  asprintf(&tf,"%s%d%lld.tmp",gettempdir(),rand()%1000,timestamp());
+  asprintf(&cmd_file,"%s%d%lld.cmd",gettempdir(),rand()%1000,timestamp());
+  proc_async=calloc(1,sizeof(struct subprocess_s));
+  chan_t *recv_chan=chan_init(100);
+  unsigned index = 0;
+  unsigned bytes_read = 0;
+  static char data[1048576 + 1] = {0};
+  const char  *command_line[] = { which("env"),which("bash"),"-c",which("stockfish"), NULL};
+  int result,ret;
+  if((result= subprocess_create(command_line, subprocess_option_enable_async, proc_async))!=0){
+    log_error("subprocess error");
+    return(NULL);
+  }
+  do {
+    bytes_read = subprocess_read_stdout(proc_async, data + index,sizeof(data) - 1 - index);
+    index += bytes_read;
+  } while (bytes_read != 0);
+  subprocess_join(proc_async, &ret);
+  subprocess_destroy(proc_async);
+  char *s;
+  if(strlen(data)>0){
+    stringfn_mut_trim((char*)data);
+    struct StringFNStrings lines=stringfn_split_lines_and_trim((char*)data);
+    if(lines.count>0)
+      s = strdup(lines.strings[lines.count-1]);
+    stringfn_release_strings_struct(lines);
+  }
+  s = fsio_read_text_file(of);
+  return(s);
+
+}
 char *__chess_exec_stockfish(const char *cmd){
   size_t buf_len=1024;
   char *tf,*of,*cmd_file;
