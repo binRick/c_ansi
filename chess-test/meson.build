@@ -15,6 +15,7 @@ chess_test_deps = [
   tempdir_dep,
   timestamp_dep,
   str_dep,
+  async_dep,
   c_fsio_dep,
   c_stringfn_dep,
   c_string_buffer_dep,

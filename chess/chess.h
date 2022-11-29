@@ -30,7 +30,6 @@ module(chess) {
     char *(*move)(const char *fen);
     unsigned char *(*svg)(const char *fen, size_t *len);
     unsigned char *(*png)(const char *fen, size_t *len);
-    bool (*print)(const char *fen);
     char *(*cmd)(const char *fen,int depth);
     module(chess_fen_image){
       unsigned char *(*buffer)(char *fen, char *fmt, size_t *len);
@@ -59,10 +58,7 @@ module(chess) {
 
 int __chess_init(module(chess) *exports);
 void __chess_deinit(module(chess) *exports);
-char *__chess_exec_stockfish(const char *cmd);
-char *__chess_exec_stockfish_fen(const char *fen);
 void __chessterm(char *fen);
-unsigned char *__chess_fen_image(char *fen, char *fmt, size_t *len);
 
 exports(chess) {
   .init     = __chess_init,

@@ -32,6 +32,7 @@ chess_deps = [
   vips_dep,
   glib_dep,
   tempdir_dep,
+  async_dep,
 ]
 
 chess_c_args = [

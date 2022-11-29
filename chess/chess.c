@@ -8,6 +8,7 @@
 ////////////////////////////////////////////
 #include "ansi-codes/ansi-codes.h"
 #include "glib.h"
+#include "async/async.h"
 #include "vips/vips.h"
 #include "subprocess.h/subprocess.h"
 #include "bytes/bytes.h"
@@ -56,13 +57,6 @@ int __chess_fen_white_score(char *fen){
   int scores[2];
   get_material_scores(&board,&scores[0],&scores[1]);
   return(scores[0]);
-}
-
-bool __chess_fen_print(char *fen){
-  Board board;
-  load_fen(&board, fen);
-  print_fancy(&board);
-  return(true);
 }
 
 unsigned char *__chess_fen_image(char *fen, char *fmt, size_t *len){
@@ -335,7 +329,7 @@ char *__chess_fen_ansi(char *fen){
     stringbuffer_append_string(sb,"   \u255a");
     for (i = 0; i < 56; ++i)
         stringbuffer_append_string(sb,"\u2550");
-    asprintf(&s," %s: ", board->white_name);
+    asprintf(&s," %s: ", strlen(board->white_name) ? board->white_name:"White");
     stringbuffer_append_string(sb,s);
     if (white_score[0] - black_score[0] > 0){
       asprintf(&s,"%+d ", white_score[0] - black_score[0]);
@@ -457,7 +451,6 @@ int __chess_init(module(chess) *exports) {
     exports->fen->get=calloc(1,sizeof(module(chess_fen_get)));
   }
   {
-    exports->fen->print=__chess_fen_print;
     exports->fen->image->buffer=__chess_fen_image;
     exports->fen->is->valid=__chess_fen_valid;
     exports->fen->is->over=__chess_fen_over;
