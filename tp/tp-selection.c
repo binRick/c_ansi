@@ -1,9 +1,9 @@
 #pragma once
 #ifndef TPSELC
 #define TPSELC
+#include "log/log.h"
 #include "tp-internal.h"
 #include "tp-selection.h"
-#include "log/log.h"
 static size_t __tp_get_max_option_rows();
 int get_selected_index();
 struct tp_confirm_option_t AC_CONFIRM_DEFAULT_OPTION = {
@@ -41,7 +41,7 @@ struct tp_confirm_option_t *tp_confirm_init_option(char *NEW_OPTION_TEXT){
 }
 
 bool tp_confirm_add_option(struct tp_confirm_option_t *NEW_OPTION){
-  if(vector_size(TP->options)<__tp_get_max_option_rows())
+  if (vector_size(TP->options) < __tp_get_max_option_rows())
     vector_push(TP->options, (void *)NEW_OPTION);
   return(true);
 }
@@ -74,7 +74,7 @@ void render_tp_options(void){
   {
     char *msg;
     asprintf(&msg, "screen_width=%d|max_option_rows=%lu|o_col=%d|ending on row #%lu|max_option_text_size=%d", screen_width, __tp_get_max_option_rows(), o_col, __tp_get_max_option_rows(), max_option_text_size);
-    log_info("%s",msg);
+    log_info("%s", msg);
     assert(o_col < screen_width && o_col > 0);
     for (size_t i = 0; (i < vector_size(TP->options)) && (i <= __tp_get_max_option_rows()); i++) {
       o = vector_get(TP->options, i);
@@ -155,7 +155,7 @@ void change_selection_index(int CHANGE_SELECTION_TYPE) {
       set_selection_index(NEW_SELECTION_INDEX);
       int is = get_selected_index();
       asprintf(&msg, "selected index was %lu and is now %d :: selection type: %d", was, is, CHANGE_SELECTION_TYPE);
- //     LOG(msg);
+      //     LOG(msg);
       return;
     }
   }

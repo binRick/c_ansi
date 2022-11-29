@@ -29,11 +29,11 @@ enum tray_log_mode_t {
 module(tray) {
   define(tray, CLIB_MODULE);
   enum tray_log_mode_t log_mode;
-  struct tray_priv_t *priv;
+  struct tray_priv_t   *priv;
 };
 
-int tray_init(module(tray) *exports);
-void tray_deinit(module(tray) *exports);
+int  tray_init(module(tray) * exports);
+void tray_deinit(module(tray) * exports);
 
 exports(tray) {
   .log_mode = TRAY_LOG_MODE_NONE,

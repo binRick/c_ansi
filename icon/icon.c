@@ -12,12 +12,14 @@
 #include "c_vector/vector/vector.h"
 #include "log/log.h"
 #include "ms/ms.h"
-#include "timestamp/timestamp.h"
 #include "string-utils/string-utils.h"
+#include "timestamp/timestamp.h"
 #include <CoreVideo/CVPixelBuffer.h>
+
 ////////////////////////////////////////////
 CFDataRef copyIconDataForURL(CFURLRef URL){
   CFDataRef data = NULL;
+
   if (URL) {
     FSRef ref;
     if (CFURLGetFSRef(URL, &ref)) {
@@ -60,11 +62,13 @@ CFDataRef copyIconDataForPath(CFStringRef path) {
 static CFDataRef __icon_from_path(char *path) {
   return(copyIconDataForPath(cfstring_from_cstring(path)));
 }
+
 ////////////////////////////////////////////
 int icon_init(module(icon) *exports) {
   clib_module_init(icon, exports);
   return(EXIT_SUCCESS);
 }
+
 void icon_deinit(module(icon) *exports) {
   clib_module_deinit(icon);
 }

@@ -31,25 +31,25 @@ module(tess) {
   define(tess, CLIB_MODULE);
 
   enum tess_log_mode_t log_mode;
-  int                       pid;
+  int                  pid;
 
-  int                       (*GetPID)();
-  void                      (*info)(char *);
-  void                      (*debug)(char *);
-  void                      (*error)(char *);
-  struct tess_t *tess;
-  void (*mem)(const unsigned char *ptr, const size_t len);
+  int                  (*GetPID)();
+  void                 (*info)(char *);
+  void                 (*debug)(char *);
+  void                 (*error)(char *);
+  struct tess_t        *tess;
+  void                 (*mem)(const unsigned char *ptr, const size_t len);
 };
 
-int tess_init(module(tess) *exports);
-void tess_deinit(module(tess) *exports);
+int  tess_init(module(tess) * exports);
+void tess_deinit(module(tess) * exports);
 void __tess_mem(const unsigned char *ptr, const size_t len);
 
 exports(tess) {
   .log_mode = TESSERACT_LOG_MODE_NONE,
   .init     = tess_init,
   .deinit   = tess_deinit,
-  .mem=__tess_mem,
+  .mem      = __tess_mem,
   .pid      = -1,
 };
 

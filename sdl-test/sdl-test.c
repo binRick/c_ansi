@@ -6,12 +6,12 @@
 #include "c_string_buffer/include/stringbuffer.h"
 #include "c_stringfn/include/stringfn.h"
 #include "c_vector/vector/vector.h"
+#include "lodepng/lodepng.h"
 #include "log/log.h"
 #include "ms/ms.h"
 #include "sdl-test/sdl-test.h"
 #include "sdl/sdl.h"
 #include "timestamp/timestamp.h"
-#include "lodepng/lodepng.h"
 
 TEST t_sdl_test2(){
   PASS();

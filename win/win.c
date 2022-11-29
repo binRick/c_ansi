@@ -21,16 +21,17 @@ static inline void  win_info(char *message);
 static inline void  win_error(char *message);
 static inline void  win_debug(char *message);
 static inline int   win_GetPID();
+
 static bool   __win_window_id_is_active(size_t window_id){
   log_info("is active..");
-  return true;
+  return(true);
 }
 
 ////////////////////////////////////////////
 int win_init(module(win) *exports) {
   clib_module_init(win, exports);
-  exports->log_mode = WIN_LOG_MODE_NONE;
-  exports->is->active=__win_window_id_is_active;
+  exports->log_mode   = WIN_LOG_MODE_NONE;
+  exports->is->active = __win_window_id_is_active;
   return(EXIT_SUCCESS);
 }
 

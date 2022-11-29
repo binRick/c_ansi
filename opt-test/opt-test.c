@@ -22,7 +22,8 @@
 #include "which/src/which.h"
 
 TEST t_opt_test_option_qty(){
-  size_t qty=require(opt)->option->qty();
+  size_t qty = require(opt)->option->qty();
+
   Dn(qty);
   PASS();
 }

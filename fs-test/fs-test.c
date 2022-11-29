@@ -15,9 +15,10 @@
 
 TEST t_fs_test_normalize(){
   char *s;
-  log_info("%s",(require(fs)->normalize("/tmp//xx")));
-  log_info("%s",(require(fs)->normalize("/tmp//xx/123//")));
-  log_info("%s",(require(fs)->normalize("/tmp//")));
+
+  log_info("%s", (require(fs)->normalize("/tmp//xx")));
+  log_info("%s", (require(fs)->normalize("/tmp//xx/123//")));
+  log_info("%s", (require(fs)->normalize("/tmp//")));
   PASS();
 }
 

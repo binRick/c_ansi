@@ -28,19 +28,21 @@
 
 ////////////////////////////////////////////
 size_t __opt_option_qty(void){
-  return 666;
+  return(666);
 }
+
 size_t __opt_cmd_qty(void){
-  return 667;
+  return(667);
 }
+
 int opt_init(module(opt) *exports) {
   clib_module_init(opt, exports);
-  exports->log_mode = OPT_LOG_MODE_NONE;
-  exports->cmd=calloc(1,sizeof(module(opt_cmd)));
-  exports->option=calloc(1,sizeof(module(opt_option)));
-  exports->config=calloc(1,sizeof(module(opt_config)));
-  exports->option->qty=__opt_option_qty;
-  exports->cmd->qty=__opt_cmd_qty;
+  exports->log_mode    = OPT_LOG_MODE_NONE;
+  exports->cmd         = calloc(1, sizeof(module(opt_cmd)));
+  exports->option      = calloc(1, sizeof(module(opt_option)));
+  exports->config      = calloc(1, sizeof(module(opt_config)));
+  exports->option->qty = __opt_option_qty;
+  exports->cmd->qty    = __opt_cmd_qty;
   return(EXIT_SUCCESS);
 }
 

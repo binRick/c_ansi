@@ -2,6 +2,7 @@
 #ifndef OPT_H
 #define OPT_H
 //////////////////////////////////////
+#include "optparse99/optparse99.h"
 #include <assert.h>
 #include <ctype.h>
 #include <err.h>
@@ -12,7 +13,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include "optparse99/optparse99.h"
 //////////////////////////////////////
 #include "module/def.h"
 #include "module/module.h"
@@ -31,19 +31,19 @@ module(opt) {
   enum opt_log_mode_t log_mode;
   module(opt_cmd) {
     size_t (*qty)(void);
-    bool (*add)(struct optparse_cmd *cmd);
+    bool   (*add)(struct optparse_cmd *cmd);
   } *cmd;
   module(opt_config) {
     char *name, *description, *about;
   } *config;
   module(opt_option) {
     size_t (*qty)(void);
-    bool (*add)(struct optparse_opt *option);
+    bool   (*add)(struct optparse_opt *option);
   } *option;
 };
 
-int opt_init(module(opt) *exports);
-void opt_deinit(module(opt) *exports);
+int  opt_init(module(opt) * exports);
+void opt_deinit(module(opt) * exports);
 void __opt_test(void);
 size_t __opt_option_qty(void);
 size_t __opt_cmd_qty(void);

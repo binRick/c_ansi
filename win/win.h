@@ -31,20 +31,22 @@ module(win) {
   module(win_ls) {
     module(win_ls_ids) {
       struct Vector *(*vec)();
-      char **(*arr)(int *qty);
-      size_t (*qty)(void);
+      char          **(*arr)(int *qty);
+
+      size_t        (*qty)(void);
     } *ids;
     module(win_ls_names) {
       struct Vector *(*vec)();
-      char **(*arr)(int *qty);
-      size_t (*qty)(void);
+      char          **(*arr)(int *qty);
+
+      size_t        (*qty)(void);
     } *names;
   } *ls;
   size_t (*qty)();
-  bool (*open)(int width, int height);
-  bool (*resize)(int window_id);
-  bool (*move)(int window_id);
-  bool (*position)(int window_id);
+  bool   (*open)(int width, int height);
+  bool   (*resize)(int window_id);
+  bool   (*move)(int window_id);
+  bool   (*position)(int window_id);
   module(win_window_is){
     define(win_window_is, CLIB_MODULE);
     bool (*visible)(int window_id);
@@ -56,13 +58,13 @@ module(win) {
       module(win_window_is_on_space){
         define(win_window_is_on_space, CLIB_MODULE);
         bool (*id)(int window_id, size_t space_id);
-        int (*index)(int window_id, int space_index);
+        int  (*index)(int window_id, int space_index);
         char *(*uuid)(int window_id, const char *uuid);
       } *space;
       module(win_window_is_on_display){
         define(win_window_is_on_display, CLIB_MODULE);
         bool (*id)(int window_id, size_t display_id);
-        int (*index)(int window_id, int display_index);
+        int  (*index)(int window_id, int display_index);
         char *(*uuid)(int window_id, const char *uuid);
       } *display;
     } *on;
@@ -70,21 +72,21 @@ module(win) {
   module(win_window_space){
     define(win_window_space, CLIB_MODULE);
     size_t (*id)(int window_id);
-    int (*index)(int window_id);
-    int (*offset)(int window_id);
-    char *(*uuid)(int window_id);
+    int    (*index)(int window_id);
+    int    (*offset)(int window_id);
+    char   *(*uuid)(int window_id);
   } *space;
   module(win_window_display){
     define(win_window_display, CLIB_MODULE);
     size_t (*id)(int window_id);
-    int (*index)(int window_id);
-    int (*offset)(int window_id);
-    char *(*uuid)(int window_id);
+    int    (*index)(int window_id);
+    int    (*offset)(int window_id);
+    char   *(*uuid)(int window_id);
   } *display;
 };
 
-int win_init(module(win) *exports);
-void win_deinit(module(win) *exports);
+int  win_init(module(win) * exports);
+void win_deinit(module(win) * exports);
 static bool   __win_window_id_is_active(size_t window_id);
 
 exports(win) {

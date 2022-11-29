@@ -9,8 +9,8 @@
 #include "log/log.h"
 #include "ms/ms.h"
 #include "timestamp/timestamp.h"
-#include "win/win.h"
 #include "win-test/win-test.h"
+#include "win/win.h"
 
 TEST t_win_test2(){
   PASS();

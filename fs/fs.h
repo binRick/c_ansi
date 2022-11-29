@@ -18,11 +18,11 @@
 #include "module/def.h"
 #include "module/module.h"
 #include "module/require.h"
-#include "tempdir.c/tempdir.h"
-#include "wildcardcmp/wildcardcmp.h"
 #include "path-normalize.c/src/path-normalize.h"
+#include "tempdir.c/tempdir.h"
 #include "whereami/src/whereami.h"
 #include "which/src/which.h"
+#include "wildcardcmp/wildcardcmp.h"
 //////////////////////////////////////
 module(fs) {
   define(fs, CLIB_MODULE);
@@ -42,7 +42,7 @@ module(fs) {
   unsigned char *(*read_binary_file)(char *, int *len);
   bool          (*write_text_file)(char *path, char *data);
   bool          (*write_binary_file)(char *path, unsigned char *data, int len);
-  char *(*which)(const char *name);
+  char          *(*which)(const char *name);
 };
 
 int  fs_init(module(fs) * exports);
@@ -53,13 +53,13 @@ char *__fs_tmpdir_extension(const char *extension);
 char **__fs_match_files(const char *PATH, const char *GLOB, int *qty);
 
 exports(fs) {
-  .tmpdir            = gettempdir,
-  .tmpfile           = __fs_tmpfile,
-  .normalize           = path_normalize,
+  .tmpdir    = gettempdir,
+  .tmpfile   = __fs_tmpfile,
+  .normalize = path_normalize,
 
   .tmpfile_extension = __fs_tmpfile_extension,
   .tmpdir_extension  = __fs_tmpdir_extension,
-  .which              = which,
+  .which             = which,
   .init              = fs_init,
   .match_files       = __fs_match_files,
   .deinit            = fs_deinit,

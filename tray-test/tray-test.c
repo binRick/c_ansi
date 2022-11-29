@@ -1,4 +1,3 @@
-#include "tray/tray.h"
 #include "ansi-codes/ansi-codes.h"
 #include "bytes/bytes.h"
 #include "c_eventemitter/include/eventemitter.h"
@@ -18,6 +17,7 @@
 #include "tempdir.c/tempdir.h"
 #include "timestamp/timestamp.h"
 #include "tray-test/tray-test.h"
+#include "tray/tray.h"
 #include "which/src/which.h"
 
 TEST t_tray_test2(){

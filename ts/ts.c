@@ -23,12 +23,17 @@ static inline int   ts_GetPID();
 
 unsigned long __ts_ms(void){
   struct timeval tv;
-  int ret = gettimeofday(&tv, NULL);
-  if (-1 == ret) return -1;
-  return (unsigned long) ((int64_t) tv.tv_sec * 1000 + (int64_t) tv.tv_usec / 1000);
+  int            ret = gettimeofday(&tv, NULL);
+
+  if (-1 == ret) return(-1);
+
+  return((unsigned long)((int64_t)tv.tv_sec * 1000 + (int64_t)tv.tv_usec / 1000));
 }
 
-unsigned long __ts_ts(void){ return(__ts_ms()/1000); }
+unsigned long __ts_ts(void){
+  return(__ts_ms() / 1000);
+}
+
 ////////////////////////////////////////////
 int ts_init(module(ts) *exports) {
   clib_module_init(ts, exports);

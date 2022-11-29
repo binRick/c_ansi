@@ -15,12 +15,13 @@
 #include "log/log.h"
 #include "ms/ms.h"
 #include "timestamp/timestamp.h"
-struct tess_t{
-  struct Pix *img;
+struct tess_t {
+  struct Pix  *img;
   TessBaseAPI *api;
 };
+
 void __tess_mem(const unsigned char *ptr, const size_t len){
-  log_info("Loading %lu byte image",len);
+  log_info("Loading %lu byte image", len);
 }
 
 ////////////////////////////////////////////
@@ -32,10 +33,10 @@ static inline int   tess_GetPID();
 ////////////////////////////////////////////
 int tess_init(module(tess) *exports) {
   clib_module_init(tess, exports);
-  exports->pid      = getpid();
-  exports->tess=calloc(1,sizeof(struct tess_t));
-  exports->tess->api=TessBaseAPICreate();
-  if(!(TessBaseAPIInit3(exports->tess->api, NULL, "eng"))){
+  exports->pid       = getpid();
+  exports->tess      = calloc(1, sizeof(struct tess_t));
+  exports->tess->api = TessBaseAPICreate();
+  if (!(TessBaseAPIInit3(exports->tess->api, NULL, "eng"))) {
     log_error("Failed to initialize tess API");
     return(EXIT_FAILURE);
   }

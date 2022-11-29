@@ -11,6 +11,7 @@
 #include "c_string_buffer/include/stringbuffer.h"
 #include "c_stringfn/include/stringfn.h"
 #include "c_vector/vector/vector.h"
+#include "lodepng/lodepng.h"
 #include "log/log.h"
 #include "module/def.h"
 #include "module/module.h"
@@ -19,7 +20,6 @@
 #include "timestamp/timestamp.h"
 #include "vips/vips.h"
 #include "win/win.h"
-#include "lodepng/lodepng.h"
 ////////////////////////////////////////////
 static bool SDL_DEBUG_MODE = false;
 
@@ -41,7 +41,7 @@ void __sdl_screenshot(module(sdl) *exports, SDL_Renderer *renderer, const char *
 
 int sdl_init(module(sdl) *exports) {
   clib_module_init(sdl, exports);
-  exports->utils->win=require(win);
+  exports->utils->win = require(win);
   return(0);
 }
 

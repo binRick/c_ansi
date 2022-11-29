@@ -8,8 +8,8 @@
 #include "c_vector/vector/vector.h"
 #include "log/log.h"
 #include "ms/ms.h"
-#include "tess/tess.h"
 #include "tess-test/tess-test.h"
+#include "tess/tess.h"
 #include "timestamp/timestamp.h"
 
 TEST t_tess_test2(){
@@ -17,7 +17,7 @@ TEST t_tess_test2(){
 }
 
 TEST t_tess_test1(){
-  module(tess) *tess=require(tess);
+  module(tess) * tess = require(tess);
   clib_module_deinit(tess);
   PASS();
 }

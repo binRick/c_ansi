@@ -36,13 +36,13 @@ module(ts) {
   void               (*info)(char *);
   void               (*debug)(char *);
   void               (*error)(char *);
-  unsigned long (*ts)(void);
-  unsigned long (*ms)(void);
-  unsigned long (*uptime)(void);
+  unsigned long      (*ts)(void);
+  unsigned long      (*ms)(void);
+  unsigned long      (*uptime)(void);
 };
 
-int ts_init(module(ts) *exports);
-void ts_deinit(module(ts) *exports);
+int  ts_init(module(ts) * exports);
+void ts_deinit(module(ts) * exports);
 unsigned long __ts_ts(void);
 unsigned long __ts_ms(void);
 
@@ -50,9 +50,9 @@ exports(ts) {
   .log_mode = TS_LOG_MODE_NONE,
   .init     = ts_init,
   .deinit   = ts_deinit,
-  .ts=__ts_ts,
-  .ms=__ts_ms,
-  .uptime=getUptime,
+  .ts       = __ts_ts,
+  .ms       = __ts_ms,
+  .uptime   = getUptime,
   .pid      = -1,
 };
 

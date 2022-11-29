@@ -10,9 +10,9 @@
 #include <string.h>
 #include <termios.h>
 #include <unistd.h>
-#define DEBUG false
-module(tp_confirm) *B;
-module(tp_tab) *T;
+#define DEBUG          false
+module(tp_confirm) * B;
+module(tp_tab) * T;
 #define TABS_QTY       5
 #define OPTIONS_QTY    45
 #define NEW_TAB(NUM, SELECTED)               \
@@ -43,12 +43,12 @@ int main(int argc, char **argv) {
         NEW_OPTION(i, false);
     }
     /*
-    T = require(tp_tab);
-    NEW_TAB(1, false);
-    NEW_TAB(2, true);
-    NEW_TAB(2, false);
-    */
-    if(DEBUG){
+       T = require(tp_tab);
+       NEW_TAB(1, false);
+       NEW_TAB(2, true);
+       NEW_TAB(2, false);
+     */
+    if (DEBUG) {
       fprintf(stderr, "# tabs:  %lu\n", T->get_tabs_qty());
       fprintf(stderr, "# options:  %lu\n", B->get_options_qty());
       fflush(STDIN_FILENO);

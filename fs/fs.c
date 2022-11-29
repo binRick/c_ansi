@@ -15,6 +15,7 @@
 #include "c_vector/vector/vector.h"
 #include "cache/cache.h"
 #include "log/log.h"
+#include "microtar/src/microtar.h"
 #include "ms/ms.h"
 #include "qoi/qoi.h"
 #include "qoir/src/qoir.h"
@@ -23,7 +24,6 @@
 #include "timestamp/timestamp.h"
 #include "tinydir/tinydir.h"
 #include "wildcardcmp/wildcardcmp.h"
-#include "microtar/src/microtar.h"
 
 ////////////////////////////////////////////
 char *__fs_tmpdir_extension(const char *extension) {

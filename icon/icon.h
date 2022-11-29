@@ -22,12 +22,12 @@ module(icon) {
   define(icon, CLIB_MODULE);
 };
 
-int icon_init(module(icon) *exports);
-void icon_deinit(module(icon) *exports);
+int  icon_init(module(icon) * exports);
+void icon_deinit(module(icon) * exports);
 
 exports(icon) {
-  .init     = icon_init,
-  .deinit   = icon_deinit,
+  .init   = icon_init,
+  .deinit = icon_deinit,
 };
 
 #define icon_m    module(icon)

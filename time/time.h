@@ -37,8 +37,8 @@ module(time) {
   void                 (*error)(char *);
 };
 
-int time_init(module(time) *exports);
-void time_deinit(module(time) *exports);
+int  time_init(module(time) * exports);
+void time_deinit(module(time) * exports);
 
 exports(time) {
   .log_mode = TIME_LOG_MODE_NONE,

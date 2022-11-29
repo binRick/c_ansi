@@ -7,14 +7,14 @@
 #include "ansi-codes/ansi-codes.h"
 #include "bytes/bytes.h"
 #include "c_eventemitter/include/eventemitter.h"
-#include "c_workqueue/include/workqueue.h"
 #include "c_fsio/include/fsio.h"
-#include "clamp/clamp.h"
 #include "c_string_buffer/include/stringbuffer.h"
 #include "c_stringfn/include/stringfn.h"
 #include "c_vector/vector/vector.h"
+#include "c_workqueue/include/workqueue.h"
 #include "chan/src/chan.h"
 #include "chan/src/queue.h"
+#include "clamp/clamp.h"
 #include "incbin/incbin.h"
 #include "log/log.h"
 #include "module/def.h"
@@ -92,6 +92,7 @@ void **async_chan_bufs(size_t concurrency, void **items, size_t item_len, int in
     chan_send_buf(chans[ii % concurrency]->work, (void *)(items[ii]), item_len);
   }
 }
+
 void **async_chan_items(size_t concurrency, void **items, int in_qty, int *out_qty, async_worker_cb cb){
   size_t        qty = 0;
   struct Vector *v = vector_new(), *r;
@@ -141,28 +142,35 @@ struct Vector *async_chan_items_v(size_t concurrency, struct Vector *items, asyn
 
   return(results_v);
 }
-void ** __async_each_arr(size_t concurrency, void **items,size_t qty, async_worker_cb cb){
 
+void ** __async_each_arr(size_t concurrency, void **items, size_t qty, async_worker_cb cb){
   return(NULL);
 }
+
 void **__async_filter_arr__queued(size_t concurrency, struct Vector *items, async_worker_cb cb, size_t bufs_qty){
 }
+
 void **__async_filter_bufs__queued(size_t concurrency, struct Vector *items, async_worker_cb cb, size_t bufs_qty){
 }
+
 void **__async_filter_arr__workqueue(size_t concurrency, struct Vector *items, async_worker_cb cb, size_t bufs_qty){
 }
+
 void **__async_filter_bufs__workqueue(size_t concurrency, struct Vector *items, async_worker_cb cb, size_t bufs_qty){
 }
+
 void **__async_each_arr__queued(size_t concurrency, struct Vector *items, async_worker_cb cb, size_t bufs_qty){
 }
+
 void **__async_each_bufs__queued(size_t concurrency, struct Vector *items, async_worker_cb cb, size_t bufs_qty){
 }
+
 void **__async_each_arr__workqueue(size_t concurrency, struct Vector *items, async_worker_cb cb, size_t bufs_qty){
 }
+
 void **__async_each_bufs__workqueue(size_t concurrency, struct Vector *items, async_worker_cb cb, size_t bufs_qty){
 }
 struct Vector *__async_filter_vec__chan(size_t concurrency, struct Vector *items, async_worker_cb cb){
-
 }
 struct Vector *__async_each_vec__queued(size_t concurrency, struct Vector *items, async_worker_cb cb){
   Dn(concurrency);
@@ -184,25 +192,26 @@ struct Vector *__async_each_vec__queued(size_t concurrency, struct Vector *items
     workqueue_release(queues[i]);
   return(results_v);
 }
+
 ////////////////////////////////////////////
 int async_init(module(async) *exports) {
   clib_module_init(async, exports);
   return(0);
 
-  exports->each = calloc(1,sizeof(module(async_each)));
-  exports->each->queued = calloc(1,sizeof(module(async_each_queued)));
-  exports->each->chan = calloc(1,sizeof(module(async_each_chan)));
-  exports->filter->queued = calloc(1,sizeof(module(async_each_queued)));
-  exports->filter->chan = calloc(1,sizeof(module(async_each_chan)));
-  exports->each->queued->bufs=__async_each_bufs__queued;
-  exports->each->queued->arr=__async_each_arr__queued;
-  exports->each->queued->vec=__async_each_vec__queued;
-  exports->each->chan->bufs=__async_each_bufs__queued;
-  exports->each->chan->arr=__async_each_arr__queued;
-  exports->each->chan->vec=__async_each_vec__queued;
-  exports->each->arr=__async_each_arr__queued;
-  exports->each->vec=__async_each_vec__queued;
-  exports->each->arr=__async_each_arr__queued;
+  exports->each               = calloc(1, sizeof(module(async_each)));
+  exports->each->queued       = calloc(1, sizeof(module(async_each_queued)));
+  exports->each->chan         = calloc(1, sizeof(module(async_each_chan)));
+  exports->filter->queued     = calloc(1, sizeof(module(async_each_queued)));
+  exports->filter->chan       = calloc(1, sizeof(module(async_each_chan)));
+  exports->each->queued->bufs = __async_each_bufs__queued;
+  exports->each->queued->arr  = __async_each_arr__queued;
+  exports->each->queued->vec  = __async_each_vec__queued;
+  exports->each->chan->bufs   = __async_each_bufs__queued;
+  exports->each->chan->arr    = __async_each_arr__queued;
+  exports->each->chan->vec    = __async_each_vec__queued;
+  exports->each->arr          = __async_each_arr__queued;
+  exports->each->vec          = __async_each_vec__queued;
+  exports->each->arr          = __async_each_arr__queued;
   Ds("kk");
   return(EXIT_SUCCESS);
 }

@@ -9,25 +9,30 @@
 #include "log/log.h"
 #include "ms/ms.h"
 #include "timestamp/timestamp.h"
-#include "ts/ts.h"
 #include "ts-test/ts-test.h"
+#include "ts/ts.h"
 
 TEST t_ts_test_uptime(){
-  unsigned long uptime=require(ts)->uptime();
-  char *s;
-  asprintf(&s,"Uptime: %ld",uptime);
+  unsigned long uptime = require(ts)->uptime();
+  char          *s;
+
+  asprintf(&s, "Uptime: %ld", uptime);
   PASSm(s);
 }
+
 TEST t_ts_test_ms(){
-  unsigned long ms=require(ts)->ms();
-  char *s;
-  asprintf(&s,"Now: %ld",ms);
+  unsigned long ms = require(ts)->ms();
+  char          *s;
+
+  asprintf(&s, "Now: %ld", ms);
   PASSm(s);
 }
+
 TEST t_ts_test_ts(){
-  unsigned long ts=require(ts)->ts();
-  char *s;
-  asprintf(&s,"Now: %ld",ts);
+  unsigned long ts = require(ts)->ts();
+  char          *s;
+
+  asprintf(&s, "Now: %ld", ts);
   PASSm(s);
 }
 
