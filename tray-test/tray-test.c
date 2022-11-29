@@ -25,7 +25,7 @@ TEST t_tray_test2(){
 }
 
 TEST t_tray_test1(){
-  Ds(require(tray)->name);
+  //Ds(require(tray)->name);
   PASS();
 }
 

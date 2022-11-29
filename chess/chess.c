@@ -164,9 +164,53 @@ void __chessterm(char *fen){
 //  stop_engine(&white_engine);
 }
 
+char **__chess_fen_get_moves(const char **fens,size_t qty,size_t *moves_qty){
+  int depth=CHESS_DEFAULT_DEPTH;
+  depth=4;
+  char *cmd = stringfn_join(fens,"\n",0,qty);
+  struct StringFNStrings fen_cmds=stringfn_split_lines_and_trim(cmd);
+  struct Vector *cmds_v=vector_new();
+  struct StringBuffer *sb= stringbuffer_new();
+  stringbuffer_append_string(sb,"printf \"");
+  for(size_t i=0;i<qty;i++){
+    if(strlen(fens[i])<5)continue;
+    char *l;
+    char *f=fens[i];
+    struct StringFNStrings words= stringfn_split_words(f);
+    f=stringfn_join(words.strings," ",0,5);
+    asprintf(&l,"position fen \\\"%s\\\"\\ngo depth %d\\n",f,depth);
+    if(i<qty-1)
+      stringfn_mut_trim(l);
+    vector_push(cmds_v,(void*)l);
+    stringbuffer_append_string(sb,l);
+  }
+  stringbuffer_append_string(sb,"\"");
+  char *bulk_cmd=stringbuffer_to_string(sb);
+  stringbuffer_release(sb);
+  char *res=require(chess)->stockfish->exec(bulk_cmd);
+  struct StringFNStrings lines=stringfn_split_lines_and_trim(res);
+
+  char *fen_move[lines.count];
+  size_t fen_moves_qty=0;
+  struct Vector *v=vector_new();
+  for(int i=0;i<lines.count;i++){
+    if(stringfn_starts_with(lines.strings[i],"bestmove ")){
+      struct StringFNStrings words=stringfn_split_words(lines.strings[i]);
+      if(words.count<2)continue;
+      asprintf(&(fen_move[fen_moves_qty]),"%s:%s",fens[fen_moves_qty],words.strings[1]);
+      vector_push(v,(void*)fen_move[fen_moves_qty]);
+      fen_moves_qty++;
+    }
+  }
+  char *moves_s=stringfn_join((char**)vector_to_array(v),"\n",0,vector_size(v));
+  *moves_qty=vector_size(v);
+  return(vector_to_array(v));
+}
 char *__chess_fen_get_move(const char *fen){
   char *move;
-  char *res=require(chess)->stockfish->exec(require(chess)->fen->cmd(fen,CHESS_DEFAULT_DEPTH));
+  int depth=CHESS_DEFAULT_DEPTH;
+  depth=4;
+  char *res=require(chess)->stockfish->exec(require(chess)->fen->cmd(fen,depth));
   if(stringfn_starts_with(res,"bestmove")){
     struct StringFNStrings words= stringfn_split_words(res);
     move=strdup(words.strings[words.count-1]);
@@ -176,7 +220,15 @@ char *__chess_fen_get_move(const char *fen){
 
 char *__chess_exec_stockfish(const char *cmd){
   size_t buf_len=1024;
-  const char  *command_line[] = { which("sh"),"-c", cmd, NULL};
+  char *tf,*of,*cmd_file;
+  setenv("TMPDIR","/tmp/",1);
+  asprintf(&of,"%s%d%lld.out",gettempdir(),rand()%1000,timestamp());
+  asprintf(&tf,"%s%d%lld.tmp",gettempdir(),rand()%1000,timestamp());
+  asprintf(&cmd_file,"%s%d%lld.cmd",gettempdir(),rand()%1000,timestamp());
+  fsio_write_text_file(tf,cmd);
+  asprintf(&cmd,"bash -c '%s|%s' > %s\n",cmd,which("stockfish"),of);
+  fsio_write_text_file(cmd_file,cmd);
+  const char  *command_line[] = { which("env"),which("bash"), cmd_file, NULL};
   struct subprocess_s proc;
   int result,ret;
   unsigned index = 0;
@@ -200,6 +252,7 @@ char *__chess_exec_stockfish(const char *cmd){
       s = strdup(lines.strings[lines.count-1]);
     stringfn_release_strings_struct(lines);
   }
+  s = fsio_read_text_file(of);
   return(s);
 }
 
@@ -210,8 +263,14 @@ bool __chess_fen_over(const char *fen){
   get_material_scores(&board, &(s[0]), &(s[1]));
   return(is_gameover(&board));
 }
-
+#define FEN_WORDS_QTY 6
 bool __chess_fen_valid(const char *fen){
+  if(!fen)return false;
+  struct StringFNStrings words= stringfn_split_words(fen);
+  if(words.count<FEN_WORDS_QTY) return false;
+  char *color=words.strings[1];
+  if(strlen(color)!=1||(strcmp(color,"w")!=0&&strcmp(color,"b")!=0))return false;
+  stringfn_release_strings_struct(words);
   Board board;
   load_fen(&board, fen);
   int s[2]={0,0};
@@ -461,6 +520,7 @@ int __chess_init(module(chess) *exports) {
     exports->fen->stats=__chess_fen_stats;
     exports->fen->cmd=__chess_render_fen_cmd;
     exports->fen->get->move=__chess_fen_get_move;
+    exports->fen->get->moves=__chess_fen_get_moves;
     exports->fen->get->player=__chess_fen_get_player_to_move;
     exports->fen->image->ansi=__chess_fen_ansi;
     exports->stockfish->exec=__chess_exec_stockfish;

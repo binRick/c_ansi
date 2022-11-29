@@ -28,6 +28,23 @@
 struct tray_priv_t {
 //  struct tray_menu menu;
 };
+/*
+struct tray{};
+struct tray_menu{};
+static struct tray *get_tray(void){
+  struct tray *t=calloc(1,sizeof(struct tray));
+//  t->icon=TRAY_ICON1;
+//  t->tooltip="tt";
+  t->menu = (struct tray_menu[]){
+            {.text = "Hello", .cb = hello_cb},
+            {.text = "Checked", .checked = 1, .checkbox = 1, .cb = toggle_cb},
+            {.text = "Disabled", .disabled = 1},
+            {.text = "-"},
+            {.text = NULL},
+  };
+  return(t);
+}
+            */
 ////////////////////////////////////////////
 int tray_init(module(tray) *exports) {
   clib_module_init(tray, exports);

@@ -33,4 +33,5 @@ char *pad_string_right(char *s, int len, char p);
 char *hash_buffer(void *s, size_t len);
 char *hash_path(char *path);
 char *hash_buffer(void *s, size_t len);
+char *hash_string(char *s, size_t len);
 #endif

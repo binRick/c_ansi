@@ -4,7 +4,6 @@
 ////////////////////////////////////////////
 #include <stdbool.h>
 bool __qr_qrcode(char *png_path);
-
 ////////////////////////////////////////////
 #include "qr/qr.h"
 ////////////////////////////////////////////
@@ -30,6 +29,7 @@ bool __qr_encode_str(const char *str){
   QRcode_free (qr);
   return true;
 }
+
 bool __qr_qrcode(char *png_path){
     struct qr_code_match_list *matches;
     struct finder_pattern_list *finder_patterns, *tmp_finder_patterns;

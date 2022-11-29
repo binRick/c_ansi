@@ -18,7 +18,13 @@
 #include "module/module.h"
 #include "module/require.h"
 //////////////////////////////////////
-
+enum pieceType { Rook = 'r', Knight = 'n', Bishop = 'b', Queen = 'q', King = 'k', Pawn ='p', Empty = ' ' };
+enum pieceColor { White = 'w', Black = 'b' };
+struct boardElement {
+    int x,y;
+    enum pieceType piece;
+    enum pieceColor color;
+};
 module(chess) {
   define(chess, CLIB_MODULE);
   const char *svg_template;
@@ -50,6 +56,7 @@ module(chess) {
     } *is;
     module(chess_fen_get){
       char *(*move)(const char *fen);
+      char **(*moves)(const char **fens,size_t fens_qty,size_t *moves_qty);
       char *(*player)(const char *fen);
     } *get;
   } *fen;
