@@ -3,8 +3,26 @@
 #define CHESS_C
 #define DEBUG_MODE             false
 #define CHESS_DEFAULT_DEPTH    10
+#define FEN_WORDS_QTY    6
+#define QOIR_IMPLEMENTATION
 ////////////////////////////////////////////
 #include "chess/chess.h"
+////////////////////////////////////////////
+#include <stdlib.h>
+#include <stdio.h>
+#include "qoir/src/qoir.h"
+////////////////////////////////////////////
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
+#include <SDL2/SDL_render.h>
+////////////////////////////////////////////
+#define SCREEN_WIDTH 920
+#define SCREEN_HIGHT 920
+#define PADDING 50
+#define DARK  0x786452FF
+#define LIGHT 0xA5907EFF
+#define RED   0xFF0000FF
+#define GREEN 0x00A300FF
 ////////////////////////////////////////////
 #include "ansi-codes/ansi-codes.h"
 #include "async/async.h"
@@ -16,9 +34,11 @@
 #include "chan/src/chan.h"
 #include "chan/src/queue.h"
 #include "chessterm/include/board.h"
-#include "chessterm/include/chessterm.h"
 #include "chessterm/include/engine.h"
+#include "chessterm/include/chessterm.h"
 #include "chessterm/include/uci.h"
+#include "chessterm/include/io.h"
+#include "chessterm/include/engine.h"
 #include "fen2svg/fen2svg.h"
 #include "fen2svg/unsortedlinkedlist.h"
 #include "glib.h"
@@ -31,6 +51,90 @@
 #include "timestamp/timestamp.h"
 #include "vips/vips.h"
 #include "which/src/which.h"
+bool __chess_sdl_draw(SDL_Window* window,SDL_Surface* surface);
+SDL_Surface *__chess_decoded_surface(qoir_decode_result *decode);
+qoir_decode_result *__chess_sdl_decode_qoir(unsigned char *buf, size_t len);
+INCBIN(chess_piece_rook_black_qoir,"assets/pieces/r/b/w.qoir");
+INCBIN(chess_piece_rook_white_qoir,"assets/pieces/r/w/w.qoir");
+INCBIN(chess_piece_queen_black_qoir,"assets/pieces/q/b/w.qoir");
+INCBIN(chess_piece_queen_white_qoir,"assets/pieces/q/w/w.qoir");
+enum CHESS_PIECE_COLOR {
+  CHESS_PIECE_COLOR_WHITE,
+  CHESS_PIECE_COLOR_BLACK,
+  CHESS_PIECE_COLORS_QTY,
+};
+enum CHESS_PIECE_TYPE {
+  CHESS_PIECE_TYPE_ROOK,
+  CHESS_PIECE_TYPE_QUEEN,
+  CHESS_PIECE_TYPES_QTY,
+};
+struct chess_piece_t;
+struct chess_piece_t *__chess_get_piece_at_position(int x, int y);
+static struct chess_piece_t {
+  enum CHESS_PIECE_TYPE type;
+  enum CHESS_PIECE_COLOR color;
+  struct {
+    int x, y;
+  } position;
+  struct {
+    unsigned char *buf; 
+    size_t (^len)(void); 
+  } qoir;
+} chess_pieces[CHESS_PIECE_COLORS_QTY][CHESS_PIECE_TYPES_QTY] = {
+  [CHESS_PIECE_COLOR_WHITE] = {
+    [CHESS_PIECE_TYPE_QUEEN] = {
+      .qoir={
+        .buf=gchess_piece_queen_white_qoirData,
+        .len=^size_t(void){return gchess_piece_queen_white_qoirSize;},
+      },
+    },
+    [CHESS_PIECE_TYPE_ROOK] = {
+      .qoir={
+        .buf=gchess_piece_rook_white_qoirData,
+        .len=^size_t(void){return gchess_piece_rook_white_qoirSize;},
+      },
+    },
+  },
+  [CHESS_PIECE_COLOR_BLACK] = {
+    [CHESS_PIECE_TYPE_QUEEN] = {
+      .qoir={
+        .buf=gchess_piece_queen_black_qoirData,
+        .len=^size_t(void){return gchess_piece_queen_black_qoirSize;},
+      },
+    },
+    [CHESS_PIECE_TYPE_ROOK] = {
+      .qoir={
+        .buf=gchess_piece_rook_black_qoirData,
+        .len=^size_t(void){return gchess_piece_rook_black_qoirSize;},
+      },
+    },
+  },
+};
+
+bool __chess_sdl_fen_load(const char *fen) {
+  require(chess)->fen->cur=calloc(1,sizeof(struct chess_fen_t));
+  Di(require(chess)->fen->cur->valid);
+  require(chess)->fen->cur->valid=true;
+  Di(require(chess)->fen->cur->valid);
+  Ds(require(chess)->fen->cur->text);
+  asprintf(&(require(chess)->fen->cur->text),"%s",fen);
+  Ds(require(chess)->fen->cur->text);
+  Ds(fen);
+  return(true);
+}
+
+struct chess_piece_t *__chess_get_piece_at_position(int x, int y){
+  for(int c=0;c<CHESS_PIECE_COLORS_QTY;c++)
+    for(int t=0;t<CHESS_PIECE_TYPES_QTY;t++)
+      if(chess_pieces[c][t].position.x==x && chess_pieces[c][t].position.y==y){
+        log_info("found piece match @%dx%d",x,y);
+        return(&(chess_pieces[c][t]));
+      }
+  if(DEBUG_MODE)
+    log_warn("no piece found @%dx%d",x,y);
+  return(0);
+}
+
 #define STOCKFISH_EVALUATE_FEN_FMT    "printf \"position fen %s\\ngo depth %d\" | %s"
 INCTXT(svg_template, "assets/template.svg");
 #define SVG_FILE                      "dia00001.svg"
@@ -177,7 +281,6 @@ void __chessterm(char *fen){
 char **__chess_fen_get_moves(const char **fens, size_t qty, size_t *moves_qty){
   int depth = CHESS_DEFAULT_DEPTH;
 
-  depth = 4;
   char                   *cmd     = stringfn_join(fens, "\n", 0, qty);
   struct StringFNStrings fen_cmds = stringfn_split_lines_and_trim(cmd);
   struct Vector          *cmds_v  = vector_new();
@@ -220,11 +323,22 @@ char **__chess_fen_get_moves(const char **fens, size_t qty, size_t *moves_qty){
   return(vector_to_array(v));
 } /* __chess_fen_get_moves */
 
+char *__chess_fen_get_best(const char *fen){
+  char *b;
+ b= require(chess)->fen->get->player(fen);
+ b= require(chess)->fen->cmd(fen, 10);
+  Ds(fen);
+  Ds(b);
+  return(b);
+
+
+  return(0);
+}
+
 char *__chess_fen_get_move(const char *fen){
   char *move;
   int  depth = CHESS_DEFAULT_DEPTH;
 
-  depth = 4;
   char *res = require(chess)->stockfish->exec(require(chess)->fen->cmd(fen, depth));
 
   if (stringfn_starts_with(res, "bestmove")) {
@@ -234,15 +348,14 @@ char *__chess_fen_get_move(const char *fen){
   return(move);
 }
 
-/*
-
-        Candidate cans[MOVES_PER_POSITION];
-        get_all_moves(&temp_board, cans);
-
- */
+void __chess_get_moves(const char *fen){
+  Board board;
+  load_fen(&board, fen);
+  Candidate cans[MOVES_PER_POSITION];
+ // get_all_moves(&board, cans);
+}
 
 static struct subprocess_s *proc_async;
-
 void __chess_exec_stockfish_async_init(void){
   size_t buf_len = 1024;
   char   *tf, *of, *cmd_file;
@@ -332,7 +445,6 @@ bool __chess_fen_over(const char *fen){
   get_material_scores(&board, &(s[0]), &(s[1]));
   return(is_gameover(&board));
 }
-#define FEN_WORDS_QTY    6
 
 bool __chess_fen_valid(const char *fen){
   if (!fen) return(false);
@@ -383,11 +495,20 @@ bool __chess_fen_is_black_move(const char *fen){
   return(move);
 }
 
+struct chess_fen_t __chess_fen_load(char *fen){
+  return((struct chess_fen_t){
+      .text=fen,
+      .valid=require(chess)->fen->is->valid(fen),
+      .over=require(chess)->fen->is->over(fen),
+      .player=require(chess)->fen->get->player(fen),
+      .best=require(chess)->fen->get->best(fen),
+      });
+}
 char *__chess_fen_stats(char *fen){
   char                *s;
   struct StringBuffer *sb    = stringbuffer_new();
-  int                 LIGHT  = 179;
-  int                 DARK   = 58;
+  int                 L  = 179;
+  int                 D   = 58;
   Board               *board = calloc(1, sizeof(Board));
 
   load_fen(board, fen);
@@ -428,7 +549,7 @@ char *__chess_fen_stats(char *fen){
 
 char *__chess_fen_ansi(char *fen){
   struct StringBuffer *sb = stringbuffer_new();
-  int                 LIGHT = 179, DARK = 58, i;
+  int                 L = 179, D = 58, i;
   Board               *board = calloc(1, sizeof(Board));
 
   load_fen(board, fen);
@@ -508,9 +629,9 @@ char *__chess_fen_ansi(char *fen){
         stringbuffer_append_string(sb, "\e[48;5;12m");
     }else {
       if (!(!(i & 1) ^ !(i & 8)))
-        asprintf(&s, "\e[48;5;%dm", LIGHT);
+        asprintf(&s, "\e[48;5;%dm", L);
       else
-        asprintf(&s, "\e[48;5;%dm", DARK);
+        asprintf(&s, "\e[48;5;%dm", D);
       stringbuffer_append_string(sb, s);
     }
 
@@ -588,8 +709,10 @@ int __chess_init(module(chess) *exports) {
     exports->fen->score->black    = __chess_fen_black_score;
     exports->fen->score->white    = __chess_fen_white_score;
     exports->fen->stats           = __chess_fen_stats;
+    exports->fen->load           = __chess_fen_load;
     exports->fen->cmd             = __chess_render_fen_cmd;
     exports->fen->get->move       = __chess_fen_get_move;
+    exports->fen->get->best       = __chess_fen_get_best;
     exports->fen->get->moves      = __chess_fen_get_moves;
     exports->fen->get->player     = __chess_fen_get_player_to_move;
     exports->fen->image->ansi     = __chess_fen_ansi;
@@ -608,5 +731,301 @@ void __chess_deinit(module(chess) *exports) {
   clib_module_deinit(chess);
 }
 
+////////////////////////////////////////////
+
+int scc(int code){
+		if(code<0){
+      fprintf(stderr, "SDL error: %s\n", SDL_GetError());
+			exit(1);
+		}
+    return code;
+}
+void* scp(void* buf){
+  if(buf == NULL){
+    fprintf(stderr, "SDL error: %s\n", SDL_GetError());
+    exit(1);
+  }
+  return buf;
+}
+
+void sdl_set_color_hex(SDL_Renderer* renderer, Uint32 color_hex){
+  scc(SDL_SetRenderDrawColor(renderer,
+                             (color_hex >> (3*8)) & 0xFF,
+                             (color_hex >> (2*8)) & 0xFF,
+                             (color_hex >> (1*8)) & 0xFF,
+                             (color_hex >> (0*8)) & 0xFF));
+}
+
+void highlight_file(SDL_Renderer* renderer, Uint32 file){
+  for(int i=0; i<8; i++){
+    SDL_Rect mrect;
+    mrect.x=PADDING+100*file;
+    mrect.y=PADDING+100*i;
+    mrect.w=100;
+    mrect.h=100;
+    sdl_set_color_hex(renderer, RED);
+    SDL_RenderFillRect(renderer, &mrect);
+  }
+}
+
+void highlight_col(SDL_Renderer* renderer, Uint32 col){
+  for(int i=0; i<8; i++){
+    SDL_Rect mrect;
+    mrect.x=PADDING+100*i;
+    mrect.y=PADDING+100*(7-col);
+    mrect.w=100;
+    mrect.h=100;
+    sdl_set_color_hex(renderer, RED);
+    SDL_RenderFillRect(renderer, &mrect);
+  }
+}
+
+void highlight_sq(SDL_Renderer* renderer, int mouse_x, int mouse_y){
+  if (mouse_x>PADDING+800 || mouse_y>PADDING+800 || mouse_x<PADDING || mouse_y<PADDING) return;
+  int i=(mouse_x-PADDING)/100;
+  int j=(mouse_y-PADDING)/100;
+  SDL_Rect mrect;
+  mrect.x=PADDING+100*i;
+  mrect.y=PADDING+100*j;
+  mrect.w=100;
+  mrect.h=100;
+  sdl_set_color_hex(renderer, GREEN);
+  SDL_RenderFillRect(renderer, &mrect);
+}
+#define GRID_WIDTH 100
+#define GRID_HEIGHT 100
+void draw_grid(SDL_Renderer* renderer, int nb_cells, int mouse_x, int mouse_y, int mouse_pressed){
+  for(int i=0; i<nb_cells; i++){
+    for(int j=0; j<nb_cells; j++){
+      SDL_Rect myrect;
+      myrect.x=PADDING+GRID_WIDTH*i;
+      myrect.y=PADDING+GRID_HEIGHT*j;
+      myrect.w=GRID_WIDTH;
+      myrect.h=GRID_HEIGHT;
+      if(DEBUG_MODE)
+        log_info("%dx%d|%dx%d|%dx%d",i,j,myrect.x,myrect.y,myrect.w,myrect.h);
+      struct chess_piece_t *p;
+      if((p=__chess_get_piece_at_position(myrect.x,myrect.y))){
+        log_info("got piece!");
+      }
+
+      if((i+j)%2){
+        sdl_set_color_hex(renderer, DARK);
+      }
+      else{
+        sdl_set_color_hex(renderer, LIGHT);
+      }
+      SDL_RenderFillRect(renderer, &myrect);
+    }
+  }
+  if(mouse_pressed) highlight_sq(renderer, mouse_x, mouse_y);
+}
+void __chess_sdl_init(void){
+
+}
+
+void __chess_sdl_loop(void){
+  /*
+  size_t len=chess_pieces[CHESS_PIECE_COLOR_WHITE][CHESS_PIECE_TYPE_ROOK].qoir.len();
+  unsigned char *buf=NULL; qoir_decode_result *decoded=NULL;
+  buf=calloc(len,sizeof(unsigned char *));
+  memcpy(buf,chess_pieces[CHESS_PIECE_COLOR_WHITE][CHESS_PIECE_TYPE_ROOK].qoir.buf,len);
+  Dn(len);
+  decoded=__chess_sdl_decode_qoir(buf,len);
+  Di(decoded->dst_pixbuf.pixcfg.width_in_pixels);
+  Di(decoded->dst_pixbuf.pixcfg.height_in_pixels);
+  */
+  scc(SDL_Init(SDL_INIT_EVERYTHING));
+  SDL_Window* window = scp(SDL_CreateWindow("First Window", 100, 100, SCREEN_WIDTH, SCREEN_HIGHT, SDL_WINDOW_BORDERLESS | SDL_WINDOW_ALWAYS_ON_TOP));
+	SDL_Renderer* renderer = scp(SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED));
+  int mouse_x;
+  int mouse_y;
+  int mouse_pressed=0;
+  int file=8;
+  int col=8;
+
+	int quit=0;
+	while(!quit){
+		SDL_Event event;
+		while(SDL_PollEvent(&event)){
+			switch(event.type){
+      case SDL_MOUSEBUTTONDOWN:{
+        SDL_GetMouseState(&mouse_x, &mouse_y);
+        mouse_pressed=1;
+        printf("mouse coord: %i,%i\n", mouse_x, mouse_y); 
+      } break;
+      case SDL_KEYDOWN:{
+        switch(event.key.keysym.sym){
+        case SDLK_a:
+          file=0;
+          col=8;
+          break;
+        case SDLK_b: {
+  SDL_Surface *s;
+  size_t len=chess_pieces[CHESS_PIECE_COLOR_WHITE][CHESS_PIECE_TYPE_ROOK].qoir.len();
+  unsigned char *buf=NULL; qoir_decode_result *decoded=NULL;
+  buf=calloc(len,sizeof(unsigned char *));
+  memcpy(buf,chess_pieces[CHESS_PIECE_COLOR_WHITE][CHESS_PIECE_TYPE_ROOK].qoir.buf,len);
+  Dn(len);
+  decoded=__chess_sdl_decode_qoir(buf,len);
+  Di(decoded->dst_pixbuf.pixcfg.width_in_pixels);
+  Di(decoded->dst_pixbuf.pixcfg.height_in_pixels);
+  Ds(require(chess)->sdl.fen.text);
+  if((s=__chess_decoded_surface(decoded))){
+    log_info("got surface");
+    SDL_RenderClear(renderer);
+    SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, s);
+    SDL_RenderCopy(renderer, texture, NULL, &s->clip_rect);
+    SDL_DestroyTexture(texture);
+    SDL_RenderPresent(renderer);
+    /*
+    if(!(__chess_sdl_draw(window,s))){
+      log_error("failed to draw surface");
+    }
+    */
+    SDL_FreeSurface(s);
+  }
+          file=1;
+          col=8;
+                    }
+          break;
+        case SDLK_c:
+          file=2;
+          col=8;
+          break;
+        case SDLK_d:
+          file=3;
+          col=8;
+          break;
+        case SDLK_e:
+          file=4;
+          col=8;
+          break;
+        case SDLK_f:
+          file=5;
+          col=8;
+          break;
+        case SDLK_g:
+          file=6;
+          col=8;
+          break;
+        case SDLK_h:
+          file=7;
+          col=8;
+          break;
+        case SDLK_1:
+          col=0;
+          file=8;
+          break;
+        case SDLK_2:
+          col=1;
+          file=8;
+          break;
+        case SDLK_3:
+          col=2;
+          file=8;
+          break;
+        case SDLK_4:
+          col=3;
+          file=8;
+          break;
+        case SDLK_5:
+          col=4;
+          file=8;
+          break;
+        case SDLK_6:
+          col=5;
+          file=8;
+          break;
+        case SDLK_7:
+          col=6;
+          file=8;
+          break;
+        case SDLK_8:
+          col=7;
+          file=8;
+          break;
+        case SDLK_i:
+          file=8;
+          col=8;
+          break;
+        }
+      } break;
+			case SDL_QUIT:{
+		    		quit=1;
+			} break;
+			}
+		}
+    scc(SDL_SetRenderDrawColor(renderer, 18, 18, 18, 255));
+    scc(SDL_RenderClear(renderer));
+    draw_grid(renderer, 8, mouse_x, mouse_y, mouse_pressed);
+    if(file<8) highlight_file(renderer, file);
+    if(col<8) highlight_col(renderer, col);
+		SDL_RenderPresent(renderer);
+	}
+
+	SDL_Quit();
+}
+
+qoir_decode_result *__chess_sdl_decode_qoir(unsigned char *buf, size_t len){
+  qoir_decode_options opts = {0};
+  opts.pixfmt = QOIR_PIXEL_FORMAT__BGRA_PREMUL;
+  qoir_decode_result *decode = calloc(1,sizeof(qoir_decode_result));
+  *decode = qoir_decode(buf, len, &opts);
+  free(buf);
+  buf = NULL;
+  len = 0;
+  if (decode->status_message) {
+    free(decode->owned_memory);
+    fprintf(stderr, "main: load: could not decode file: %s\n",
+            decode->status_message);
+    return NULL;
+  }
+  return(decode);
+}
+
+SDL_Surface *__chess_decoded_surface(qoir_decode_result *decode){
+  uint64_t now = SDL_GetPerformanceCounter();
+
+  uint64_t elapsed = SDL_GetPerformanceCounter() - now;
+  printf("%" PRIu64 " microseconds to decode %s.\n",
+           (elapsed * 1000000) / SDL_GetPerformanceFrequency(),
+           bytes_to_string(decode->dst_pixbuf.stride_in_bytes*decode->dst_pixbuf.pixcfg.height_in_pixels)
+           );
+
+  return SDL_CreateRGBSurfaceFrom(
+      decode->dst_pixbuf.data, decode->dst_pixbuf.pixcfg.width_in_pixels,
+      decode->dst_pixbuf.pixcfg.height_in_pixels, 32,
+      decode->dst_pixbuf.stride_in_bytes,
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+      0x0000FF00, 0x00FF0000, 0xFF000000, 0x000000FF);
+#else
+      0x00FF0000, 0x0000FF00, 0x000000FF, 0xFF000000);
+#endif
+}
+
+bool __chess_sdl_draw(SDL_Window* window,SDL_Surface* surface) {
+  SDL_Surface* ws = SDL_GetWindowSurface(window);
+  if (!ws) {
+    SDL_Renderer* r = SDL_CreateRenderer(window, -1, 0);
+    if (!r) {
+      fprintf(stderr, "main: draw: SDL_CreateRenderer: %s\n", SDL_GetError());
+      return false;
+    }
+    SDL_RenderClear(r);
+    SDL_Texture* texture = SDL_CreateTextureFromSurface(r, surface);
+    SDL_RenderCopy(r, texture, NULL, &surface->clip_rect);
+    SDL_DestroyTexture(texture);
+    SDL_RenderPresent(r);
+    SDL_DestroyRenderer(r);
+    return true;
+  }
+
+  // Use a direct approach.
+  SDL_FillRect(ws, NULL, SDL_MapRGB(ws->format, 0x00, 0x00, 0x00));
+  SDL_BlitSurface(surface, NULL, ws, NULL);
+  SDL_UpdateWindowSurface(window);
+  return true;
+}
 ////////////////////////////////////////////
 #endif

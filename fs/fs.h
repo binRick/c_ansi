@@ -43,6 +43,7 @@ module(fs) {
   bool          (*write_text_file)(char *path, char *data);
   bool          (*write_binary_file)(char *path, unsigned char *data, int len);
   char          *(*which)(const char *name);
+  bool          *(*copy)(const char *src, const char *dst);
 };
 
 int  fs_init(module(fs) * exports);
@@ -56,7 +57,7 @@ exports(fs) {
   .tmpdir    = gettempdir,
   .tmpfile   = __fs_tmpfile,
   .normalize = path_normalize,
-
+  .copy = fsio_copy_file,
   .tmpfile_extension = __fs_tmpfile_extension,
   .tmpdir_extension  = __fs_tmpdir_extension,
   .which             = which,

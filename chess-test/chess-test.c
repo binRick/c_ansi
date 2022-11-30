@@ -237,6 +237,39 @@ TEST t_chess_test_fen_is_move(){
   PASS();
 }
 
+TEST t_chess_test_env_fen(){
+  if(!getenv("FEN"))
+    PASS();
+  char *fen=getenv("FEN");
+  char *move = require(chess)->fen->get->move(fen);
+  char *over = require(chess)->fen->is->over(fen)?"Over":"Not Over";
+  char *player = require(chess)->fen->get->player(fen);
+  Ds(over);
+  Ds(player);
+  Ds(fen);
+  Ds(move);
+
+  PASS();
+}
+TEST t_chess_test_fen_load(){
+  char *fen=lines.strings[0];
+  struct chess_fen_t f = require(chess)->fen->load(fen);
+  Ds(f.text);
+  Ds(f.best);
+  Di(f.valid);
+  Ds(f.player);
+  Di(f.over);
+  PASS();
+}
+TEST t_chess_test_sdl(){
+  char *fen=lines.strings[0];
+  Ds(fen);
+  require(chess)->sdl.init();
+  require(chess)->sdl.fen.load(fen);
+  require(chess)->sdl.loop();
+  PASS();
+}
+
 TEST t_chess_test_chessterm(){
   PASS();
 }
@@ -254,6 +287,9 @@ SUITE(s_chess_test) {
   RUN_TEST(t_chess_test_fen_players);
   RUN_TEST(t_chess_test_fen_scores);
   RUN_TEST(t_chess_test_chessterm);
+  RUN_TEST(t_chess_test_env_fen);
+  RUN_TEST(t_chess_test_fen_load);
+  RUN_TEST(t_chess_test_sdl);
 }
 
 GREATEST_MAIN_DEFS();

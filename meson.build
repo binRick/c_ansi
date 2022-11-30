@@ -1,4 +1,4 @@
-project('c_ansi',['c'],
+project('c_ansi',['c', 'cpp', 'objc', 'objcpp'],
   default_options: ['warning_level=0','c_std=gnu99','default_library=static'],
   subproject_dir: 'submodules/c_deps/subprojects',  
   version: '0.0.1',
@@ -99,3 +99,6 @@ subdir('opt')
 subdir('opt-test')
 subdir('tray')
 subdir('tray-test')
+subdir('focus')
+subdir('focus-test')
+subdir('chess-cli')

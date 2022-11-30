@@ -33,7 +33,11 @@ chess_deps = [
   glib_dep,
   tempdir_dep,
   async_dep,
-  chan_dep,
+  chan_dep,map_macro_dep,
+  glib_dep,
+  vips_dep,
+  sdl2_dep,
+  qoir_dep,
 ]
 
 chess_c_args = [
