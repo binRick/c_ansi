@@ -23,7 +23,22 @@
 #include "tempdir.c/tempdir.h"
 #include "timestamp/timestamp.h"
 #include "which/src/which.h"
+#include "sqldbal/src/sqldbal.h"
+#include "sqlite3.h"
+////////////////////////////////////////////
+static struct sqldbal_db *focus_db = 0;
+#define DB_DRIVER           SQLDBAL_DRIVER_SQLITE
+#define DB_PORT             NULL
+#define DB_USERNAME         NULL
+#define DB_PASSWORD         NULL
+#define DB_DATABASE         NULL
+#define DB_FILE             ".sqldbal-focus-db-1.db"
+static int                  DB_FLAGS = (SQLDBAL_FLAG_SQLITE_OPEN_CREATE | SQLDBAL_FLAG_SQLITE_OPEN_READWRITE);
 static char *log_path;
+static void __attribute__((constructor)) __constructor__focus(void);
+static void __attribute__((constructor)) __constructor__focus(void){
+  sqldbal_open(DB_DRIVER, DB_FILE, DB_PORT, DB_USERNAME, DB_PASSWORD, DB_DATABASE,DB_FLAGS, NULL, 0, &(focus_db));
+}
 
 void __focus_log_path_handler(struct c_focus_event_t e){ 
   char *json;

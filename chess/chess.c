@@ -11,6 +11,16 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "qoir/src/qoir.h"
+#include "sqldbal/src/sqldbal.h"
+#include "sqlite3.h"
+////////////////////////////////////////////
+#define DB_DRIVER           SQLDBAL_DRIVER_SQLITE
+#define DB_PORT             NULL
+#define DB_USERNAME         NULL
+#define DB_PASSWORD         NULL
+#define DB_DATABASE         NULL
+#define DB_FILE             ".sqldbal-chess-db-1.db"
+static int                  DB_FLAGS = (SQLDBAL_FLAG_SQLITE_OPEN_CREATE | SQLDBAL_FLAG_SQLITE_OPEN_READWRITE);
 ////////////////////////////////////////////
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
@@ -68,8 +78,64 @@ enum CHESS_PIECE_TYPE {
   CHESS_PIECE_TYPE_QUEEN,
   CHESS_PIECE_TYPES_QTY,
 };
+
+#define ENGINE_READ  to_engine[0]
+#define CLIENT_WRITE to_engine[1]
+#define CLIENT_READ  from_engine[0]
+#define ENGINE_WRITE from_engine[1]
+static unsigned long __chess_started;
+static chan_t      *engine_chan=0;
+
+void __chess_start_engine(void){
+    if(!engine_chan)
+      engine_chan=chan_init(100);
+    int to_engine[2];
+    int from_engine[2];
+    int result = pipe(to_engine);
+    while (result == -1)
+        result = pipe(to_engine);
+    result = pipe(from_engine);
+    if (result == -1)
+        result = pipe(from_engine);
+    chan_send(engine_chan,(void*)0);
+    chan_send(engine_chan,(void*)0);
+    chan_send(engine_chan,(void*)0);
+    //chan_send(engine_chan,(void*)lines.strings[0]);
+    pid_t child_pid = fork();
+    if (child_pid){
+        close(ENGINE_READ);
+        close(ENGINE_WRITE);
+        send_uci(CLIENT_WRITE);
+        send_isready(CLIENT_WRITE);
+        char* message = get_message(CLIENT_READ);
+        while (!strstr(message, "readyok")){
+            log_info("%d> [WAITING FOR readyok] %s Ready after %s", getpid(), message,milliseconds_to_string(timestamp()-__chess_started));
+            message = get_message(CLIENT_READ);
+        }
+        log_debug("%s\n", message);
+        free(message);
+        void *msg;
+        log_info("waiting for msgs");
+        while(chan_recv(engine_chan,&msg)==0){
+          char *s=(char*)msg;
+          log_info("process msg:%s",s);
+
+        }
+        log_info("ended msgs");
+    }else{
+        dup2(ENGINE_READ,  0);
+        dup2(ENGINE_WRITE, 1);
+
+        close(CLIENT_READ);
+        close(CLIENT_WRITE);
+
+        char* args[] = {which("stockfish"), NULL};
+        execvp(which("stockfish"), args);
+    }
+}
 struct chess_piece_t;
 struct chess_piece_t *__chess_get_piece_at_position(int x, int y);
+static struct sqldbal_db *chess_db = 0;
 static struct chess_piece_t {
   enum CHESS_PIECE_TYPE type;
   enum CHESS_PIECE_COLOR color;
@@ -110,6 +176,10 @@ static struct chess_piece_t {
     },
   },
 };
+
+void __chess_sql_test(void){
+  log_info("sql test");
+}
 
 bool __chess_sdl_fen_load(const char *fen) {
   require(chess)->fen->cur=calloc(1,sizeof(struct chess_fen_t));
@@ -322,7 +392,11 @@ char **__chess_fen_get_moves(const char **fens, size_t qty, size_t *moves_qty){
   *moves_qty = vector_size(v);
   return(vector_to_array(v));
 } /* __chess_fen_get_moves */
-
+static void __attribute__((constructor)) __constructor__chess(void);
+static void __attribute__((constructor)) __constructor__chess(void){
+__chess_started=timestamp();
+  chess_db=sqldbal_open(DB_DRIVER, DB_FILE, DB_PORT, DB_USERNAME, DB_PASSWORD, DB_DATABASE,DB_FLAGS, NULL, 0, &(chess_db));
+}
 char *__chess_fen_get_best(const char *fen){
   char *b;
  b= require(chess)->fen->get->player(fen);

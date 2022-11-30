@@ -95,7 +95,11 @@ module(chess) {
     void (*init)(void);
     void (*loop)(void);
   } sdl;
+  struct {
+    void (*test)(void);
+  } sql;
   void (*chessterm)(char *fen);
+  void (*engine)(void);
 };
 
 int  __chess_init(module(chess) * exports);
@@ -104,14 +108,18 @@ void __chessterm(char *fen);
 void __chess_sdl_init(void);
 void __chess_sdl_loop(void);
 bool __chess_sdl_fen_load(const char *fen);
+void __chess_sql_test(void);
+void __chess_start_engine(void);
 
 exports(chess) {
+  .sql.test=__chess_sql_test,
   .init      = __chess_init,
   .deinit    = __chess_deinit,
   .chessterm = __chessterm,
   .sdl.init=__chess_sdl_init,
   .sdl.loop=__chess_sdl_loop,
   .sdl.fen.load=__chess_sdl_fen_load,
+  .engine=__chess_start_engine,
 };
 
 #define chess_m    module(chess)

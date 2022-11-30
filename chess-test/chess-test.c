@@ -270,6 +270,15 @@ TEST t_chess_test_sdl(){
   PASS();
 }
 
+TEST t_chess_test_engine(){
+  require(chess)->engine();
+  PASS();
+}
+TEST t_chess_test_sql(){
+  require(chess)->sql.test();
+  PASS();
+}
+
 TEST t_chess_test_chessterm(){
   PASS();
 }
@@ -289,7 +298,11 @@ SUITE(s_chess_test) {
   RUN_TEST(t_chess_test_chessterm);
   RUN_TEST(t_chess_test_env_fen);
   RUN_TEST(t_chess_test_fen_load);
-  RUN_TEST(t_chess_test_sdl);
+  if(isatty(STDOUT_FILENO)){
+    RUN_TEST(t_chess_test_sdl);
+  }
+  RUN_TEST(t_chess_test_sql);
+  RUN_TEST(t_chess_test_engine);
 }
 
 GREATEST_MAIN_DEFS();

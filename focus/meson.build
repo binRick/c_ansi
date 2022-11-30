@@ -24,6 +24,7 @@ focus_deps = [
   timestamp_dep,
   log_dep,
   ms_dep,
+  sqldbal_dep,sqlite3_dep,
   bytes_dep,
   c_focus_dep,
 ]

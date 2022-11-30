@@ -38,6 +38,8 @@ chess_deps = [
   vips_dep,
   sdl2_dep,
   qoir_dep,
+  sqlite3_dep,
+  sqldbal_dep,
 ]
 
 chess_c_args = [
